@@ -20,10 +20,11 @@ function FirstSpawn( ply )
 	ply:SetNetworkedBool("Muted", 0)
 	ply:SetNetworkedBool("Cloaked", 0)
 	ply:SetNetworkedBool("Frozen", 0)
+	ply:SendLua("na_playernocollide = " .. na_playernocollide)
+	ply:SendLua("hostname = \"" .. GetGlobalString("ServerName") .. "\"")
 	
 	//Welcome player
 	SendNotify(ply, "Welcome on " .. GetGlobalString("ServerName") .. "!")
-	ply:SendLua("hostname = \"" .. GetGlobalString("ServerName") .. "\"")
 end
 hook.Add( "PlayerInitialSpawn", "playerInitialSpawn", FirstSpawn );
 
@@ -286,7 +287,7 @@ concommand.Add( "NA_TeleToMe", NA_TeleToMe )
 
 //Freeze
 function NA_Freeze( player, command, arguments )
-	if player:IsAdmin() or player:IsSuperAdmin() or player:IsSuperAdmin() then
+	if player:IsAdmin() or player:IsSuperAdmin() then
 		if GetPlayerbyNick( arguments[1] ) ~= nil then
 			if tonumber(arguments[2]) == 1 then
 				SayToAll(player:Nick() .. " has frozen " .. arguments[1])
@@ -302,9 +303,35 @@ concommand.Add( "NA_Freeze", NA_Freeze )
 
 //Set hostname
 function NA_Hostname( player, command, arguments )
-	if player:IsAdmin() or player:IsSuperAdmin() or player:IsSuperAdmin() or player:IsSuperAdmin() then
+	if player:IsAdmin() or player:IsSuperAdmin() then
 		RunConsoleCommand("hostname", arguments[1])
 		player:SendLua("hostname = \"" .. GetGlobalString("ServerName") .. "\"")
 	end
 end
 concommand.Add( "NA_Hostname", NA_Hostname )
+
+function SendLuaToAll( lua )
+	for k, v in pairs(player.GetAll()) do
+		v:SendLua(lua)
+	end
+end
+
+//Set no-collide setting
+function NA_Nocollide( ply, command, arguments )
+	if ply:IsAdmin() or ply:IsSuperAdmin() then
+		//Set option
+		na_playernocollide = tonumber(arguments[1])
+		for k, v in pairs(player.GetAll()) do
+			if na_playernocollide == 1 then
+				v:SetCollisionGroup(COLLISION_GROUP_WEAPON)
+			else
+				v:SetCollisionGroup(COLLISION_GROUP_PLAYER)
+			end
+		end
+		
+		//Notify
+		SendNotify(ply, "Variable 'playernocollide' has been set to '" .. arguments[1] .. "'")
+		SendLuaToAll("na_playernocollide = " .. arguments[1])
+	end
+end
+concommand.Add( "NA_Nocollide", NA_Nocollide )

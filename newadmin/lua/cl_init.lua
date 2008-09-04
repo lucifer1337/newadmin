@@ -409,7 +409,25 @@ function CreateServerTab()
 	SetHostname:SetSize( 100, 20 )
 	SetHostname.DoClick = function ()
 		RunConsoleCommand("NA_Hostname", Hostname:GetValue())
-	end 
+	end
+	
+	//No-collide players
+	CheckBoxSvNocollide = vgui.Create( "DCheckBoxLabel", TabServer )
+	CheckBoxSvNocollide:SetPos( 5,  40)
+	CheckBoxSvNocollide:SetText( "No-collide players" )
+	CheckBoxSvNocollide:SetValue( na_playernocollide )
+	CheckBoxSvNocollide:SizeToContents()
+	CheckBoxSvNocollide.OnChange = function ()
+		if CheckBoxSvNocollide:GetChecked() == true then
+			checkval = 1
+		else
+			checkval = 0
+		end
+		
+		if checkval ~= na_playernocollide then	
+			RunConsoleCommand("NA_Nocollide", checkval)
+		end
+	end
 end
 
 function CreateGamemodeTab()
