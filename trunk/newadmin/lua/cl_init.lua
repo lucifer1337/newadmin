@@ -6,6 +6,8 @@ PlayerAway = ""
 
 //HUD
 function DrawHud()
+	if newadmin == 1 then
+	
 	//Blind?
 	if tonumber(Blind) == 1 then
 		surface.SetDrawColor( 255, 255, 255, 255 )
@@ -42,6 +44,8 @@ function DrawHud()
 				draw.DrawText( v:Nick() , "ScoreboardText", pos.x, pos.y, Color(255, 255, 255, transparency), 1)
 			end
 		end
+	end
+	
 	end
 end
 hook.Add("HUDPaint", "HUD_TEST", DrawHud)

@@ -34,6 +34,7 @@ function FirstSpawn( ply )
 	ply:SetNetworkedBool("Frozen", 0)
 	ply:SendLua("na_playernocollide = " .. na_playernocollide)
 	ply:SendLua("hostname = \"" .. GetGlobalString("ServerName") .. "\"")
+	ply:SendLua("newadmin = 1")
 	
 	//Welcome player
 	SendNotify(ply, "Welcome on " .. GetGlobalString("ServerName") .. "!")
