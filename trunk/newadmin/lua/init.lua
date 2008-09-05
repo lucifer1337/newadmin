@@ -10,9 +10,21 @@ function ShowAdmin( ply, command, arguments )
 end
 concommand.Add( "NA_Show", ShowAdmin )
 
+//Recollide when for example a player joins
+function ReCollide()
+	for k, v in pairs(player.GetAll()) do
+		if na_playernocollide == 1 then
+			v:SetCollisionGroup(COLLISION_GROUP_WEAPON)
+		else
+			v:SetCollisionGroup(COLLISION_GROUP_PLAYER)
+		end
+	end
+end
+
 //Fix for some reason nescesarry to start cl_init.lua on the client
 function FirstSpawn( ply )
 	ply:SendLua("include(\"cl_init.lua\")")
+	ReCollide()
 	
 	//Privileges/Info
 	ply:SetNetworkedBool("Blinded", 0)
@@ -39,6 +51,7 @@ function playerRespawn( ply )
 	end
 	
 	//If you die you are automatically extinguished
+	ReCollide()
 	ply:Extinguish()
 	ply:SetNetworkedBool("Ignited", 0)
 end
@@ -210,7 +223,7 @@ function NA_Cloak( player, command, arguments )
 	if player:IsAdmin() or player:IsSuperAdmin() then
 		if GetPlayerbyNick( arguments[1] ) ~= nil then
 			if tonumber(arguments[2]) == 1 then
-				GetPlayerbyNick(arguments[1]):SetColor(255, 255, 255, 128)
+				GetPlayerbyNick(arguments[1]):SetColor(255, 255, 255, na_cloakedalpha)
 				GetPlayerbyNick(arguments[1]):SetRenderMode( RENDERMODE_TRANSALPHA )
 				
 				SayToAll(player:Nick() .. " has cloaked " .. arguments[1])
