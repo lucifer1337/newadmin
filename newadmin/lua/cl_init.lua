@@ -2,12 +2,46 @@
 w, h = 700, 430
 PFilter = ""
 Blind = 0
+PlayerAway = ""
 
 //HUD
 function DrawHud()
+	//Blind?
 	if tonumber(Blind) == 1 then
 		surface.SetDrawColor( 255, 255, 255, 255 )
 		surface.DrawRect( 0, 0, ScrW(), ScrH() )
+	end
+	
+	//Draw playernames in hud shamelessly copied from puzzle mod ^^
+	for k, v in pairs(player.GetAll()) do
+		if v:Nick() == LocalPlayer():Nick() then
+		else
+			you = LocalPlayer():GetShootPos()
+			lookat = v:GetShootPos()
+			distance = you:Distance(lookat)
+			
+			//Check if you can see this player
+			local tracedata = {}
+			tracedata.start = you
+			tracedata.endpos = lookat
+			local res = util.TraceLine( tracedata )
+			if res.HitWorld then
+			else
+				//We didn't hit the world, but the player!
+				local pos = v:GetShootPos():ToScreen()
+				
+				//Credits to foszor for this line :)
+				pos.y = pos.y - 75
+				pos.y = pos.y + (75 * (v:GetShootPos():Distance(LocalPlayer():GetShootPos()) / 2048)) * 0.5
+				
+				transparency = 255 * (500/distance)
+				if transparency > 255 then
+					transparency = 255
+				end
+				
+				draw.DrawText( v:Nick() , "ScoreboardText", pos.x, pos.y, Color(255, 255, 255, transparency), 1)
+			end
+		end
 	end
 end
 hook.Add("HUDPaint", "HUD_TEST", DrawHud)
@@ -75,6 +109,10 @@ end
 function GetPlayerbyNick( nick )
 	for k, v in pairs(player.GetAll()) do
 		if v:Nick() == nick then
+			if v:Nick() == PlayerAway then
+				PlayerAway = ""
+			end
+		
 			return v
 		end
 	end
@@ -120,6 +158,10 @@ function CreatePlayerTab()
 		CheckBoxCloak:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Cloaked"))
 		CheckBoxMute:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Muted"))
 		CheckBoxFrozen:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Frozen"))
+		
+		if PlayerAway ~= "" then
+			FillPlayerList()
+		end
 	end
 	
 	//Godmode
@@ -258,6 +300,7 @@ function CreatePlayerTab()
 	cmdKick.DoClick = function ()
 		if ListPlayers:GetSelectedItems()[1] ~= nil then
 			RunConsoleCommand("NA_Kick", ListPlayers:GetSelectedItems()[1]:GetValue())
+			PlayerAway = ListPlayers:GetSelectedItems()[1]:GetValue()
 		end
 	end
 	
@@ -270,6 +313,7 @@ function CreatePlayerTab()
 	cmdBan.DoClick = function ()
 		if ListPlayers:GetSelectedItems()[1] ~= nil and tonumber(BanMinutes:GetValue()) ~= nil then
 			RunConsoleCommand("NA_Ban", ListPlayers:GetSelectedItems()[1]:GetValue(), BanMinutes:GetValue())
+			PlayerAway = ListPlayers:GetSelectedItems()[1]:GetValue()
 		end
 	end
 	BanMinutes = vgui.Create( "DTextEntry", TabPlayers )
@@ -285,6 +329,7 @@ function CreatePlayerTab()
 	cmdBan2.DoClick = function ()
 		if ListPlayers:GetSelectedItems()[1] ~= nil and tonumber(BanMinutes:GetValue()) ~= nil then
 			RunConsoleCommand("NA_Ban", ListPlayers:GetSelectedItems()[1]:GetValue(), BanMinutes:GetValue())
+			PlayerAway = ListPlayers:GetSelectedItems()[1]:GetValue()
 		end
 	end
 	
@@ -297,6 +342,7 @@ function CreatePlayerTab()
 	cmdPermaban.DoClick = function ()
 		if ListPlayers:GetSelectedItems()[1] ~= nil then
 			RunConsoleCommand("NA_Ban", ListPlayers:GetSelectedItems()[1]:GetValue(), 0)
+			FillPlayerList()
 		end
 	end
 	
