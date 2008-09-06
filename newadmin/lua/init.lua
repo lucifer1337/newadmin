@@ -1,6 +1,10 @@
 AddCSLuaFile("cl_init.lua")
 include("settings.lua")
 
+na_godmode = server_settings.Int( "sbox_godmode", 0 )
+na_noclip = server_settings.Int( "sbox_noclip", 0 )
+na_playernocollide = 0
+
 function ShowAdmin( ply, command, arguments )
 	if ply:IsAdmin() or ply:IsSuperAdmin() then
 		umsg.Start("adminmenu", ply)
@@ -33,6 +37,8 @@ function FirstSpawn( ply )
 	ply:SetNetworkedBool("Cloaked", 0)
 	ply:SetNetworkedBool("Frozen", 0)
 	ply:SendLua("na_playernocollide = " .. na_playernocollide)
+	ply:SendLua("na_godmode = " .. na_godmode)
+	ply:SendLua("na_noclip = " .. na_noclip)
 	ply:SendLua("hostname = \"" .. GetGlobalString("ServerName") .. "\"")
 	ply:SendLua("newadmin = 1")
 	
@@ -344,8 +350,40 @@ function NA_Nocollide( ply, command, arguments )
 		end
 		
 		//Notify
-		SendNotify(ply, "Variable 'playernocollide' has been set to '" .. arguments[1] .. "'")
+		SendNotify(ply, "Variable 'playernocollide' has been set to '" .. math.floor(arguments[1]) .. "'")
 		SendLuaToAll("na_playernocollide = " .. arguments[1])
 	end
 end
 concommand.Add( "NA_Nocollide", NA_Nocollide )
+
+//Set godmode value
+function NA_Godmode( ply, command, arguments )
+	if ply:IsAdmin() or ply:IsSuperAdmin() then
+		//Set option
+		na_playernocollide = tonumber(arguments[1])
+		game.ConsoleCommand("sbox_godmode " .. math.floor(arguments[1]) .. "\n")
+		
+		//Notify
+		SendNotify(ply, "Variable 'sbox_godmode' has been set to '" .. math.floor(arguments[1]) .. "'")
+		SendLuaToAll("na_godmode = " .. arguments[1])
+	end
+end
+concommand.Add( "NA_Godmode", NA_Godmode )
+
+//Set noclip value
+function NA_Noclip( ply, command, arguments )
+	if ply:IsAdmin() or ply:IsSuperAdmin() then
+		//Set option
+		na_playernocollide = tonumber(arguments[1])
+		game.ConsoleCommand("sbox_noclip ".. math.floor(arguments[1]) .."\n")
+		
+		//Notify
+		SendNotify(ply, "Variable 'sbox_noclip' has been set to '" .. math.floor(arguments[1]) .. "'")
+		SendLuaToAll("na_noclip = " .. arguments[1])
+	end
+end
+concommand.Add( "NA_Noclip", NA_Noclip )
+
+Msg("\n=================================================\n")
+Msg("\nNewAdmin has been succesfully loaded serverside!\n")
+Msg("\n=================================================\n\n")
