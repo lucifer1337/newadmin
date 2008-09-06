@@ -478,6 +478,42 @@ function CreateServerTab()
 			RunConsoleCommand("NA_Nocollide", checkval)
 		end
 	end
+	
+	//Serverwide godmode
+	CheckBoxSvGodmode = vgui.Create( "DCheckBoxLabel", TabServer )
+	CheckBoxSvGodmode:SetPos( 5,  65)
+	CheckBoxSvGodmode:SetText( "Godmode" )
+	CheckBoxSvGodmode:SetValue( na_godmode )
+	CheckBoxSvGodmode:SizeToContents()
+	CheckBoxSvGodmode.OnChange = function ()
+		if CheckBoxSvGodmode:GetChecked() == true then
+			checkval = 1
+		else
+			checkval = 0
+		end
+		
+		if checkval ~= na_godmode then	
+			RunConsoleCommand("NA_Godmode", checkval)
+		end
+	end
+	
+	//Noclip
+	CheckBoxSvNoclip = vgui.Create( "DCheckBoxLabel", TabServer )
+	CheckBoxSvNoclip:SetPos( 5,  90)
+	CheckBoxSvNoclip:SetText( "Noclip" )
+	CheckBoxSvNoclip:SetValue( na_noclip )
+	CheckBoxSvNoclip:SizeToContents()
+	CheckBoxSvNoclip.OnChange = function ()
+		if CheckBoxSvNoclip:GetChecked() == true then
+			checkval = 1
+		else
+			checkval = 0
+		end
+		
+		if checkval ~= na_noclip then	
+			RunConsoleCommand("NA_Noclip", checkval)
+		end
+	end
 end
 
 function CreateGamemodeTab()
