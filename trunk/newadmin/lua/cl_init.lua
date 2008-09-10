@@ -41,6 +41,9 @@ function DrawHud()
 					transparency = 255
 				end
 				
+				//Draw box with name
+				local w, h = surface.GetTextSize( v:Nick() )
+				draw.RoundedBox( 8, pos.x-5-(w/2), pos.y-5, w+10, h+10, Color(0, 0, 0, transparency) )
 				draw.DrawText( v:Nick() , "ScoreboardText", pos.x, pos.y, Color(255, 255, 255, transparency), 1)
 			end
 		end
