@@ -3,6 +3,7 @@ w, h = 700, 430
 PFilter = ""
 Blind = 0
 PlayerAway = ""
+MapList = {}
 
 //HUD
 function DrawHud()
@@ -443,6 +444,15 @@ function CreateServerTab()
 		surface.SetTextColor( 255, 255, 255, 255 )
 		surface.SetTextPos( 5, 8 )
 		surface.DrawText( "Hostname:" )
+		
+		surface.SetTextPos( 5, 38 )
+		surface.DrawText( "Map:" )
+		
+		surface.SetTextPos( 5, 78 )
+		surface.DrawText( "Options:" )
+		
+		surface.SetTextPos( 5, 162 )
+		surface.DrawText( "Messages:" )
 	end
 	
 	//Hostname	
@@ -464,9 +474,31 @@ function CreateServerTab()
 		RunConsoleCommand("NA_Hostname", Hostname:GetValue())
 	end
 	
+	//Map list
+	ListMaps = vgui.Create( "DMultiChoice", TabServer )
+	ListMaps:SetPos( 65, 35 )
+	ListMaps:SetSize( TabServer:GetWide()-170, 20 )
+	ListMaps:SetEditable(false)
+	for k, v in pairs(MapList) do
+		ListMaps:AddChoice(v)
+	end
+	ListMaps:ChooseOptionID(1)
+	
+	local SetMap = vgui.Create( "DButton" )
+	SetMap:SetParent( TabServer )
+	SetMap:SetText( "Change" )
+	SetMap:SetPos( TabServer:GetWide()-100, 35 )
+	SetMap:SetSize( 100, 20 )
+	SetMap.DoClick = function ()
+		if ListMaps.TextEntry:GetValue() ~= nil then
+			RunConsoleCommand("NA_Map", ListMaps.TextEntry:GetValue())
+		end
+	end
+	
+	checkboxoffset = 75
 	//No-collide players
 	CheckBoxSvNocollide = vgui.Create( "DCheckBoxLabel", TabServer )
-	CheckBoxSvNocollide:SetPos( 5,  40)
+	CheckBoxSvNocollide:SetPos( 65,  checkboxoffset)
 	CheckBoxSvNocollide:SetText( "No-collide players" )
 	CheckBoxSvNocollide:SetValue( na_playernocollide )
 	CheckBoxSvNocollide:SizeToContents()
@@ -484,7 +516,7 @@ function CreateServerTab()
 	
 	//Serverwide godmode
 	CheckBoxSvGodmode = vgui.Create( "DCheckBoxLabel", TabServer )
-	CheckBoxSvGodmode:SetPos( 5,  65)
+	CheckBoxSvGodmode:SetPos( 65,  checkboxoffset+25)
 	CheckBoxSvGodmode:SetText( "Godmode" )
 	CheckBoxSvGodmode:SetValue( na_godmode )
 	CheckBoxSvGodmode:SizeToContents()
@@ -502,7 +534,7 @@ function CreateServerTab()
 	
 	//Noclip
 	CheckBoxSvNoclip = vgui.Create( "DCheckBoxLabel", TabServer )
-	CheckBoxSvNoclip:SetPos( 5,  90)
+	CheckBoxSvNoclip:SetPos( 65,  checkboxoffset+50)
 	CheckBoxSvNoclip:SetText( "Noclip" )
 	CheckBoxSvNoclip:SetValue( na_noclip )
 	CheckBoxSvNoclip:SizeToContents()
@@ -517,6 +549,46 @@ function CreateServerTab()
 			RunConsoleCommand("NA_Noclip", checkval)
 		end
 	end
+	
+	//Notifications
+	local lvNotifications = vgui.Create("DListView")
+	lvNotifications:SetParent(TabServer)
+	lvNotifications:SetPos(65, checkboxoffset+85)
+	lvNotifications:SetSize(TabServer:GetWide()-65, 180)
+	lvNotifications:SetMultiSelect(false)
+	cMessage = lvNotifications:AddColumn("Message")
+	cInterval = lvNotifications:AddColumn("Interval (seconds)")
+	cMessage:SetWide(500)
+	cMessage:SetTall(20)
+	cInterval:SetWide(100)
+	cInterval:SetTall(20)
+	
+	local Message = vgui.Create( "DTextEntry", TabServer )
+	Message:SetPos( 65, checkboxoffset+269 )
+	Message:SetTall( 20 )
+	Message:SetWide( TabServer:GetWide()-65-50-100-10 )
+	Message:SetEnterAllowed( true )
+	
+	local Interval = vgui.Create( "DTextEntry", TabServer )
+	Interval:SetPos( TabServer:GetWide()-155, checkboxoffset+269 )
+	Interval:SetTall( 20 )
+	Interval:SetWide( 50 )
+	Interval:SetValue(60)
+	Interval:SetEnterAllowed( true )
+	
+	local AddMessage = vgui.Create( "DButton" )
+	AddMessage:SetParent( TabServer )
+	AddMessage:SetText( "Add" )
+	AddMessage:SetPos( TabServer:GetWide()-100, checkboxoffset+269 )
+	AddMessage:SetSize( 100, 20 )
+	AddMessage.DoClick = function ()
+		//Console command here
+	end
+end
+
+function AddMap(name)
+	//Add map to maplist
+	table.insert(MapList, name)
 end
 
 function CreateGamemodeTab()
