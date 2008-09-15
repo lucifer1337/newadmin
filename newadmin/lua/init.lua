@@ -4,6 +4,7 @@ include("settings.lua")
 na_godmode = server_settings.Int( "sbox_godmode", 0 )
 na_noclip = server_settings.Int( "sbox_noclip", 0 )
 na_playernocollide = 0
+na_cheats = server_settings.Int( "sv_cheats", 0)
 
 function ShowAdmin( ply, command, arguments )
 	if ply:IsAdmin() or ply:IsSuperAdmin() then
@@ -17,7 +18,7 @@ concommand.Add( "NA_Show", ShowAdmin )
 //Recollide when for example a player joins
 function ReCollide()
 	for k, v in pairs(player.GetAll()) do
-		if na_playernocollide == 1 then
+		if tonumber(na_playernocollide) == 1 then
 			v:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 		else
 			v:SetCollisionGroup(COLLISION_GROUP_PLAYER)
@@ -39,8 +40,15 @@ function FirstSpawn( ply )
 	ply:SendLua("na_playernocollide = " .. na_playernocollide)
 	ply:SendLua("na_godmode = " .. na_godmode)
 	ply:SendLua("na_noclip = " .. na_noclip)
+	ply:SendLua("na_cheats = " .. na_cheats)
 	ply:SendLua("hostname = \"" .. GetGlobalString("ServerName") .. "\"")
 	ply:SendLua("newadmin = 1")
+	
+	//Send map list
+	local Maps = file.Find("../maps/*.bsp")
+	for k, v in pairs(Maps) do
+		ply:SendLua("AddMap(\"" .. string.Replace(v, ".bsp", "") .. "\")")
+	end
 	
 	//Welcome player
 	SendNotify(ply, "Welcome on " .. GetGlobalString("ServerName") .. "!")
@@ -326,9 +334,18 @@ function NA_Hostname( player, command, arguments )
 	if player:IsAdmin() or player:IsSuperAdmin() then
 		RunConsoleCommand("hostname", arguments[1])
 		player:SendLua("hostname = \"" .. GetGlobalString("ServerName") .. "\"")
+		SendNotify(player, "The hostname has been changed succesfully!")
 	end
 end
 concommand.Add( "NA_Hostname", NA_Hostname )
+
+//Change map
+function NA_Map( player, command, arguments )
+	if player:IsAdmin() or player:IsSuperAdmin() then
+		RunConsoleCommand("changelevel", arguments[1])
+	end
+end
+concommand.Add( "NA_Map", NA_Map )
 
 function SendLuaToAll( lua )
 	for k, v in pairs(player.GetAll()) do
@@ -350,7 +367,7 @@ function NA_Nocollide( ply, command, arguments )
 		end
 		
 		//Notify
-		SendNotify(ply, "Variable 'playernocollide' has been set to '" .. math.floor(arguments[1]) .. "'")
+		SendNotify(ply, "Variable 'na_playernocollide' has been set to '" .. math.floor(arguments[1]) .. "'")
 		SendLuaToAll("na_playernocollide = " .. arguments[1])
 	end
 end
@@ -384,6 +401,7 @@ function NA_Noclip( ply, command, arguments )
 end
 concommand.Add( "NA_Noclip", NA_Noclip )
 
+//Load message
 Msg("\n=================================================\n")
 Msg("\nNewAdmin has been succesfully loaded serverside!\n")
 Msg("\n=================================================\n\n")
