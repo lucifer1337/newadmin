@@ -1,0 +1,10 @@
+"AddonInfo"
+{
+	"name"				"NewAdmin"
+	"version"			"0.1"
+	"author_name"			"Overv"
+	"author_email"			"overv161@gmail.com"
+	"author_url"			"http://www.overvprojects.nl/"
+	"info"				"Advanced Admin Mod"
+	"override"			"0"
+}
