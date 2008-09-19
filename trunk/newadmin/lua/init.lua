@@ -5,6 +5,7 @@ na_godmode = server_settings.Int( "sbox_godmode", 0 )
 na_noclip = server_settings.Int( "sbox_noclip", 0 )
 na_playernocollide = 0
 na_cheats = server_settings.Int( "sv_cheats", 0)
+bantable = {}
 
 function ShowAdmin( ply, command, arguments )
 	if ply:IsAdmin() or ply:IsSuperAdmin() then
@@ -14,6 +15,66 @@ function ShowAdmin( ply, command, arguments )
 	end
 end
 concommand.Add( "NA_Show", ShowAdmin )
+
+function LoadBans()
+	if file.Exists("NewAdmin/bans.txt") then
+		//This loads every line with ban information into a table on the server
+		local banfile = file.Read("NewAdmin/bans.txt")
+		bantable = string.Explode("\n", banfile)
+	end
+end
+
+function SaveBans()
+	//Get all entrys and save them
+	local filetobe = ""
+	for k, v in pairs(bantable) do
+		if v ~= "" and v ~= "\n" then
+			filetobe = filetobe .. v .. "\n"
+		end
+	end
+	
+	file.Write("NewAdmin/bans.txt", filetobe)
+end
+
+//Check if someone is banned
+function CheckBan(ply)
+	if bantable[1] ~= nil then
+		for k, v in pairs(bantable) do
+			if v ~= "" and v ~= "\n" then
+				local pars = string.Explode("[split]", v)
+				
+				//First check if this ban hasn't expired yet
+				pars[3] = string.sub(pars[3], 7)
+				if tonumber(pars[3]) == 0 or tonumber(pars[3]) > os.time() then
+					if string.find(pars[2], ply:SteamID()) then
+						local secsrem = tonumber(pars[3])-os.time()
+						if secsrem < 60 then
+							if secsrem > 0 then
+								time = " " .. secsrem .. " seconds"
+							else
+								time = "ever"
+							end
+						else
+							time = " " .. math.floor(secsrem/60) .. " minutes"
+						end
+					
+						RunConsoleCommand("kickid", ply:UserID(), "Banned for".. time .. "!")
+						Msg("(NEWADMIN) Player \"" .. ply:Nick() .. "\" checked and found entry -> Player kicked! (".. tonumber(pars[3])-os.time() .." seconds remaining)\n")
+						return 
+					end
+				else
+					//Remove this ban, it has expired :)
+					Msg("(NEWADMIN) Ban for \"" .. pars[1] .. "\" has expired. (Now: " .. os.time() .. "; Then: " .. pars[3] .. ")\n")
+					table.remove(bantable, k)
+				end
+			end
+		end
+		Msg("(NEWADMIN) Player \"" .. ply:Nick() .. "\" checked -> No entry found.\n")
+		return 
+	end
+	Msg("(NEWADMIN) Ban check failed -> Empty ban list\n")
+end
+hook.Add( "PlayerInitialSpawn", "CheckBan", CheckBan ) 
 
 //Recollide when for example a player joins
 function ReCollide()
@@ -43,6 +104,7 @@ function FirstSpawn( ply )
 	ply:SendLua("na_cheats = " .. na_cheats)
 	ply:SendLua("hostname = \"" .. GetGlobalString("ServerName") .. "\"")
 	ply:SendLua("newadmin = 1")
+	ply:SendLua("CurrentMap = \"" .. game.GetMap() .. "\"")
 	
 	//Send map list
 	local Maps = file.Find("../maps/*.bsp")
@@ -111,12 +173,18 @@ concommand.Add( "NA_Kick", NA_Kick )
 function NA_Ban( player, command, arguments )
 	if player:IsAdmin() or player:IsSuperAdmin() then
 		if GetPlayerbyNick( arguments[1] ) ~= nil then
-			RunConsoleCommand("addip", arguments[1], GetPlayerbyNick(arguments[1]):IPAddress())
 			if tonumber(arguments[2]) ~= 0 then
 				SayToAll(arguments[1] .. " has been banned by " .. player:Nick() .. " for " .. arguments[2] .. " minutes")
+				RunConsoleCommand("kickid", GetPlayerbyNick(arguments[1]):UserID(), "Banned for " .. arguments[2] .. " minutes!")
+				table.insert(bantable, arguments[1] .. "[split]" .. GetPlayerbyNick(arguments[1]):SteamID() .. "[split]" .. os.time()+(tonumber(arguments[2])*60))
 			else
 				SayToAll(arguments[1] .. " has been permabanned by " .. player:Nick())
+				RunConsoleCommand("kickid", GetPlayerbyNick(arguments[1]):UserID(), "Permabanned!")
+				table.insert(bantable, arguments[1] .. "[split]" .. GetPlayerbyNick(arguments[1]):SteamID() .. "[split]" .. 0)
 			end
+			
+			//Add ban entry
+			SaveBans()
 		end
 	end
 end
@@ -401,7 +469,9 @@ function NA_Noclip( ply, command, arguments )
 end
 concommand.Add( "NA_Noclip", NA_Noclip )
 
+LoadBans()
 //Load message
 Msg("\n=================================================\n")
 Msg("\nNewAdmin has been succesfully loaded serverside!\n")
+Msg("\nLoaded " .. table.Count(bantable) .. " bans.\n")
 Msg("\n=================================================\n\n")
