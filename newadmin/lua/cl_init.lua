@@ -479,10 +479,15 @@ function CreateServerTab()
 	ListMaps:SetPos( 65, 35 )
 	ListMaps:SetSize( TabServer:GetWide()-170, 20 )
 	ListMaps:SetEditable(false)
+	local curmap = 1
 	for k, v in pairs(MapList) do
 		ListMaps:AddChoice(v)
+		
+		if v == CurrentMap then
+			curmap = k
+		end
 	end
-	ListMaps:ChooseOptionID(1)
+	ListMaps:ChooseOptionID(curmap)
 	
 	local SetMap = vgui.Create( "DButton" )
 	SetMap:SetParent( TabServer )
@@ -610,5 +615,33 @@ function CreateBanListTab()
 	TabBans.Paint = function()
 		surface.SetDrawColor( 171, 171, 171, 255 )
 		surface.DrawRect( 0, 0, TabBans:GetWide(), TabBans:GetTall() )
+	end
+	
+	//Ban list
+	local lvBans = vgui.Create("DListView")
+	lvBans:SetParent(TabBans)
+	lvBans:SetPos(0, 0)
+	lvBans:SetSize(TabBans:GetWide(), 339)
+	lvBans:SetMultiSelect(false)
+	
+	local cNick = lvBans:AddColumn("Nickname")
+	local cSteamID = lvBans:AddColumn("SteamID")
+	local cReason = lvBans:AddColumn("Reason")
+	local cUnban = lvBans:AddColumn("Unban")
+	
+	cNick:SetWide(200)
+	cSteamID:SetWide(100)
+	cUnban:SetWide(100)
+	cReason:SetWide(200)
+	
+	//Filter textbox
+	BanFilter = vgui.Create( "DTextEntry", TabBans )
+	BanFilter:SetPos( 0, 344 )
+	BanFilter:SetTall( 20 )
+	BanFilter:SetWide( TabBans:GetWide() )
+	BanFilter:SetEnterAllowed( true )
+	BanFilter.OnTextChanged = function()
+		BFilter = BanFilter:GetValue()
+		FillBanList()
 	end
 end
