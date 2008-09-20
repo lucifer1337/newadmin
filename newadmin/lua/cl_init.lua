@@ -309,35 +309,41 @@ function CreatePlayerTab()
 		if ListPlayers:GetSelectedItems()[1] ~= nil then
 			RunConsoleCommand("NA_Kick", ListPlayers:GetSelectedItems()[1]:GetValue())
 			PlayerAway = ListPlayers:GetSelectedItems()[1]:GetValue()
+			FillPlayerList()
 		end
 	end
 	
 	//Ban for a certain amount of seconds
-	cmdBan = vgui.Create( "DButton" )
-	cmdBan:SetParent( TabPlayers )
-	cmdBan:SetText( "Ban for" )
-	cmdBan:SetPos( controlx, 25 )
-	cmdBan:SetSize( 50, 20 )
-	cmdBan.DoClick = function ()
-		if ListPlayers:GetSelectedItems()[1] ~= nil and tonumber(BanMinutes:GetValue()) ~= nil then
-			RunConsoleCommand("NA_Ban", ListPlayers:GetSelectedItems()[1]:GetValue(), BanMinutes:GetValue())
-			PlayerAway = ListPlayers:GetSelectedItems()[1]:GetValue()
-		end
-	end
-	BanMinutes = vgui.Create( "DTextEntry", TabPlayers )
-	BanMinutes:SetPos( controlx+55, 25 )
-	BanMinutes:SetTall( 20 )
-	BanMinutes:SetWide( 50 )
-	BanMinutes:SetEnterAllowed( true )
+	ListBTimes = vgui.Create( "DMultiChoice", TabPlayers )
+	ListBTimes:SetPos( controlx, 25 )
+	ListBTimes:SetSize( 105, 20 )
+	ListBTimes:SetEditable(false)
+	//Add ban times
+	ListBTimes:AddChoice("5 Minutes")
+	ListBTimes:AddChoice("15 Minutes")
+	ListBTimes:AddChoice("30 Minutes")
+	ListBTimes:AddChoice("1 Hour")
+	ListBTimes:AddChoice("2 Hours")
+	ListBTimes:AddChoice("6 Hours")
+	ListBTimes:AddChoice("1 Day")
+	ListBTimes:AddChoice("2 Days")
+	ListBTimes:AddChoice("7 Days")
+	ListBTimes:AddChoice("1 Month")
+	ListBTimes:AddChoice("6 Months")
+	ListBTimes:AddChoice("1 Year")
+	ListBTimes:ChooseOptionID(1)
+	
+	
 	cmdBan2 = vgui.Create( "DButton" )
 	cmdBan2:SetParent( TabPlayers )
-	cmdBan2:SetText( "minutes" )
+	cmdBan2:SetText( "Ban" )
 	cmdBan2:SetPos( controlx+110, 25 )
 	cmdBan2:SetSize( 65, 20 )
 	cmdBan2.DoClick = function ()
-		if ListPlayers:GetSelectedItems()[1] ~= nil and tonumber(BanMinutes:GetValue()) ~= nil then
-			RunConsoleCommand("NA_Ban", ListPlayers:GetSelectedItems()[1]:GetValue(), BanMinutes:GetValue())
+		if ListPlayers:GetSelectedItems()[1] ~= nil then
+			RunConsoleCommand("NA_Ban", ListPlayers:GetSelectedItems()[1]:GetValue(), ListBTimes.TextEntry:GetValue())
 			PlayerAway = ListPlayers:GetSelectedItems()[1]:GetValue()
+			FillPlayerList()
 		end
 	end
 	

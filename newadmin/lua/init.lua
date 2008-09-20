@@ -174,9 +174,39 @@ function NA_Ban( player, command, arguments )
 	if player:IsAdmin() or player:IsSuperAdmin() then
 		if GetPlayerbyNick( arguments[1] ) ~= nil then
 			if tonumber(arguments[2]) ~= 0 then
-				SayToAll(arguments[1] .. " has been banned by " .. player:Nick() .. " for " .. arguments[2] .. " minutes")
-				RunConsoleCommand("kickid", GetPlayerbyNick(arguments[1]):UserID(), "Banned for " .. arguments[2] .. " minutes!")
-				table.insert(bantable, arguments[1] .. "[split]" .. GetPlayerbyNick(arguments[1]):SteamID() .. "[split]" .. os.time()+(tonumber(arguments[2])*60))
+				//First convert the text values to seconds
+				local bantime = 0
+				if arguments[2] == "5 Minutes" then
+					bantime = 300
+				elseif arguments[2] == "15 Minutes" then
+					bantime = 900
+				elseif arguments[2] == "30 Minutes" then
+					bantime = 1800
+				elseif arguments[2] == "1 Hour" then
+					bantime = 3600
+				elseif arguments[2] == "2 Hours" then
+					bantime = 7200
+				elseif arguments[2] == "6 Hours" then
+					bantime = 21600
+				elseif arguments[2] == "1 Day" then
+					bantime = 86400
+				elseif arguments[2] == "2 Days" then
+					bantime = 172800
+				elseif arguments[2] == "7 Days" then
+					bantime = 604800
+				elseif arguments[2] == "1 Month" then
+					bantime = 2592000
+				elseif arguments[2] == "6 Months" then
+					bantime = 15552000
+				elseif arguments[2] == "1 Year" then
+					bantime = 31104000
+				else
+					bantime = 1
+				end
+			
+				SayToAll(arguments[1] .. " has been banned by " .. player:Nick() .. " for " .. arguments[2])
+				RunConsoleCommand("kickid", GetPlayerbyNick(arguments[1]):UserID(), "Banned for " .. arguments[2] .. "!")
+				table.insert(bantable, arguments[1] .. "[split]" .. GetPlayerbyNick(arguments[1]):SteamID() .. "[split]" .. os.time()+bantime)
 			else
 				SayToAll(arguments[1] .. " has been permabanned by " .. player:Nick())
 				RunConsoleCommand("kickid", GetPlayerbyNick(arguments[1]):UserID(), "Permabanned!")
