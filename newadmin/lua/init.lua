@@ -14,13 +14,25 @@ function ShowAdmin( ply, command, arguments )
 		umsg.End()
 	end
 end
-concommand.Add( "NA_Show", ShowAdmin )
+concommand.Add( "+NA_Show", ShowAdmin )
 
 function LoadBans()
 	if file.Exists("NewAdmin/bans.txt") then
 		//This loads every line with ban information into a table on the server
 		local banfile = file.Read("NewAdmin/bans.txt")
 		bantable = string.Explode("\n", banfile)
+	end
+	
+	for k, v in pairs(player.GetAll()) do
+		SendBans( v )
+	end
+end
+
+function SendBans( ply )
+	ply:SendLua("GetBans(\"RESET\")")
+	
+	for k, v in pairs(bantable) do
+		ply:SendLua("GetBans(\"".. v .."\")")
 	end
 end
 
@@ -66,6 +78,7 @@ function CheckBan(ply)
 					//Remove this ban, it has expired :)
 					Msg("(NEWADMIN) Ban for \"" .. pars[1] .. "\" has expired. (Now: " .. os.time() .. "; Then: " .. pars[3] .. ")\n")
 					table.remove(bantable, k)
+					SaveBans()
 				end
 			end
 		end
@@ -105,6 +118,9 @@ function FirstSpawn( ply )
 	ply:SendLua("hostname = \"" .. GetGlobalString("ServerName") .. "\"")
 	ply:SendLua("newadmin = 1")
 	ply:SendLua("CurrentMap = \"" .. game.GetMap() .. "\"")
+	
+	SendBans(ply)
+	Msg("Sent the ban list to " .. ply:Nick() .. "\n")
 	
 	//Send map list
 	local Maps = file.Find("../maps/*.bsp")
@@ -152,9 +168,13 @@ function GetPlayerbyNick( nick )
 	return nil
 end
 
-function SayToAll(message)
+function SayToAll(message, noadminflag)
 	for k, v in pairs(player.GetAll()) do
-		v:PrintMessage(HUD_PRINTTALK, "(ADMIN) " .. message)
+		if noadminflag == true then
+			v:PrintMessage(HUD_PRINTTALK, message)
+		else
+			v:PrintMessage(HUD_PRINTTALK, "(ADMIN) " .. message)
+		end
 	end
 end
 
@@ -171,11 +191,11 @@ concommand.Add( "NA_Kick", NA_Kick )
 
 //Ban
 function NA_Ban( player, command, arguments )
-	if player:IsAdmin() or player:IsSuperAdmin() then
+	if player:IsSuperAdmin() then
 		if GetPlayerbyNick( arguments[1] ) ~= nil then
 			if tonumber(arguments[2]) ~= 0 then
 				//First convert the text values to seconds
-				local bantime = 0
+				local bantime = arguments[2]
 				if arguments[2] == "5 Minutes" then
 					bantime = 300
 				elseif arguments[2] == "15 Minutes" then
@@ -200,6 +220,16 @@ function NA_Ban( player, command, arguments )
 					bantime = 15552000
 				elseif arguments[2] == "1 Year" then
 					bantime = 31104000
+				elseif tonumber(arguments[2]) ~= nil then
+					if tonumber(arguments[2]) < 60 then
+						if tonumber(arguments[2]) > 0 then
+							arguments[2] = arguments[2] .. " Seconds"
+						else
+							arguments[2] = "ever"
+						end
+					else
+						arguments[2] = math.floor(tonumber(arguments[2])/60) .. " Minutes"
+					end
 				else
 					bantime = 1
 				end
@@ -215,38 +245,59 @@ function NA_Ban( player, command, arguments )
 			
 			//Add ban entry
 			SaveBans()
+			for k, v in pairs(player.GetAll()) do
+				SendBans(v)
+			end
 		end
 	end
 end
 concommand.Add( "NA_Ban", NA_Ban ) 
 
-//Kill
-function NA_Kill( player, command, arguments )
+//Explode
+function NA_Explode( player, command, arguments )
 	if player:IsAdmin() or player:IsSuperAdmin() then
 		if GetPlayerbyNick( arguments[1] ) ~= nil then
-			GetPlayerbyNick(arguments[1]):Kill()
-			SayToAll(arguments[1] .. " has been killed by " .. player:Nick())
+			//Create explosive and explode it
+			local explosive = ents.Create( "env_explosion" )
+			explosive:SetPos( GetPlayerbyNick( arguments[1] ):GetPos() )
+			explosive:SetOwner( GetPlayerbyNick(arguments[1]) )
+			explosive:Spawn()
+			explosive:SetKeyValue( "iMagnitude", "1" )
+			explosive:Fire( "Explode", 0, 0 )
+			explosive:EmitSound( "ambient/explosions/explode_4.wav", 500, 500 )
+			GetPlayerbyNick(arguments[1]):Kill( )
+			
+			SayToAll(arguments[1] .. " has been exploded by " .. player:Nick())
 		end
 	end
 end
-concommand.Add( "NA_Kill", NA_Kill ) 
+concommand.Add( "NA_Explode", NA_Explode ) 
 
 //Slay
 function NA_Slay( player, command, arguments )
 	if player:IsAdmin() or player:IsSuperAdmin() then
 		if GetPlayerbyNick( arguments[1] ) ~= nil then
-			GetPlayerbyNick(arguments[1]):TakeDamage(10)
+			GetPlayerbyNick(arguments[1]):Kill()
 			SayToAll(arguments[1] .. " has been slayed by " .. player:Nick())
 		end
 	end
 end
 concommand.Add( "NA_Slay", NA_Slay ) 
 
-//Slay
+//Slap
 function NA_Slap( player, command, arguments )
 	if player:IsAdmin() or player:IsSuperAdmin() then
 		if GetPlayerbyNick( arguments[1] ) ~= nil then
-			GetPlayerbyNick(arguments[1]):ViewPunch( Angle( -5, 0, 0 ) )
+			local prehe = GetPlayerbyNick(arguments[1]):Health()
+			GetPlayerbyNick(arguments[1]):TakeDamage(10)
+			
+			if (prehe == GetPlayerbyNick(arguments[1]):Health()) then
+				GetPlayerbyNick(arguments[1]):SetHealth(GetPlayerbyNick(arguments[1]):Health()-10)
+				if GetPlayerbyNick(arguments[1]):Health() < 1 then
+					GetPlayerbyNick(arguments[1]):Kill()
+				end
+			end
+			
 			SayToAll(arguments[1] .. " has been slapped by " .. player:Nick())
 		end
 	end
@@ -369,15 +420,92 @@ function NA_Mute( player, command, arguments )
 end
 concommand.Add( "NA_Mute", NA_Mute )
 
-//Chat messages
+function HasFlags(ply, flags)
+	local fl = 0
+	
+	if ply:IsAdmin() then fl = 1 end
+	if ply:IsSuperAdmin() then fl = 2 end
+	
+	if fl >= flags then
+		return true
+	else
+		return false
+	end
+end
+
+function GetPlayerByPart( namepart )
+	for k, v in pairs(player.GetAll()) do
+		if string.find(string.lower(v:Nick()), string.lower(namepart)) then
+			return v
+		end
+	end
+	return false
+end
+
+//Chat messages + admin chat commands
 function PlayerSaid( ply, text )
 	if tonumber(ply:GetNetworkedBool("Muted")) == 1 then
+		return ""
+	elseif string.Left(text, 1) == "!" then
+		//Command
+		local handledcom = false
+		
+		if string.Left(text, 4) == "!me " then
+			SayToAll(ply:Nick() .. " " .. string.sub(text, 5), true)
+			handledcom = true
+		elseif string.Left(text, 6) == "!goto " and HasFlags(ply, 1) then
+			local args = string.Explode(" ", string.sub(text, 7))
+			if args[1] ~= nil then
+				local pl = GetPlayerByPart(args[1])
+				if pl ~= false then
+					args[1] = pl:Nick()
+					NA_TeleTo(ply, "", args)
+				end
+			else
+				ply:PrintMessage( HUD_PRINTTALK, "This command requires the playername as argument!")
+			end
+			handledcom = true
+		elseif string.Left(text, 6) == "!kick " and HasFlags(ply, 1) then
+			local args = string.Explode(" ", string.sub(text, 7))
+			if args[1] ~= nil then
+				local pl = GetPlayerByPart(args[1])
+				if pl ~= false then
+					args[1] = pl:Nick()
+					NA_Kick(ply, "", args)
+				end
+			else
+				ply:PrintMessage( HUD_PRINTTALK, "This command requires the playername as argument!")
+			end
+			handledcom = true
+		elseif string.Left(text, 5) == "!ban " and HasFlags(ply, 2) then
+			local args = string.Explode(" ", string.sub(text, 6))
+			if args[1] ~= nil and tonumber(args[2]) ~= nil then
+				local pl = GetPlayerByPart(args[1])
+				if pl ~= false then
+					args[1] = pl:Nick()
+					NA_Ban(ply, "", args)
+				end
+			else
+				ply:PrintMessage( HUD_PRINTTALK, "This command requires the playername and bantime as argument!")
+			end
+			handledcom = true
+		end
+			
+		if handledcom == false then
+			ply:PrintMessage( HUD_PRINTTALK, "Unknown command or unauthorised!")
+		end
+		
 		return ""
 	else
 		return text
 	end
 end
 hook.Add( "PlayerSay", "PlayerSaid", PlayerSaid );
+
+function ReHook()
+	hook.Add( "PlayerSay", "PlayerSaid", PlayerSaid );
+end
+timer.Create("ReHook", 1, 0, ReHook)
 
 //Teleport to other player
 function NA_TeleTo( player, command, arguments )
@@ -498,6 +626,9 @@ function NA_Noclip( ply, command, arguments )
 	end
 end
 concommand.Add( "NA_Noclip", NA_Noclip )
+
+//Reset bans
+concommand.Add( "NA_BanReload", LoadBans )
 
 LoadBans()
 //Load message

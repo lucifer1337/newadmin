@@ -2,8 +2,31 @@
 w, h = 700, 430
 PFilter = ""
 Blind = 0
-PlayerAway = ""
 MapList = {}
+AllowClose = true
+PlayerGone = ""
+bantable = {}
+MenuOpen = false
+
+function GetHeadPos( ply )
+	local BoneIndx = ply:LookupBone("ValveBiped.Bip01_Head1")
+	local BonePos, BoneAng = ply:GetBonePosition( BoneIndx )
+	
+	return BonePos
+end
+
+//Another attempt to block the npc exploit
+CreateClientConVar("npc_create", "0", false, false)
+
+//Get ban list from server
+function GetBans( sentence )
+	if sentence == "RESET" then
+		bantable = nil
+		bantable = {}
+	elseif sentence ~= "" then
+		table.insert(bantable, sentence)
+	end
+end
 
 //HUD
 function DrawHud()
@@ -15,37 +38,41 @@ function DrawHud()
 		surface.DrawRect( 0, 0, ScrW(), ScrH() )
 	end
 	
-	//Draw playernames in hud shamelessly copied from puzzle mod ^^
+	//Draw playernames in hud shamelessly copied from uberHUD
 	for k, v in pairs(player.GetAll()) do
-		if v:Nick() == LocalPlayer():Nick() then
-		else
-			you = LocalPlayer():GetShootPos()
-			lookat = v:GetShootPos()
-			distance = you:Distance(lookat)
+		if v:Nick() ~= LocalPlayer():Nick() then
+			local iHealth = v:Health()
 			
-			//Check if you can see this player
-			local tracedata = {}
-			tracedata.start = you
-			tracedata.endpos = lookat
-			local res = util.TraceLine( tracedata )
-			if res.HitWorld then
-			else
-				//We didn't hit the world, but the player!
-				local pos = v:GetShootPos():ToScreen()
+			if iHealth > 1 then
+					//Get the information
+					local iTeam = team.GetName(v:Team())
+					local iTeamC = team.GetColor(v:Team())
+					local iName = v:Nick()
+					local iDistance = LocalPlayer():GetShootPos():Distance(v:GetShootPos())
 				
-				//Credits to foszor for this line :)
-				pos.y = pos.y - 75
-				pos.y = pos.y + (75 * (v:GetShootPos():Distance(LocalPlayer():GetShootPos()) / 2048)) * 0.5
-				
-				transparency = 255 * (500/distance)
-				if transparency > 255 then
-					transparency = 255
-				end
-				
-				//Draw box with name
-				local w, h = surface.GetTextSize( v:Nick() )
-				draw.RoundedBox( 8, pos.x-5-(w/2), pos.y-5, w+10, h+10, Color(0, 0, 0, transparency) )
-				draw.DrawText( v:Nick() , "ScoreboardText", pos.x, pos.y, Color(255, 255, 255, transparency), 1)
+					//Convert distance to meters
+					iDistance = iDistance * 30.48 / 100 / 16
+					
+					//Display the info
+					local scrpos = v:GetShootPos():ToScreen()
+					scrpos.y = scrpos.y - 75
+					scrpos.y = scrpos.y + (75 * (GetHeadPos(v):Distance(LocalPlayer():GetShootPos()) / 2048)) * 0.5
+					
+					local alpha = 0
+					if iDistance < 200 then
+						alpha = 255
+					elseif iDistance < 2000 then
+						alpha = 255 - (255 * (iDistance-200) / 2200)
+					else
+						alpha = 0
+					end
+					
+					local w, h = surface.GetTextSize( iName )
+					iTeamC.a = alpha
+					draw.DrawText( iName , "ScoreboardText", scrpos.x + 1, scrpos.y + 1, Color(0, 0, 0), 1)
+					draw.DrawText( iName , "ScoreboardText", scrpos.x, scrpos.y, iTeamC, 1)
+					draw.DrawText( math.floor(iDistance) .. " Meters - " .. iHealth .. "%" , "DefaultSmall", scrpos.x + 1, scrpos.y+16, Color(0, 0, 0), 1)
+					draw.DrawText( math.floor(iDistance) .. " Meters - " .. iHealth .. "%" , "DefaultSmall", scrpos.x, scrpos.y+15, iTeamC, 1)
 			end
 		end
 	end
@@ -63,21 +90,29 @@ end
 hook.Add( "Move", "Moving", Moving)
 
 function ShowAdmin(um)
+	//Do not open the menu twice
+	if MenuOpen == true then return  end
+	MenuOpen = true
+	
+	AllowClose = true
+
 	//Build the admin panel
 	AdminPanel = vgui.Create( "DFrame" )
 	AdminPanel:SetPos( (ScrW()/2)-(w/2) , (ScrH()/2)-(h/2) )
 	AdminPanel:SetSize( w, h )
 	AdminPanel:SetTitle( "NewAdmin" )
 	AdminPanel:SetVisible( true )
-	AdminPanel:SetDraggable( true )
-	AdminPanel:ShowCloseButton( true )
+	AdminPanel:SetDraggable( false )
+	AdminPanel:ShowCloseButton( false )
 	AdminPanel:MakePopup()
+	AdminPanel.Paint = function()
+	end
 	
 	//Add tabs
 	Categories = vgui.Create( "DPropertySheet" )
 	Categories:SetParent( AdminPanel )
-	Categories:SetPos( 5, 30 )
-	Categories:SetSize( w-10, h-35 ) 
+	Categories:SetPos( 5 , 5 )
+	Categories:SetSize( w-10, h-35 )
 	
 	//Create tabs
 	CreatePlayerTab()
@@ -92,24 +127,52 @@ function ShowAdmin(um)
 end
 usermessage.Hook("adminmenu", ShowAdmin)
 
-function FillPlayerList()
-	ListPlayers:Clear()
-	//Refill it
-	for k, v in pairs(player.GetAll()) do
-		if string.find(string.lower(v:Nick()), string.lower(PFilter)) or PFilter == "" then
-			ListPlayers:AddItem(v:Nick())
-		end
+function CloseAdmin()
+	if AllowClose == true then
+		AdminPanel:Remove()
+		PFilter = ""
+		MenuOpen = false
 	end
-	
-	//Select first
-	for k, v in pairs(ListPlayers:GetItems()) do
-		ListPlayers:SelectItem(v)
+end
+concommand.Add( "-NA_Show", CloseAdmin )
+
+//Hold open and close system
+function KeyboardFocusOn( pnl )
+	AllowClose = false
+end
+hook.Add( "OnTextEntryGetFocus", "KeyboardFocusOn", KeyboardFocusOn )
+
+function KeyboardFocusOff( pnl )
+	AllowClose = true
+	AdminPanel:SetKeyboardInputEnabled( false )
+	//CloseAdmin()
+end
+hook.Add( "OnTextEntryLoseFocus", "KeyboardFocusOff", KeyboardFocusOff )
+
+function UpdateCheckboxes()
+	if ListPlayers:GetSelectedItems()[1] ~= nil then
 		CheckBoxBlind:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Blinded"))
 		CheckBoxGod:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("GodMode"))
 		CheckBoxIgnite:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Ignited"))
 		CheckBoxCloak:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Cloaked"))
 		CheckBoxMute:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Muted"))
 		CheckBoxFrozen:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Frozen"))
+	end
+end
+
+function FillPlayerList()
+	ListPlayers:Clear()
+	//Refill it
+	for k, v in pairs(player.GetAll()) do
+		if string.find(string.lower(v:Nick()), string.lower(PFilter)) or PFilter == "" then
+			if PlayerGone ~= v:Nick() then ListPlayers:AddItem(v:Nick()) end
+		end
+	end
+	
+	//Select first
+	for k, v in pairs(ListPlayers:GetItems()) do
+		ListPlayers:SelectItem(v)
+		UpdateCheckboxes()
 		break
 	end
 end
@@ -117,10 +180,6 @@ end
 function GetPlayerbyNick( nick )
 	for k, v in pairs(player.GetAll()) do
 		if v:Nick() == nick then
-			if v:Nick() == PlayerAway then
-				PlayerAway = ""
-			end
-		
 			return v
 		end
 	end
@@ -160,16 +219,7 @@ function CreatePlayerTab()
 		end
 	end
 	CheckBoxBlind.Paint = function()
-		CheckBoxBlind:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Blinded"))
-		CheckBoxGod:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("GodMode"))
-		CheckBoxIgnite:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Ignited"))
-		CheckBoxCloak:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Cloaked"))
-		CheckBoxMute:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Muted"))
-		CheckBoxFrozen:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Frozen"))
-		
-		if PlayerAway ~= "" then
-			FillPlayerList()
-		end
+		UpdateCheckboxes()
 	end
 	
 	//Godmode
@@ -278,17 +328,13 @@ function CreatePlayerTab()
 	ListPlayers:SetSize( 500, 339 )
 	ListPlayers:SetMultiple( false )
 	ListPlayers.DoClick = function()
-		CheckBoxBlind:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Blinded"))
-		CheckBoxGod:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("GodMode"))
-		CheckBoxIgnite:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Ignited"))
-		CheckBoxCloak:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Cloaked"))
-		CheckBoxMute:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Muted"))
-		CheckBoxFrozen:SetValue(GetPlayerbyNick(ListPlayers:GetSelectedItems()[1]:GetValue()):GetNetworkedBool("Frozen"))
+		UpdateCheckboxes()
 	end
 	FillPlayerList()
 	
 	//Filter textbox
 	PlayerFilter = vgui.Create( "DTextEntry", TabPlayers )
+	PlayerFilter:AllowInput(true)
 	PlayerFilter:SetPos( 0, 344 )
 	PlayerFilter:SetTall( 20 )
 	PlayerFilter:SetWide( 500 )
@@ -296,6 +342,14 @@ function CreatePlayerTab()
 	PlayerFilter.OnTextChanged = function()
 		PFilter = PlayerFilter:GetValue()
 		FillPlayerList()
+	end
+	PlayerFilter.StartKeyFocus = function()
+		AllowClose = false
+		AdminPanel:SetKeyboardInputEnabled( true )
+	end
+	PlayerFilter.EndKeyFocus = function()
+		AdminPanel:SetKeyboardInputEnabled( false )
+		AllowClose = true
 	end
 	
 	//Commands
@@ -308,7 +362,7 @@ function CreatePlayerTab()
 	cmdKick.DoClick = function ()
 		if ListPlayers:GetSelectedItems()[1] ~= nil then
 			RunConsoleCommand("NA_Kick", ListPlayers:GetSelectedItems()[1]:GetValue())
-			PlayerAway = ListPlayers:GetSelectedItems()[1]:GetValue()
+			PlayerGone = ListPlayers:GetSelectedItems()[1]:GetValue()
 			FillPlayerList()
 		end
 	end
@@ -331,7 +385,12 @@ function CreatePlayerTab()
 	ListBTimes:AddChoice("1 Month")
 	ListBTimes:AddChoice("6 Months")
 	ListBTimes:AddChoice("1 Year")
+	ListBTimes:AddChoice("Forever")
 	ListBTimes:ChooseOptionID(1)
+	ListBTimes:SetEnabled(false)
+	if LocalPlayer():IsSuperAdmin() then
+		ListBTimes:SetEnabled(true)
+	end
 	
 	
 	cmdBan2 = vgui.Create( "DButton" )
@@ -341,10 +400,16 @@ function CreatePlayerTab()
 	cmdBan2:SetSize( 65, 20 )
 	cmdBan2.DoClick = function ()
 		if ListPlayers:GetSelectedItems()[1] ~= nil then
-			RunConsoleCommand("NA_Ban", ListPlayers:GetSelectedItems()[1]:GetValue(), ListBTimes.TextEntry:GetValue())
-			PlayerAway = ListPlayers:GetSelectedItems()[1]:GetValue()
+			local bantime = 0
+			if ListBTimes.TextEntry:GetValue() ~= "Forever" then bantime = ListBTimes.TextEntry:GetValue() end
+			RunConsoleCommand("NA_Ban", ListPlayers:GetSelectedItems()[1]:GetValue(), bantime)
+			PlayerGone = ListPlayers:GetSelectedItems()[1]:GetValue()
 			FillPlayerList()
 		end
+	end
+	cmdBan2:SetEnabled(false)
+	if LocalPlayer():IsSuperAdmin() then
+		cmdBan2:SetEnabled(true)
 	end
 	
 	//Permaban
@@ -356,19 +421,24 @@ function CreatePlayerTab()
 	cmdPermaban.DoClick = function ()
 		if ListPlayers:GetSelectedItems()[1] ~= nil then
 			RunConsoleCommand("NA_Ban", ListPlayers:GetSelectedItems()[1]:GetValue(), 0)
+			PlayerGone = ListPlayers:GetSelectedItems()[1]:GetValue()
 			FillPlayerList()
 		end
 	end
+	cmdPermaban:SetEnabled(false)
+	if LocalPlayer():IsSuperAdmin() then
+		cmdPermaban:SetEnabled(true)
+	end
 	
-	//Kill
+	//Explode
 	cmdKill = vgui.Create( "DButton" )
 	cmdKill:SetParent( TabPlayers )
-	cmdKill:SetText( "Kill" )
+	cmdKill:SetText( "Explode" )
 	cmdKill:SetPos( controlx, 85 )
 	cmdKill:SetSize( 175, 20 )
 	cmdKill.DoClick = function ()
 		if ListPlayers:GetSelectedItems()[1] ~= nil then
-			RunConsoleCommand("NA_Kill", ListPlayers:GetSelectedItems()[1]:GetValue())
+			RunConsoleCommand("NA_Explode", ListPlayers:GetSelectedItems()[1]:GetValue())
 		end
 	end
 	
@@ -479,6 +549,10 @@ function CreateServerTab()
 	SetHostname.DoClick = function ()
 		RunConsoleCommand("NA_Hostname", Hostname:GetValue())
 	end
+	SetHostname:SetEnabled(false)
+	if LocalPlayer():IsSuperAdmin() then
+		SetHostname:SetEnabled(true)
+	end
 	
 	//Map list
 	ListMaps = vgui.Create( "DMultiChoice", TabServer )
@@ -504,6 +578,10 @@ function CreateServerTab()
 		if ListMaps.TextEntry:GetValue() ~= nil then
 			RunConsoleCommand("NA_Map", ListMaps.TextEntry:GetValue())
 		end
+	end
+	SetMap:SetEnabled(false)
+	if LocalPlayer():IsSuperAdmin() then
+		SetMap:SetEnabled(true)
 	end
 	
 	checkboxoffset = 75
@@ -542,6 +620,10 @@ function CreateServerTab()
 			RunConsoleCommand("NA_Godmode", checkval)
 		end
 	end
+	CheckBoxSvGodmode:SetEnabled(false)
+	if LocalPlayer():IsSuperAdmin() then
+		CheckBoxSvGodmode:SetEnabled(true)
+	end
 	
 	//Noclip
 	CheckBoxSvNoclip = vgui.Create( "DCheckBoxLabel", TabServer )
@@ -559,6 +641,10 @@ function CreateServerTab()
 		if checkval ~= na_noclip then	
 			RunConsoleCommand("NA_Noclip", checkval)
 		end
+	end
+	CheckBoxSvNoclip:SetEnabled(false)
+	if LocalPlayer():IsSuperAdmin() then
+		CheckBoxSvNoclip:SetEnabled(true)
 	end
 	
 	//Notifications
@@ -594,6 +680,10 @@ function CreateServerTab()
 	AddMessage:SetSize( 100, 20 )
 	AddMessage.DoClick = function ()
 		//Console command here
+	end
+	AddMessage:SetEnabled(false)
+	if LocalPlayer():IsSuperAdmin() then
+		AddMessage:SetEnabled(true)
 	end
 end
 
@@ -639,6 +729,21 @@ function CreateBanListTab()
 	cSteamID:SetWide(100)
 	cUnban:SetWide(100)
 	cReason:SetWide(200)
+	
+	//Fill ban list
+	for k, v in pairs(bantable) do
+		local pars = string.Explode("[split]", v)
+		if pars[3] == 0 then
+			unbannedwhen = "Never"
+		else
+			if os.date("%x", pars[3]) == os.date("%x", os.time()) then
+				unbannedwhen = os.date("Today %X", tonumber(pars[3]))
+			else
+				unbannedwhen = os.date("%x", tonumber(pars[3]))
+			end
+		end
+		lvBans:AddLine(pars[1], pars[2], "", unbannedwhen)
+	end
 	
 	//Filter textbox
 	BanFilter = vgui.Create( "DTextEntry", TabBans )
