@@ -23,6 +23,7 @@ function Kick( ply, params )
 
 		if pl ~= nil then
 			RunConsoleCommand("kickid", pl:UserID(), GetReason(params))
+			NotifyAll( ply:Nick() .. " has kicked " .. pl:Nick() .. " (" .. GetReason(params) .. ")", "NOTIFY_CLEANUP" )
 		else
 			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
 		end
@@ -86,15 +87,10 @@ function Ban( ply, params )
 			
 			//Do it and notify
 			if time > 0 then
-				for k, v in pairs(player.GetAll()) do
-					SendNotify( v, pl:Nick() .. " has been banned by " .. ply:Nick() .. " for " .. time .. " minutes", "NOTIFY_CLEANUP")
-				end
-				
+				NotifyAll( pl:Nick() .. " has been banned by " .. ply:Nick() .. " for " .. time .. " minutes", "NOTIFY_CLEANUP" )				
 				RunConsoleCommand("kickid", pl:UserID(), "Banned for " .. time .. " minutes!\nReason: " .. reason)
 			else
-				for k, v in pairs(player.GetAll()) do
-					SendNotify( v, pl:Nick() .. " has been permabanned by " .. ply:Nick(), "NOTIFY_CLEANUP")
-				end
+				NotifyAll( pl:Nick() .. " has been permabanned by " .. ply:Nick(), "NOTIFY_CLEANUP" )
 				
 				RunConsoleCommand("kickid", pl:UserID(), "Permanently banned!\nReason: " .. reason)
 			end

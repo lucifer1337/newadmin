@@ -3,8 +3,8 @@
 //Welcome message
 function WelcomeMessage( ply )
 	SendNotify( ply, "Welcome to " .. GetGlobalString("ServerName") .. "!", "NOTIFY_GENERIC" )
-	SendNotify( ply, "Type !listcommands to get an overview of the commands!", "NOTIFY_GENERIC" )
-	ply:PrintMessage( HUD_PRINTTALK, "Type !listcommands to get an overview of the commands!" )
+	SendNotify( ply, "Type " .. ComPrefix .. "listcommands to get an overview of the commands!", "NOTIFY_GENERIC" )
+	ply:PrintMessage( HUD_PRINTTALK, "Type " .. ComPrefix .. "listcommands to get an overview of the commands!" )
 end
 hook.Add( "PlayerInitialSpawn", "WelcomeHook", WelcomeMessage )
 
@@ -12,7 +12,7 @@ hook.Add( "PlayerInitialSpawn", "WelcomeHook", WelcomeMessage )
 function ReloadMap( ply, params )
 	RunConsoleCommand( "changelevel", game.GetMap() )
 end
-AddCommand( "ReloadMap", "Reloads the map", "reloadmap", "reloadmap", ReloadMap, 2, "Overv", 3)
+AddCommand( "ReloadMap", "Reloads the map", "reload", "reload", ReloadMap, 2, "Overv", 4)
 
 //Cleanup everything
 function FullCleanup( ply, params )
@@ -20,11 +20,9 @@ function FullCleanup( ply, params )
 	for k, v in pairs(ents.FindByClass("prop_*")) do v:Remove() end
 	for k, v in pairs(ents.FindByClass("npc_*")) do v:Remove() end
 	
-	for k, v in pairs(player.GetAll()) do
-		SendNotify( v, ply:Nick() .. " has cleaned up the map", "NOTIFY_CLEANUP" )
-	end
+	NotifyAll( ply:Nick() .. " has cleaned up the map", "NOTIFY_CLEANUP" )
 end
-AddCommand( "Cleanup", "Removes every entity in the map", "cleanup", "cleanup", FullCleanup, 2, "Overv", 3)
+AddCommand( "Cleanup", "Removes every entity in the map", "cleanup", "cleanup", FullCleanup, 2, "Overv", 4)
 
 //Message
 function Message( ply, params )
@@ -52,4 +50,45 @@ function Message( ply, params )
 		end
 	end
 end
-AddCommand( "Message", "This command allows admins to send a message to all players (type 1 = Notification, 2 = Chat, 3 = Center)", "message", "message <type> <message>", Message, 2, "Overv", 3)
+AddCommand( "Message", "This command allows admins to send a message to all players (type 1 = Notification, 2 = Chat, 3 = Center)", "message", "message <type> <message>", Message, 2, "Overv", 4)
+
+local maps = {}
+
+//List maps on server
+function ListMaps( ply, params )
+	//Populate maps table if it isn't yet
+	if maps[1] == nil then maps = file.Find("../maps/*.bsp") end
+	
+	for _, v in pairs(maps) do
+		ply:SendLua( "AddMap(\"" .. string.Left( v, string.len(v) - 4) .. "\")" )
+	end
+	
+	//Inform player
+	SendNotify( ply, "All the maps on the server have been printed to the console" )
+end
+AddCommand( "Maps", "Prints out all the maps on the server to the console", "maps", "maps", ListMaps, 0, "Overv", 4)
+
+//Clientside map list receiving
+function AddMap( mapname )
+	table.insert( maps, mapname )
+	Msg( mapname .. "\n" )
+end
+
+//Go to other map
+function ChangeMap( ply, params )
+	if params[1] ~= nil then
+		RunConsoleCommand("changelevel", params[1])
+	end
+end
+AddCommand( "Map", "Use this command to change the map", "map", "map <mapname>", ChangeMap, 2, "Overv", 4)
+
+//Logging
+function LogJoin( ply )
+	ply:SetNetworkedInt( "JoinTime", os.time() )
+	AddLog( ply:Nick() .. " (" .. ply:SteamID() .. ") has spawned for the first time (Succesful join)" )
+end
+function LogLeave( ply )
+	AddLog( ply:Nick() .. " (" .. ply:SteamID() .. ") has left the server" )
+end
+hook.Add("PlayerInitialSpawn", "LogJoin", LogJoin)
+hook.Add("PlayerDisconnected", "LogLeave", LogLeave)

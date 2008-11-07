@@ -20,12 +20,10 @@ function SetFlags( ply, params )
 				return 
 			end
 			
-			for k, v in pairs(player.GetAll()) do
-				SendNotify( v, pl:Nick() .. " is now in the " .. trans .. " group!", "NOTIFY_UNDO" )
-			end
+			NotifyAll( pl:Nick() .. " is now in the " .. trans .. " group!", "NOTIFY_UNDO" )
 		else
 			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
 		end
 	end
 end
-AddCommand( "Set Flags", "Set the flags of someone. (0 = player, 1 = admin, 2 = super admin)", "setflags", "setflags <name> <flags>", SetFlags, 2, "Overv", 6)
+AddCommand( "Set Flags", "Set the flags of someone. (0 = player, 1 = admin, 2 = super admin)", "setflags", "setflags <name> <flags>", SetFlags, 2, "Overv", 7)
