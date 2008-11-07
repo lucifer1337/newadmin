@@ -1,15 +1,22 @@
 //This file handles the module commands
 Commands = {}
 
-//Module categorys
+//Prefix for commands (e.g. !)
+ComPrefix = "!"
+
+//NewAdmin version
+Version = "1.0b"
+
+//Module categories
 //
-//1 - Player punishment
-//2 - Player administration
-//3 - Server management
-//4 - Teleportation
-//5 - Chat
-//6 - User Groups
-//7 - Other
+//1 - Player administration
+//2 - Player Actions
+//3 - Player punishment
+//4 - Server management
+//5 - Teleportation
+//6 - Chat
+//7 - User Groups
+//8 - Other
 
 //This function should be called by all modules adding commands
 function AddCommand( Name, Description, ChatCommand, Usage, CallFunction, Flag, Author, CategoryID )
@@ -28,11 +35,26 @@ function AddCommand( Name, Description, ChatCommand, Usage, CallFunction, Flag, 
 	table.insert(Commands, Command)
 end
 
+//Log commands used
+function AddLog(Text)
+	local curlog = ""
+	if file.Exists("NewAdmin/log.txt") then curlog = file.Read("NewAdmin/log.txt") end
+	
+	file.Write( "NewAdmin/log.txt", curlog .. os.date("%c") .. " -> " .. Text .. "\n" )
+end
+AddLog("Server started in map \"" .. game.GetMap() .. "\"")
+
 //Send notification
 function SendNotify(ply, text, icon)
 	if icon == nil then icon = "NOTIFY_GENERIC" end
 
 	ply:SendLua("GAMEMODE:AddNotify(\"".. text .."\", " .. icon .. ", 8); surface.PlaySound( \"".. "ambient/water/drip" .. math.random(1, 4) .. ".wav" .."\" )")
+end
+
+function NotifyAll( text, icon )
+	for k, v in pairs(player.GetAll()) do
+		SendNotify( v, text, icon )
+	end
 end
 
 //Get player by part of name
@@ -100,16 +122,19 @@ end
 //Handle chat
 function PlayerSay( ply, Message)
 	//Command?
-	if string.Left( Message, 1 ) == "!" then
+	if string.Left( Message, 1 ) == ComPrefix then
 		//Check if this command is known
 		local err = 1
 		
 		for k, v in pairs(Commands) do
 			//Way better system
-			if CommandRequested(Message) == "!" .. v.ChatCommand then
+			if CommandRequested(Message) == ComPrefix .. v.ChatCommand then
 				if GetFlags(ply) >= v.Flag then
 					err = 0
 					v.Function(ply, GetParameters(Message))
+					
+					//Log this command
+					AddLog(ply:Nick() .. " (" .. ply:SteamID() .. ") has called a command: " .. Message)
 				else
 					flagn = v.Flag
 					err = 2

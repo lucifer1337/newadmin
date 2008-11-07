@@ -9,14 +9,12 @@ function God( ply, params )
 		pl:GodEnable()
 		pl:SetNetworkedBool( "Godded", true )
 		
-		for k, v in pairs(player.GetAll()) do
-			SendNotify( v, ply:Nick() .. " has enabled godmode for " .. pl:Nick() )
-		end
+		NotifyAll( ply:Nick() .. " has enabled godmode for " .. pl:Nick() )
 	else
 		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
 	end
 end
-AddCommand( "God", "Enable godmode for a player", "god", "god [name]", God, 1, "Overv", 1)
+AddCommand( "God", "Enable godmode for a player", "god", "god [name]", God, 1, "Overv", 2)
 
 function UnGod( ply, params )
 	if params[1] == nil then params[1] = ply:Nick() end
@@ -26,14 +24,12 @@ function UnGod( ply, params )
 		pl:GodDisable()
 		pl:SetNetworkedBool( "Godded", false )
 		
-		for k, v in pairs(player.GetAll()) do
-			SendNotify( v, ply:Nick() .. " has disabled godmode for " .. pl:Nick() )
-		end
+		NotifyAll( ply:Nick() .. " has disabled godmode for " .. pl:Nick() )
 	else
 		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
 	end
 end
-AddCommand( "UnGod", "Disable godmode for a player", "ungod", "ungod [name]", UnGod, 1, "Overv", 1)
+AddCommand( "UnGod", "Disable godmode for a player", "ungod", "ungod [name]", UnGod, 1, "Overv", 2)
 
 //When you respawn godmode gets disabled, this will re-enable it :)
 function RestartGod( ply )
@@ -62,15 +58,13 @@ function SetHealth( ply, params )
 				hp = 100
 			end
 			
-			for k, v in pairs(player.GetAll()) do
-				SendNotify( v, ply:Nick() .. " has set " .. pl:Nick() .. "'s health to " .. hp )
-			end
+			NotifyAll( ply:Nick() .. " has set " .. pl:Nick() .. "'s health to " .. hp )
 		else
 			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
 		end
 	end
 end
-AddCommand( "SetHealth", "Set health for a player", "hp", "hp <name> [amount=100]", SetHealth, 1, "Overv", 1)
+AddCommand( "SetHealth", "Set health for a player", "hp", "hp <name> [amount=100]", SetHealth, 1, "Overv", 2)
 
 //Unlimited ammo
 function uAmmo( ply, params )
@@ -79,15 +73,12 @@ function uAmmo( ply, params )
 	local pl = GetPlayerByPart(params[1])
 	if pl ~= nil then
 		pl:SetNetworkedBool( "uAmmo", true)
-		
-		for k, v in pairs(player.GetAll()) do
-			SendNotify( v, pl:Nick() .. " has been given unlimited ammo by " .. ply:Nick() )
-		end
+		NotifyAll( pl:Nick() .. " has been given unlimited ammo by " .. ply:Nick() )
 	else
 		SendNotify( ply, "Player '" .. params[1] .. "' not found!" )
 	end
 end
-AddCommand( "Unlimited Ammo", "Enables unlimited ammo for the player", "uammo", "uammo [name]", uAmmo, 1, "Overv", 1)
+AddCommand( "Unlimited Ammo", "Enables unlimited ammo for the player", "uammo", "uammo [name]", uAmmo, 1, "Overv", 2)
 
 function UnuAmmo( ply, params )
 	if params[1] == nil then params[1] = ply:Nick() end
@@ -95,15 +86,12 @@ function UnuAmmo( ply, params )
 	local pl = GetPlayerByPart(params[1])
 	if pl ~= nil then
 		pl:SetNetworkedBool( "uAmmo", false)
-		
-		for k, v in pairs(player.GetAll()) do
-			SendNotify( v, ply:Nick() .. " has disabled unlimited ammo for " .. pl:Nick() )
-		end
+		NotifyAll( ply:Nick() .. " has disabled unlimited ammo for " .. pl:Nick() )
 	else
 		SendNotify( ply, "Player '" .. params[1] .. "' not found!" )
 	end
 end
-AddCommand( "Limited Ammo", "Disables unlimited ammo for the player", "unuammo", "unuammo [name]", UnuAmmo, 1, "Overv", 1)
+AddCommand( "Limited Ammo", "Disables unlimited ammo for the player", "unuammo", "unuammo [name]", UnuAmmo, 1, "Overv", 2)
 
 function uAmmoGive()
 	for k, v in pairs(player.GetAll()) do
@@ -126,20 +114,24 @@ function uAmmoGive()
 end
 if SERVER then hook.Add("Think", "uAmmoGive", uAmmoGive) end
 
-//Slay
-function Slay( ply, params )
+//Set frags
+//Kick
+function SetFrags( ply, params )
 	if params[1] ~= nil then
 		local pl = GetPlayerByPart( params[1] )
 
 		if pl ~= nil then
-			pl:Kill()
-			
-			for k, v in pairs(player.GetAll()) do
-				SendNotify( v, ply:Nick() .. " slayed " .. pl:Nick(), "NOTIFY_CLEANUP" )
+			if tonumber(params[2]) == nil then
+				frags = pl:Frags()
+			else
+				frags = tonumber(params[2])
+				NotifyAll( ply:Nick() .. " has set " .. pl:Nick() .. "'s frags to " .. frags )
 			end
+			
+			pl:SetFrags( frags )
 		else
 			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
 		end
 	end
 end
-AddCommand( "Slay", "Kill a player", "slay", "slay <name>", Slay, 1, "Overv", 1)
+AddCommand( "SetFrags", "Set the frags of a player", "setfrags", "setfrags <name> <frags>", SetFrags, 1, "Overv", 2)

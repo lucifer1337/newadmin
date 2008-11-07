@@ -1,5 +1,21 @@
 //This module takes care of punishing people
 
+//Slay
+function Slay( ply, params )
+	if params[1] ~= nil then
+		local pl = GetPlayerByPart( params[1] )
+
+		if pl ~= nil then
+			pl:Kill()
+			
+			NotifyAll( ply:Nick() .. " slayed " .. pl:Nick(), "NOTIFY_CLEANUP" )
+		else
+			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+		end
+	end
+end
+AddCommand( "Slay", "Kill a player", "slay", "slay <name>", Slay, 1, "Overv", 3)
+
 //Jail
 local JailPos = nil
 
@@ -7,7 +23,7 @@ function SetJailPos( ply, params )
 	JailPos = ply:GetPos()
 	SendNotify( ply, "Jail position set to your current position!" )
 end
-AddCommand( "Set jail position", "Set the jail position to your current position", "setjailpos", "setjailpos", SetJailPos, 1, "Overv", 2)
+AddCommand( "Set jail position", "Set the jail position to your current position", "setjail", "setjail", SetJailPos, 1, "Overv", 3)
 
 function Jail( ply, params )
 	//Check if we have a jail position yet
@@ -24,9 +40,7 @@ function Jail( ply, params )
 			playertojail:StripWeapons()
 			playertojail:SetNetworkedBool( "Jailed", true)
 			
-			for k, v in pairs(player.GetAll()) do
-				SendNotify( v, playertojail:Nick() .. " has been jailed by " .. ply:Nick(), "NOTIFY_CLEANUP" )
-			end
+			NotifyAll( playertojail:Nick() .. " has been jailed by " .. ply:Nick(), "NOTIFY_CLEANUP" )
 		else
 			SendNotify( ply, "Player '" .. params[1] .. "' not found!" )
 		end
@@ -34,7 +48,7 @@ function Jail( ply, params )
 		SendNotify( ply, "Specify a player to jail!" )
 	end
 end
-AddCommand( "Jail", "Jail the specified player", "jail", "jail <name>", Jail, 1, "Overv", 2)
+AddCommand( "Jail", "Jail the specified player", "jail", "jail <name>", Jail, 1, "Overv", 3)
 
 function UnJail( ply, params )
 	if params[1] ~= nil then
@@ -45,9 +59,7 @@ function UnJail( ply, params )
 				playertojail:GodDisable()
 				playertojail:Kill()
 				
-				for k, v in pairs(player.GetAll()) do
-					SendNotify( v, playertojail:Nick() .. " has been released by " .. ply:Nick(), "NOTIFY_UNDO" )
-				end
+				NotifyAll( playertojail:Nick() .. " has been released by " .. ply:Nick(), "NOTIFY_UNDO" )
 			else
 				SendNotify( ply, playertojail:Nick() .. " is not in jail!" )
 			end
@@ -58,7 +70,7 @@ function UnJail( ply, params )
 		SendNotify( ply, "Specify a player to unjail!" )
 	end
 end
-AddCommand( "UnJail", "Unjail the specified player and respawn him", "unjail", "unjail <name>", UnJail, 1, "Overv", 2)
+AddCommand( "UnJail", "Unjail the specified player and respawn him", "unjail", "unjail <name>", UnJail, 1, "Overv", 3)
 
 //If a player is in jail he may not move
 function BlockMove( ply )
