@@ -1,6 +1,6 @@
 //All this module does is add a command to list the commands in the console
 
-function CatName( id )
+function GetCatName( id )
 	if id == 1 then
 		return "Administration"
 	elseif id == 2 then
@@ -32,7 +32,7 @@ function ListCommands( ply, params )
 		for k, v in pairs(Commands) do
 			if v.CategoryID == c then
 				if first == true then
-					Msg("o " .. CatName(c) .. "\n\n")
+					Msg("o " .. GetCatName(c) .. "\n\n")
 					first = false
 				end
 			
@@ -51,4 +51,4 @@ function ListCommands( ply, params )
 		if first == false then Msg("\n") end
 	end
 end
-AddCommand( "List Commands", "List all the commands in the console", "listcommands", "listcommands", ListCommands, 0, "Overv", 7)
+AddCommand( "List Commands", "List all the commands in the console", "commands", "commands", ListCommands, 0, "Overv", 7)
