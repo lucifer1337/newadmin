@@ -59,9 +59,12 @@ function ListMaps( ply, params )
 	//Populate maps table if it isn't yet
 	if maps[1] == nil then maps = file.Find("../maps/*.bsp") end
 	
-	for _, v in pairs(maps) do
-		ply:SendLua( "AddMap(\"" .. string.Left( v, string.len(v) - 4) .. "\")" )
+	if ply:GetNetworkedBool("ReceivedMaps") ~= true then
+		for _, v in pairs(maps) do
+			ply:SendLua( "AddMap(\"" .. string.Left( v, string.len(v) - 4) .. "\")" )
+		end
 	end
+	ply:SendLua("ListMaps()")
 	
 	//Inform player
 	SendNotify( ply, "All the maps on the server have been printed to the console" )
@@ -81,6 +84,17 @@ function ChangeMap( ply, params )
 	end
 end
 AddCommand( "Map", "Use this command to change the map", "map", "map <mapname>", ChangeMap, 2, "Overv", 4)
+
+//Show maps
+function ListMaps()
+	Msg("\n=== Maps on this server ===\n\n")
+	
+	for k, v in pairs(maps) do
+		Msg(v .. "\n")
+	end
+	
+	Msg("\n")
+end
 
 //Logging
 function LogJoin( ply )
