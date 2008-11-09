@@ -88,7 +88,7 @@ function Message( ply, params )
 		end
 	end
 end
-AddCommand( "Message", "This command allows admins to send a message to all players (type 1 = Notification, 2 = Chat, 3 = Center)", "message", "message <type> <message>", Message, 2, "Overv", 4)
+AddCommand( "Message", "Send a message to all players (type 1 = Notification, 2 = Chat, 3 = Center)", "message", "message <type> <message>", Message, 2, "Overv", 4)
 
 local maps = {}
 
