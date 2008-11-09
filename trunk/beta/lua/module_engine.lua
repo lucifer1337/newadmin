@@ -44,6 +44,14 @@ function AddLog(Text)
 end
 AddLog("Server started in map \"" .. game.GetMap() .. "\"")
 
+//Log chat messages
+function AddChatLog(Text)
+	local curlog = ""
+	if file.Exists("NewAdmin/chatlog.txt") then curlog = file.Read("NewAdmin/chatlog.txt") end
+	
+	file.Write( "NewAdmin/chatlog.txt", curlog .. os.date("%c") .. " -> " .. Text .. "\n" )
+end
+
 //Send notification
 function SendNotify(ply, text, icon)
 	if icon == nil then icon = "NOTIFY_GENERIC" end
@@ -150,6 +158,9 @@ function PlayerSay( ply, Message)
 		end
 		
 		return ""
+	else
+		//Log chat message
+		AddChatLog(ply:Nick() .. ": " .. Message)
 	end
 end
 hook.Add("PlayerSay", "ChatMessage", PlayerSay)

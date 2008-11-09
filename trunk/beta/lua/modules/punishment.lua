@@ -16,6 +16,22 @@ function Slay( ply, params )
 end
 AddCommand( "Slay", "Kill a player", "slay", "slay <name>", Slay, 1, "Overv", 3)
 
+//Strip weapons
+function Strip( ply, params )
+	if params[1] ~= nil then
+		local pl = GetPlayerByPart( params[1] )
+
+		if pl ~= nil then
+			pl:StripWeapons()
+			
+			NotifyAll( ply:Nick() .. " stripped " .. pl:Nick() .. "'s weapons", "NOTIFY_CLEANUP" )
+		else
+			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+		end
+	end
+end
+AddCommand( "Strip", "Strip weapons from a player", "strip", "strip <name>", Strip, 1, "Overv", 3)
+
 //Jail
 local JailPos = nil
 
@@ -34,7 +50,8 @@ function Jail( ply, params )
 
 	if params[1] ~= nil then
 		local playertojail = GetPlayerByPart(params[1])
-		if playertojail ~= nil then
+		
+		if playertojail ~= nil and playertojail:Alive() == true then
 			playertojail:SetPos( JailPos )
 			playertojail:GodEnable()
 			playertojail:StripWeapons()
@@ -57,7 +74,14 @@ function UnJail( ply, params )
 			if playertojail:GetNetworkedBool( "Jailed" ) == true then
 				playertojail:SetNetworkedBool( "Jailed", false)
 				playertojail:GodDisable()
-				playertojail:Kill()
+				
+				//Find first spawn
+				local spawn = ents.FindByClass("info_player_start")
+				playertojail:SetPos(spawn[1]:GetPos())
+				playertojail:SetAngles(spawn[1]:GetAngles())
+				
+				//Re-arm
+				Arm( ply, params )
 				
 				NotifyAll( playertojail:Nick() .. " has been released by " .. ply:Nick(), "NOTIFY_UNDO" )
 			else
