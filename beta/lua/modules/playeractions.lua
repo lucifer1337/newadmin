@@ -115,7 +115,6 @@ end
 if SERVER then hook.Add("Think", "uAmmoGive", uAmmoGive) end
 
 //Set frags
-//Kick
 function SetFrags( ply, params )
 	if params[1] ~= nil then
 		local pl = GetPlayerByPart( params[1] )
@@ -135,3 +134,36 @@ function SetFrags( ply, params )
 	end
 end
 AddCommand( "SetFrags", "Set the frags of a player", "setfrags", "setfrags <name> <frags>", SetFrags, 1, "Overv", 2)
+
+//Collect default weapons
+local defweapons = {}
+function AddWeapons()
+	if defweapons[1] == nil then
+		for k, v in pairs(ents.GetAll()) do
+			if v:IsWeapon() then
+				table.insert( defweapons, v:GetClass() )
+			end
+		end
+		
+		if table.Count(defweapons) > 0 then
+			ConsoleMsg("Added " .. table.Count(defweapons) .. " default weapons!")
+		end
+	end
+end
+if SERVER then hook.Add("Think", "AddWeapons", AddWeapons) end
+
+function Arm( ply, params )
+	if params[1] ~= nil then
+		local pl = GetPlayerByPart( params[1] )
+
+		if pl ~= nil then
+			for _, v in pairs(defweapons) do
+				pl:Give( v )
+			end
+			pl:SelectWeapon("weapon_physgun")
+		else
+			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+		end
+	end
+end
+AddCommand( "Arm", "Gives a player all the weapons", "arm", "arm <name>", Arm, 1, "Overv", 2)

@@ -60,3 +60,28 @@ function Whisper( ply, params )
 	end
 end
 AddCommand( "Whisper", "Whisper messages to people close to you", "w", "w <message>", Whisper, 0, "Overv", 6)
+
+//Imitate someone
+function Imitate( ply, params )
+	if params[1] ~= nil and params[2] ~= nil then
+		local pl = GetPlayerByPart( params[1] )
+		
+		if pl ~= nil then
+			local collect = ""
+			for k, v in pairs(params) do
+				if k > 1 then collect = collect .. v .. " " end
+			end
+			
+			gamemode.Call("PlayerSay", pl, "test")
+		else
+			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+		end
+	end
+end
+AddCommand( "Imitate", "Use this command to let someone of your choice say something", "imitate", "imitate <user> <message>", Imitate, 1, "Overv", 6)
+
+//Display the time
+function Time( ply, params )
+	NotifyAll( "The time is now: " .. os.date("%H:%M:%S") )
+end
+AddCommand( "Time", "Display the time in the chat", "time", "time", Time, 0, "Overv", 6)

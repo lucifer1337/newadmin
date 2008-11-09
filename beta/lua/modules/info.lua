@@ -57,6 +57,6 @@ AddCommand( "List Commands", "List all the commands in the console", "commands",
 
 //NewAdmin version
 function Info( ply, params )
-	ply:PrintMessage( HUD_PRINTCENTER, "This server is running NewAdmin " .. Version )
+	SendNotify( ply, "This server is running NewAdmin " .. Version )
 end
 AddCommand( "Info", "Shows info about NewAdmin, such as the version running", "info", "info", Info, 0, "Overv", 8)

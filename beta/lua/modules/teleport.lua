@@ -24,7 +24,7 @@ function Bring( ply, params )
 	if params[1] ~= nil then
 		local pl = GetPlayerByPart( params[1] )
 
-		if pl ~= nil then
+		if pl ~= nil and pl:Alive() == true then
 			local pos = ply:GetPos()
 			pl:SetPos( Vector( pos.x, pos.y, pos.z + 100 ) )
 			
