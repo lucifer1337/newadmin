@@ -96,6 +96,74 @@ function UnJail( ply, params )
 end
 AddCommand( "UnJail", "Unjail the specified player and respawn him", "unjail", "unjail <name>", UnJail, 1, "Overv", 3)
 
+//Ignite
+function Ignite( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:Ignite(999, 1)
+		
+		NotifyAll( ply:Nick() .. " has ignited " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "Ignite", "Ignite a player", "ignite", "ignite <name>", Ignite, 1, "Overv", 3)
+
+function UnIgnite( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:Extinguish()
+		
+		NotifyAll( ply:Nick() .. " has extinguished " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "Extinguish", "Extinguish a player", "unignite", "unignite <name>", UnIgnite, 1, "Overv", 3)
+
+//Blind
+function Blind( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:SetNetworkedBool( "Blinded", true )
+		
+		NotifyAll( ply:Nick() .. " has blinded " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "Blind", "Blind a player", "blind", "blind <name>", Blind, 1, "Overv", 3)
+
+function UnBlind( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:SetNetworkedBool( "Blinded", false )
+		
+		NotifyAll( ply:Nick() .. " has unblinded " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "UnBlind", "Unblind a player", "unblind", "unblind <name>", UnBlind, 1, "Overv", 3)
+
+if CLIENT then
+	function BlindCheck()
+		if LocalPlayer():GetNetworkedBool( "Blinded" ) then
+			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.DrawRect( 0, 0, ScrW(), ScrH() )
+		end
+	end
+	hook.Add("HUDPaint", "Blind", BlindCheck)
+end
+
 //If a player is in jail he may not move
 function BlockMove( ply )
 	if ply:GetNetworkedInt( "Jailed" ) == true then

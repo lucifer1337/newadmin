@@ -9,6 +9,7 @@ function GetReason( params, offset )
 		for k, v in pairs(params) do
 			if k > offset then reason = reason .. " " .. v end
 		end
+		reason = string.Trim(reason)
 	else
 		reason = "N/A"
 	end
@@ -58,9 +59,6 @@ function LoadBans()
 	end
 end
 if SERVER then LoadBans() end
-
-//Save bans
-
 
 //Ban command
 function Ban( ply, params )
