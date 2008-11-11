@@ -135,6 +135,27 @@ function SetFrags( ply, params )
 end
 AddCommand( "SetFrags", "Set the frags of a player", "setfrags", "setfrags <name> <frags>", SetFrags, 1, "Overv", 2)
 
+//Set frags
+function SetDeaths( ply, params )
+	if params[1] ~= nil then
+		local pl = GetPlayerByPart( params[1] )
+
+		if pl ~= nil then
+			if tonumber(params[2]) == nil then
+				frags = pl:Deaths()
+			else
+				frags = tonumber(params[2])
+				NotifyAll( ply:Nick() .. " has set " .. pl:Nick() .. "'s deaths to " .. frags )
+			end
+			
+			pl:SetDeaths( frags )
+		else
+			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+		end
+	end
+end
+AddCommand( "SetDeaths", "Set the deaths of a player", "setdeaths", "setdeaths <name> <deaths>", SetDeaths, 1, "Overv", 2)
+
 //Collect default weapons
 local defweapons = {}
 function AddWeapons()
@@ -167,3 +188,59 @@ function Arm( ply, params )
 	end
 end
 AddCommand( "Arm", "Gives a player all the weapons", "arm", "arm <name>", Arm, 1, "Overv", 2)
+
+//Ghosting
+function Ghost( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:SetColor(255, 255, 255, 0)
+		pl:SetRenderMode( RENDERMODE_NONE )
+		pl:SetNetworkedBool( "Ghosted", true )
+		
+		//Make weapons invisible too
+		for _, v in pairs(pl:GetWeapons()) do
+			v:SetRenderMode( RENDERMODE_NONE )
+			v:SetColor(255, 255, 255, 0)
+		end
+		
+		NotifyAll( ply:Nick() .. " has ghosted " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "Ghost", "Turn a player into a ghost (invisible)", "ghost", "ghost [name]", Ghost, 1, "Overv", 2)
+
+function UnGhost( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:SetColor(255, 255, 255, 255)
+		pl:SetRenderMode( RENDERMODE_NORMAL )
+		pl:SetNetworkedBool( "Ghosted", false )
+		
+		//Make weapons visible again
+		for _, v in pairs(pl:GetWeapons()) do
+			v:SetRenderMode( RENDERMODE_NORMAL )
+			v:SetColor(255, 255, 255, 255)
+		end
+		
+		NotifyAll( ply:Nick() .. " has unghosted " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "UnGhost", "Turn a ghost into a player again", "unghost", "unghost [name]", UnGhost, 1, "Overv", 2)
+
+//When you respawn you get new weapons and they're not invisible yet D:
+function RestartGhost( ply )
+	if ply:GetNetworkedBool( "Ghosted" ) == true then
+		for _, v in pairs(pl:GetWeapons()) do
+			v:SetRenderMode( RENDERMODE_NONE )
+			v:SetColor(255, 255, 255, 0)
+		end
+	end
+end
+hook.Add( "PlayerSpawn", "RestartGhost", RestartGhost )

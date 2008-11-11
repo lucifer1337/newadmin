@@ -178,10 +178,16 @@ AddCommand( "Admin Noclip", "Enable or disable admin only noclip", "adminnoclip"
 //Countdown
 local c_finishtime = 0
 local c_text = "CountdownText"
+local c_notedstop = false
 
 if SERVER then
 	function CreateCountdown( ply, params )
 		if tonumber(params[1]) ~= nil then
+			if tonumber(params[1]) > 86400 then
+				NotifyAll( "You can't make countdowns longer than 24 hours!", "NOTIFY_ERROR" )
+				return 
+			end
+		
 			c_finishtime = os.time() + tonumber(params[1])
 			
 			local reason = ""
@@ -194,6 +200,7 @@ if SERVER then
 			c_text = reason
 			
 			NotifyAll( ply:Nick() .. " has started a new countdown")
+			c_notedstop = false
 			for _, v in pairs(player.GetAll()) do
 				v:SendLua("CreateCountdown(" .. params[1] .. ", \"" .. c_text .. "\")")
 			end
@@ -206,6 +213,14 @@ if SERVER then
 		ply:SendLua("CreateCountdown(" .. timetosend .. ", \"" .. c_text .. "\")")
 	end
 	hook.Add("PlayerInitialSpawn", "NotifyGuys", NotifyGuys)
+	
+	function CheckCountdown()
+		if os.time() > c_finishtime and c_notedstop == false then
+			c_notedstop = true
+			NotifyAll( "The countdown has ended", "NOTIFY_CLEANUP" )
+		end
+	end
+	timer.Create("tmCheckCountdown", 1, 0, CheckCountdown)  
 end
 AddCommand( "Countdown", "Create a countdown", "countdown", "countdown <seconds> <text>", CreateCountdown, 2, "Overv", 4)
 

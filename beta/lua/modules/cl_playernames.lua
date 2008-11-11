@@ -4,6 +4,11 @@ function DrawHUD()
 end
 hook.Add("HUDPaint", "DrawHud", DrawHUD)
 
+//Load star icon to draw when a player is an admin or super admin
+local Star = surface.GetTextureID("gui/silkicons/star")
+surface.SetTexture( Star )
+surface.SetDrawColor( 255, 255, 255, 255)
+
 //All the functions for the things drawn in DrawHUD()
 function GetHeadPos( ply )
 	local BoneIndx = ply:LookupBone("ValveBiped.Bip01_Head1")
@@ -19,7 +24,7 @@ function DrawPlayers()
 	local maxfullalpha = 512
 	
 	for k, v in pairs(player.GetAll()) do
-		if v:Nick() ~= LocalPlayer():Nick() then
+		if v:Nick() ~= LocalPlayer():Nick() and v:GetNetworkedBool("Ghosted") == false then
 			local pDistance = LocalPlayer():GetShootPos():Distance(v:GetShootPos())		
 			
 			//Check if the player is even visible (e.g. no wall in between)
@@ -45,8 +50,22 @@ function DrawPlayers()
 				local w = surface.GetTextSize(v:Nick())
 				local teamColor = team.GetColor( v:Team() )
 				
-				draw.RoundedBox( 6, dPos.x-((w+10)/2), dPos.y-10, w+10, 25, Color(0, 0, 0, dAlpha) )
-				draw.DrawText( v:Nick(), "ScoreboardText", dPos.x, dPos.y-6, Color(teamColor.r, teamColor.g, teamColor.b, dAlpha), 1 )
+				if v:IsAdmin() == false then
+					draw.RoundedBox( 6, dPos.x-((w+10)/2), dPos.y-10, w+10, 25, Color(0, 0, 0, dAlpha) )
+					draw.DrawText( v:Nick(), "ScoreboardText", dPos.x, dPos.y-6, Color(teamColor.r, teamColor.g, teamColor.b, dAlpha), 1 )
+				else				
+					//Make space and draw text
+					ow = w
+					w = w + 26
+					
+					draw.RoundedBox( 6, dPos.x-((w+10)/2), dPos.y-10, w+10, 25, Color(0, 0, 0, dAlpha) )
+					draw.DrawText( v:Nick(), "ScoreboardText", dPos.x + 14, dPos.y-6, Color(teamColor.r, teamColor.g, teamColor.b, dAlpha), 1 )
+					
+					//Draw star
+					surface.SetTexture( Star )
+					surface.SetDrawColor( 255, 255, 255, dAlpha)
+					surface.DrawTexturedRect(dPos.x - (ow / 2) - 12, dPos.y - 6, 16, 16) 
+				end
 			end
 		end
 	end
