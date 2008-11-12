@@ -182,7 +182,6 @@ function Arm( ply, params )
 				pl:Give( v )
 			end
 			pl:SelectWeapon("weapon_physgun")
-			NotifyAll( ply:Nick() .. " has supplied " .. pl:Nick() .. " with guns" )
 		else
 			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
 		end
@@ -196,8 +195,8 @@ function Ghost( ply, params )
 	local pl = GetPlayerByPart( params[1] )
 
 	if pl ~= nil then
-		pl:SetColor(255, 255, 255, 0)
-		pl:SetRenderMode( RENDERMODE_NONE )
+		pl:DrawViewModel(false)
+		pl:DrawWorldModel(false)
 		pl:SetNetworkedBool( "Ghosted", true )
 		
 		//Make weapons invisible too
@@ -218,8 +217,8 @@ function UnGhost( ply, params )
 	local pl = GetPlayerByPart( params[1] )
 
 	if pl ~= nil then
-		pl:SetColor(255, 255, 255, 255)
-		pl:SetRenderMode( RENDERMODE_NORMAL )
+		pl:DrawViewModel(true)
+		pl:DrawWorldModel(true)
 		pl:SetNetworkedBool( "Ghosted", false )
 		
 		//Make weapons visible again

@@ -206,13 +206,19 @@ function Ragdoll( ply, params )
 		pl:SetRenderMode( RENDERMODE_NONE )
 		pl:GodEnable()
 		pl:StripWeapons()
-		pl:KillSilent()
 		
 		//Spawn ragdoll
 		ragdoll = ents.Create("prop_ragdoll")
 		ragdoll:SetModel( pl:GetModel() )
 		ragdoll:SetPos( pl:GetPos() )
 		ragdoll:Spawn() 
+		ragdoll:Activate()
+		ragdoll:GetPhysicsObject():SetVelocity(4 * pl:GetVelocity())
+		
+		//Spectate ragdoll for victim
+		pl:Spectate(OBS_MODE_CHASE)
+		pl:SpectateEntity( ragdoll )
+		pl.Ragdoll = ragdoll
 		
 		NotifyAll( ply:Nick() .. " has ragdolled " .. pl:Nick() )
 	else
@@ -220,6 +226,34 @@ function Ragdoll( ply, params )
 	end
 end
 AddCommand( "Ragdoll", "Turn a player into a ragdoll", "ragdoll", "ragdoll <name>", Ragdoll, 1, "Overv", 3)
+
+function UnRagdoll( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:SetNetworkedBool( "Ragdolled", false )
+		
+		//Respawn
+		pl:UnSpectate()
+		
+		local spawnonragdoll = pl.Ragdoll:GetPos()
+		spawnonragdoll.z = spawnonragdoll.z
+		pl:SetPos( spawnonragdoll )
+		
+		pl:SetColor(255, 255, 255, 255)
+		pl:SetRenderMode( RENDERMODE_NORMAL )
+		
+		pl.Ragdoll:Remove()
+		
+		Arm( ply, params )
+		
+		NotifyAll( ply:Nick() .. " has unragdolled " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "UnRagdoll", "Turn a ragdoll into a player again", "unragdoll", "unragdoll <name>", UnRagdoll, 1, "Overv", 3)
 
 //If a player is in jail or frozen he may not move
 function BlockMove( ply )
