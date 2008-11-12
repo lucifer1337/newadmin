@@ -182,6 +182,7 @@ function Arm( ply, params )
 				pl:Give( v )
 			end
 			pl:SelectWeapon("weapon_physgun")
+			NotifyAll( ply:Nick() .. " has supplied " .. pl:Nick() .. " with guns" )
 		else
 			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
 		end

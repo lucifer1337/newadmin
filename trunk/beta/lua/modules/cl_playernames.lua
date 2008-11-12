@@ -1,8 +1,38 @@
 //Drawing function
 function DrawHUD()
-	DrawPlayers()
+	if pn_enabled then DrawPlayers() end
 end
 hook.Add("HUDPaint", "DrawHud", DrawHUD)
+
+//Enable and disable playernames
+pn_enabled = true
+function PlayerNames( ply, params )
+	if params[1] == "1" then
+		pn_enabled = true
+		NotifyAll( "Playernames have been enabled by " .. ply:Nick() )
+	elseif params[1] == "0" then
+		pn_enabled = false
+		NotifyAll( "Playernames have been disabled by " .. ply:Nick() )
+	end
+	
+	for _, v in pairs(player.GetAll()) do
+		if pn_enabled then
+			v:SendLua("pn_enabled = true")
+		else
+			v:SendLua("pn_enabled = false")
+		end
+	end
+end
+AddCommand( "Playernames", "Enable or disable playernames", "playernames", "playernames <1 or 0>", PlayerNames, 2, "Overv", 4)
+
+function Sync( ply )
+	if pn_enabled then
+		ply:SendLua("pn_enabled = true")
+	else
+		ply:SendLua("pn_enabled = false")
+	end
+end
+hook.Add("PlayerInitialSpawn", "SyncInfo", Sync)
 
 //Load star icon to draw when a player is an admin or super admin
 local Star = surface.GetTextureID("gui/silkicons/star")
