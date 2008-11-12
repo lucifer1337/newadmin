@@ -35,9 +35,10 @@ end
 hook.Add("PlayerInitialSpawn", "SyncInfo", Sync)
 
 //Load star icon to draw when a player is an admin or super admin
-local Star = surface.GetTextureID("gui/silkicons/star")
-surface.SetTexture( Star )
-surface.SetDrawColor( 255, 255, 255, 255)
+if CLIENT then
+	Star = surface.GetTextureID("gui/silkicons/star")
+	Ragdolled = surface.GetTextureID("gui/silkicons/user")
+end
 
 //All the functions for the things drawn in DrawHUD()
 function GetHeadPos( ply )
@@ -54,13 +55,20 @@ function DrawPlayers()
 	local maxfullalpha = 512
 	
 	for k, v in pairs(player.GetAll()) do
-		if v:Nick() ~= LocalPlayer():Nick() and v:GetNetworkedBool("Ghosted") == false and v:GetNetworkedBool("Ragdolled") == false then
-			local pDistance = LocalPlayer():GetShootPos():Distance(v:GetShootPos())		
+		if v:Nick() ~= LocalPlayer():Nick() and v:GetNetworkedBool("Ghosted") == false then
+		
+			Position = v:GetShootPos()
+			if v:GetNetworkedBool("Ragdolled") then
+				r = ents.GetByIndex( v:GetNetworkedInt( "Ragdoll" ) )
+				Position = r:GetPos()
+			end
+		
+			local pDistance = LocalPlayer():GetShootPos():Distance( Position )
 			
 			//Check if the player is even visible (e.g. no wall in between)
 			local tracedata = {}
 			tracedata.start = LocalPlayer():GetShootPos()
-			tracedata.endpos = v:GetShootPos()
+			tracedata.endpos = Position
 			//tracedata.filter = LocalPlayer()
 			local trace = util.TraceLine(tracedata)
 			
@@ -71,7 +79,12 @@ function DrawPlayers()
 					dAlpha = 128 - math.Clamp((pDistance - maxfullalpha) / (maxdistance-maxfullalpha)*128, 0, 128)
 				end
 				
-				local dPos = GetHeadPos( v ):ToScreen()
+				if v:GetNetworkedBool("Ragdolled") then
+					dPos = GetHeadPos( r ):ToScreen()
+				else
+					dPos = GetHeadPos( v ):ToScreen()
+				end
+				
 				dPos.y = dPos.y - 75
 				dPos.y = dPos.y + (100 * (GetHeadPos(v):Distance(LocalPlayer():GetShootPos()) / 2048)) * 0.5
 				
@@ -80,10 +93,24 @@ function DrawPlayers()
 				local w = surface.GetTextSize(v:Nick())
 				local teamColor = team.GetColor( v:Team() )
 				
-				if v:IsAdmin() == false then
-					draw.RoundedBox( 6, dPos.x-((w+10)/2), dPos.y-10, w+10, 25, Color(0, 0, 0, dAlpha) )
-					draw.DrawText( v:Nick(), "ScoreboardText", dPos.x, dPos.y-6, Color(teamColor.r, teamColor.g, teamColor.b, dAlpha), 1 )
-				else				
+				if v:GetNetworkedBool("Ragdolled") == false then
+					if v:IsAdmin() == false then
+						draw.RoundedBox( 6, dPos.x-((w+10)/2), dPos.y-10, w+10, 25, Color(0, 0, 0, dAlpha) )
+						draw.DrawText( v:Nick(), "ScoreboardText", dPos.x, dPos.y-6, Color(teamColor.r, teamColor.g, teamColor.b, dAlpha), 1 )
+					else
+						//Make space and draw text
+						ow = w
+						w = w + 26
+						
+						draw.RoundedBox( 6, dPos.x-((w+10)/2), dPos.y-10, w+10, 25, Color(0, 0, 0, dAlpha) )
+						draw.DrawText( v:Nick(), "ScoreboardText", dPos.x + 14, dPos.y-6, Color(teamColor.r, teamColor.g, teamColor.b, dAlpha), 1 )
+						
+						//Draw star
+						surface.SetTexture( Star )
+						surface.SetDrawColor( 255, 255, 255, dAlpha)
+						surface.DrawTexturedRect(dPos.x - (ow / 2) - 12, dPos.y - 6, 16, 16)
+					end
+				else
 					//Make space and draw text
 					ow = w
 					w = w + 26
@@ -92,9 +119,9 @@ function DrawPlayers()
 					draw.DrawText( v:Nick(), "ScoreboardText", dPos.x + 14, dPos.y-6, Color(teamColor.r, teamColor.g, teamColor.b, dAlpha), 1 )
 					
 					//Draw star
-					surface.SetTexture( Star )
+					surface.SetTexture( Ragdolled )
 					surface.SetDrawColor( 255, 255, 255, dAlpha)
-					surface.DrawTexturedRect(dPos.x - (ow / 2) - 12, dPos.y - 6, 16, 16) 
+					surface.DrawTexturedRect(dPos.x - (ow / 2) - 12, dPos.y - 6, 16, 16)
 				end
 			end
 		end
