@@ -164,9 +164,66 @@ if CLIENT then
 	hook.Add("HUDPaint", "Blind", BlindCheck)
 end
 
-//If a player is in jail he may not move
+//Freeze
+function Freeze( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:SetNetworkedBool( "Frozen", true )
+		
+		NotifyAll( ply:Nick() .. " has frozen " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "Freeze", "Freeze a player", "freeze", "freeze <name>", Freeze, 1, "Overv", 3)
+
+function UnFreeze( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:SetNetworkedBool( "Frozen", false )
+		
+		NotifyAll( ply:Nick() .. " has unfrozen " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "UnFreeze", "Unfreeze a player", "unfreeze", "unfreeze <name>", UnFreeze, 1, "Overv", 3)
+
+//Ragdolling (experimental)
+function Ragdoll( ply, params )
+	if params[1] == nil then params[1] = ply:Nick() end
+	local pl = GetPlayerByPart( params[1] )
+
+	if pl ~= nil then
+		pl:SetNetworkedBool( "Ragdolled", true )
+		
+		//Make main body invisible and godded
+		pl:SetColor(255, 255, 255, 0)
+		pl:SetRenderMode( RENDERMODE_NONE )
+		pl:GodEnable()
+		pl:StripWeapons()
+		pl:KillSilent()
+		
+		//Spawn ragdoll
+		ragdoll = ents.Create("prop_ragdoll")
+		ragdoll:SetModel( pl:GetModel() )
+		ragdoll:SetPos( pl:GetPos() )
+		ragdoll:Spawn() 
+		
+		NotifyAll( ply:Nick() .. " has ragdolled " .. pl:Nick() )
+	else
+		SendNotify( ply, "Player '" .. params[1] .. "' not found!")
+	end
+end
+AddCommand( "Ragdoll", "Turn a player into a ragdoll", "ragdoll", "ragdoll <name>", Ragdoll, 1, "Overv", 3)
+
+//If a player is in jail or frozen he may not move
 function BlockMove( ply )
-	if ply:GetNetworkedInt( "Jailed" ) == true then
+	if ply:GetNetworkedBool( "Jailed" ) == true or ply:GetNetworkedBool("Frozen") == true then
 		return true
 	end
 end
