@@ -2,7 +2,7 @@
 function DrawHUD()
 	if pn_enabled then DrawPlayers() end
 end
-hook.Add("HUDPaint", "DrawHud", DrawHUD)
+if CLIENT then hook.Add("HUDPaint", "DrawHud", DrawHUD) end
 
 //Enable and disable playernames
 pn_enabled = true
@@ -54,7 +54,7 @@ function DrawPlayers()
 	local maxfullalpha = 512
 	
 	for k, v in pairs(player.GetAll()) do
-		if v:Nick() ~= LocalPlayer():Nick() and v:GetNetworkedBool("Ghosted") == false then
+		if v:Nick() ~= LocalPlayer():Nick() and v:GetNetworkedBool("Ghosted") == false and v:GetNetworkedBool("Ragdolled") == false then
 			local pDistance = LocalPlayer():GetShootPos():Distance(v:GetShootPos())		
 			
 			//Check if the player is even visible (e.g. no wall in between)
