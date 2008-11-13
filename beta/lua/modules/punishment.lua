@@ -250,6 +250,11 @@ function UnRagdoll( ply, params )
 end
 AddCommand( "UnRagdoll", "Turn a ragdoll into a player again", "unragdoll", "unragdoll <name>", UnRagdoll, 1, "Overv", 3)
 
+function CheckDolls()
+	
+end
+timer.Create("CheckDolls", 1, 0, CheckDolls)
+
 //If a player is in jail or frozen he may not move
 function BlockMove( ply )
 	if ply:GetNetworkedBool( "Jailed" ) == true or ply:GetNetworkedBool("Frozen") == true then
