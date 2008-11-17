@@ -127,3 +127,10 @@ function DrawPlayers()
 		end
 	end
 end
+
+//Rehook when anything goes wrong
+function DrawReHook()
+	hook.Remove( "HUDPaint", "DrawHud" )
+	hook.Add("HUDPaint", "DrawHud", DrawHUD)
+end
+timer.Create( "DrawRehook", 1, 0, DrawReHook )
