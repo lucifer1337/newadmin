@@ -2,7 +2,7 @@
 
 //Welcome message
 function WelcomeMessage( ply )
-	SendNotify( ply, "Welcome to " .. GetGlobalString("ServerName") .. "!", "NOTIFY_GENERIC" )
+	SendNotify( ply, "Welcome to " .. GetGlobalString("ServerName"), "NOTIFY_GENERIC" )
 	SendNotify( ply, "Type " .. ComPrefix .. "listcommands to get an overview of the commands!", "NOTIFY_GENERIC" )
 	ply:PrintMessage( HUD_PRINTTALK, "Type " .. ComPrefix .. "commands to get an overview of the commands!" )
 end
@@ -275,3 +275,45 @@ if CLIENT then
 		return hours .. ":" .. minutes .. ":" .. seconds
 	end
 end
+
+//Voting
+local vote_question = nil
+local vote_answers = nil
+
+//Creator
+function CreateVote( ply )
+	//If we're the server, just recall it clientside
+	if SERVER then
+		if vote_question == nil then
+			ply:SendLua("CreateVote()")
+		else
+			SendNotify( ply, "You can't make a vote when another vote is running!", "NOTIFY_ERROR" )
+		end		
+		return
+	end
+	
+	//Create the menu
+	local VotePanel = vgui.Create("DFrame")
+	local w = 250
+	local h = 400
+	VotePanel:SetPos( ScrW()/2 - w/2, ScrH()/2 - h/2)
+	VotePanel:SetSize( w, h )
+	VotePanel:SetTitle( "Create a vote" )
+	VotePanel:SetVisible( true )
+	VotePanel:SetDraggable( false )
+	VotePanel:ShowCloseButton( true )
+	VotePanel:SetBackgroundBlur( true )
+	VotePanel:MakePopup()
+	
+	lblQuestion = vgui.Create("DLabel", VotePanel)
+	lblQuestion:SetText("Question:")
+	lblQuestion:SizeToContents()
+	lblQuestion:SetPos( 5, 33 )
+	
+	local txtQuestion = vgui.Create( "DTextEntry", VotePanel )
+	txtQuestion:SetPos( 60, 30 )
+	txtQuestion:SetTall( 20 )
+	txtQuestion:SetWide( w - 65 )
+	txtQuestion:SetEnterAllowed( true )
+end
+AddCommand( "Vote", "Open the vote creator", "vote", "vote", CreateVote, 2, "Overv", 4)
