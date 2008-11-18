@@ -126,7 +126,6 @@ if SERVER then concommand.Add( "SetFlags", SetFlags2 ) end
 //Override someone's group on spawn
 function UpdateGroup( ply )
 	for _, v in pairs(usergroups) do
-		ConsoleMsg("Comparing '" .. v.SteamID .. " and " .. ply:SteamID() )
 		if v.SteamID == ply:SteamID() then
 			if v.Flags == "0" then
 				ply:SetUserGroup("unknown")
