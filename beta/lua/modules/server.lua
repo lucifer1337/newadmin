@@ -184,7 +184,7 @@ if SERVER then
 	function CreateCountdown( ply, params )
 		if tonumber(params[1]) ~= nil then
 			if tonumber(params[1]) > 86400 then
-				NotifyAll( "You can't make countdowns longer than 24 hours!", "NOTIFY_ERROR" )
+				SendNotify( ply, "You can't make countdowns longer than 24 hours!", "NOTIFY_ERROR" )
 				return 
 			end
 		
