@@ -195,8 +195,8 @@ function Ghost( ply, params )
 	local pl = GetPlayerByPart( params[1] )
 
 	if pl ~= nil then
-		pl:DrawViewModel(false)
-		pl:DrawWorldModel(false)
+		pl:SetRenderMode( RENDERMODE_NONE )
+		pl:SetColor(255, 255, 255, 0)
 		pl:SetNetworkedBool( "Ghosted", true )
 		
 		//Make weapons invisible too
@@ -217,8 +217,8 @@ function UnGhost( ply, params )
 	local pl = GetPlayerByPart( params[1] )
 
 	if pl ~= nil then
-		pl:DrawViewModel(true)
-		pl:DrawWorldModel(true)
+		pl:SetRenderMode( RENDERMODE_NORMAL )
+		pl:SetColor(255, 255, 255, 255)
 		pl:SetNetworkedBool( "Ghosted", false )
 		
 		//Make weapons visible again
