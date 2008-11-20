@@ -231,6 +231,11 @@ function UnRagdoll( ply, params )
 	local pl = GetPlayerByPart( params[1] )
 
 	if pl ~= nil then
+		if pl:GetNWBool("Ragdolled") == false then
+			SendNotify( ply, pl:Nick() .. " is not ragdolled!", "NOTIFY_ERROR" )
+			return false
+		end
+	
 		//Respawn
 		pl:SetParent()
 		local rpos = pl.Ragdoll:GetPos()
