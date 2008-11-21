@@ -47,7 +47,8 @@ function LoadBans()
 				item.Nick = params[1]
 				item.SteamID = params[2]
 				item.Reason = params[3]
-				item.EndTime = params[4]
+				item.EndTime = tonumber(params[4])
+				item.Banner = params[5]
 				
 				table.insert( BannedPlayers, item )
 			end
@@ -59,6 +60,16 @@ function LoadBans()
 	end
 end
 if SERVER then LoadBans() end
+
+function SaveBans()
+	local ftext = ""
+	for _, v in pairs( BannedPlayers ) do
+		ftext = ftext .. v.Nick .. "[split]" .. v.SteamID .. "[split]" .. v.Reason .. "[split]" .. v.EndTime .. "[split]" .. v.Banner .. "\n"
+	end
+	
+	file.Write( "NewAdmin/bans.txt", ftext )
+end
+if SERVER then SaveBans() end
 
 //Ban command
 function Ban( ply, params )
@@ -78,6 +89,8 @@ function Ban( ply, params )
 			bandata.Nick = pl:Nick()
 			bandata.SteamID = pl:SteamID()
 			bandata.Reason = reason
+			bandata.Banner = ply:SteamID()
+			
 			if time > 0 then bandata.EndTime = os.time() + (time * 60) else bandata.EndTime = 0 end
 			table.insert( BannedPlayers, bandata )
 			
@@ -86,11 +99,11 @@ function Ban( ply, params )
 			//Do it and notify
 			if time > 0 then
 				NotifyAll( pl:Nick() .. " has been banned by " .. ply:Nick() .. " for " .. time .. " minutes", "NOTIFY_CLEANUP" )				
-				RunConsoleCommand("kickid", pl:UserID(), "Banned for " .. time .. " minutes!\nReason: " .. reason)
+				RunConsoleCommand("kickid", pl:UserID(), "Banned for " .. time .. " minutes! (" .. reason .. ")")
 			else
 				NotifyAll( pl:Nick() .. " has been permabanned by " .. ply:Nick(), "NOTIFY_CLEANUP" )
 				
-				RunConsoleCommand("kickid", pl:UserID(), "Permanently banned!\nReason: " .. reason)
+				RunConsoleCommand("kickid", pl:UserID(), "Permanently banned! (" .. reason .. ")")
 			end
 		else
 			SendNotify( ply, "Player '" .. params[1] .. "' not found!")
@@ -98,3 +111,21 @@ function Ban( ply, params )
 	end
 end
 AddCommand( "Ban", "Ban a player for a certain amount of time or permanent", "ban", "ban <name> [time in minutes, 0 = perma] [reason]", Ban, 2, "Overv", 1)
+
+function KickBan( ply )
+	for k, v in pairs( BannedPlayers ) do
+		//Ban done?
+		if v.EndTime < os.time() then
+			table.remove( k )
+			SaveBans()
+		end
+	
+		if v.SteamID == ply:SteamID() and v.EndTime > os.time() then
+			local timeleft = math.floor((v.EndTime - os.time()) / 60)
+			RunConsoleCommand("kickid", ply:UserID(), "Banned for " .. timeleft .. " minutes" )
+		else
+			ConsoleMsg( "Wrong! ('" .. ply:SteamID() .. "' != '" .. v.SteamID .. "')" )
+		end
+	end
+end
+hook.Add( "PlayerInitialSpawn", "KickBan", KickBan )
