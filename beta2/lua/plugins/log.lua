@@ -1,0 +1,27 @@
+if SERVER then
+	
+	function LogSpawn( ply )
+		Log( "'" .. ply:Nick() .. "' (" .. ply:SteamID() .. ") has succesfully spawned for the first time!" )
+	end
+	hook.Add( "PlayerInitialSpawn", "LogSpawn", LogSpawn )
+
+	function LogDeath( Victim, Weapon, Killer )
+		if Killer:IsPlayer() then
+			Log( "'" .. Killer:Nick() .. "' (" .. Killer:SteamID() .. ") has killed '" .. Victim:Nick() .. "' (" .. Victim:SteamID() .. ") with '" .. Weapon:GetClass() .. "'" )
+		end
+	end
+	hook.Add( "PlayerDeath", "LogDeath", LogDeath )
+
+	function LogConnect( name, address )
+		Log( "'" .. name .. "' (" .. address .. ") has joined the server" )
+	end
+	hook.Add( "PlayerConnect", "LogConnect", LogConnect )
+
+	Log( "Server started in map '" .. game.GetMap() .. "'"  )
+
+	function LogShutDown()
+		Log( "Server shutdown while running map '" .. game.GetMap() .. "' with " .. table.Count(player.GetAll()) .. " players" )
+	end
+	hook.Add( "ShutDown", "LogShutdown", LogShutdown )
+
+end
