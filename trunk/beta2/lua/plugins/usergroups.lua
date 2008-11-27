@@ -93,6 +93,7 @@ function AssignFlags( ply )
 	if ply:IsUserGroup( "owner" ) then
 		ply:SetNWInt( "Flag", 3 )
 	end
+	SaveFlags()
 end
 hook.Add( "PlayerInitialSpawn", "AssignFlags", AssignFlags )
 
