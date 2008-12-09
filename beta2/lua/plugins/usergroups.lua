@@ -106,6 +106,7 @@ function EditFlag( ply, newflag )
 		if v.SteamID == newentry.SteamID then
 			v.Flag = newflag
 			Log( ply:Nick() .. "'s flag has been succesfully updated!" )
+			SaveFlags()
 			
 			return true
 		end

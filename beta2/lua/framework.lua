@@ -39,8 +39,14 @@ function GetArguments( Message )
 end
 
 //NewAdmin console message
-function Log( Message )
-	Msg( "(NEWADMIN) " .. Message .. "\n" )
+function Log( Message, Hide )
+	if !Hide then
+		if EngineLoading == false then
+			Msg( "(NEWADMIN) " .. Message .. "\n" )
+		else
+			Msg( "-> " .. Message .. "\n" ) //Looks better between the loading module messages :]
+		end
+	end
 	
 	//Add to log
 	local ftext = ""
@@ -137,3 +143,20 @@ function CanPlayerSuicide ( ply )
 	end
 end
 hook.Add( "CanPlayerSuicide", "BlockIt", CanPlayerSuicide )
+
+//Sync server time with clients
+if CLIENT then
+	tdiff = 0
+	function SyncTimeCL( STime )
+		tdiff = os.clock() - STime
+	end
+	
+	function ServerTime()
+		return tdiff
+	end
+end
+
+function SyncTime( ply )
+	ply:SendLua("SyncTimeCL(" .. os.clock() .. ")")
+end
+hook.Add( "PlayerInitialSpawn", "SyncTime", SyncTime )

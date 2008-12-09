@@ -79,7 +79,7 @@ function Ignite( ply, params )
 	params[1]:Ignite(999, 1)
 	Notify( ply:Nick() .. " has ignited " .. params[1]:Nick() )
 end
-RegisterCommand( "Ignite", "Ignite a player", "ignite", "ignite [name]", 1, "Overv", 3, 1, Ignite )
+RegisterCommand( "Ignite", "Ignite a player", "ignite", "ignite [name]", 1, "Overv", 3, 0, Ignite )
 RegisterCheck( "Ignite", 1, 3, "Player '%arg%' not found!" )
 
 function UnIgnite( ply, params )
