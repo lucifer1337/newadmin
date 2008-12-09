@@ -3,6 +3,7 @@ include( "plugin_manager.lua" )
 include( "framework.lua" )
 
 //Loading message start
+EngineLoading = true
 Msg( "\n===================================================\n" )
 Msg( "NewAdmin 1.0\n\n" )
 
@@ -16,3 +17,4 @@ end
 
 //End loading message
 Msg( "\n===================================================\n\n" )
+EngineLoading = false

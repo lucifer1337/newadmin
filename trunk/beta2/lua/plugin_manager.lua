@@ -59,6 +59,11 @@ function CallCommand( ChatCommand, Caller, Args )
 
 	for _, v in pairs( Commands ) do
 		if v.ChatCommand == ChatCommand then
+			if tonumber( Flag(Caller) ) < tonumber( v.Flag ) then
+				Notify( "Only " .. FlagName(v.Flag) .. " are allowed to use this command!", "NOTIFY_ERROR", Caller )
+				return false
+			end
+		
 			if table.Count(Args) < v.RequiredArguments then
 				t = ""
 				if tonumber(v.RequiredArguments) != 1 then t = "s" end

@@ -3,14 +3,96 @@ function WelcomeMessage( ply )
 	Notify( "Welcome to " .. GetGlobalString("ServerName"), "NOTIFY_GENERIC", ply )
 	Notify( "Type !commands to get an overview of the commands!", "NOTIFY_GENERIC", ply )
 	ply:PrintMessage( HUD_PRINTTALK, "Type !commands to get an overview of the commands!" )
+	
+	local found = false
+	for i, v in pairs(plinfo) do
+		if v.SteamID == ply:SteamID() then
+			for _, k in pairs(player.GetAll()) do
+				k:PrintMessage( HUD_PRINTTALK, ply:Nick() .. " has joined the server for the last time at " .. v.PrevDate .. " with the nick '" .. v.PrevNick .. "'" )
+			end
+			
+			found = true
+			plinfo[i].PrevNick = ply:Nick()
+			plinfo[i].PrevDate = os.date("%c")
+			plinfo[i].SessionStart = os.time() //This is obviously not saved to a file
+		end
+	end
+	
+	if found == false then
+		for _, k in pairs(player.GetAll()) do
+			k:PrintMessage( HUD_PRINTTALK, ply:Nick() .. " has spawned for the first time." )
+		end
+		
+		local newitem = {}
+		newitem.SteamID = ply:SteamID()
+		newitem.PrevNick = ply:Nick()
+		newitem.PrevDate = os.date("%c")
+		newitem.PlayTime = 0
+		newitem.SessionStart = os.time() //This is obviously not saved to a file
+		table.insert( plinfo, newitem )
+		SaveInfo()
+	end
+	
+	timer.Simple( 1, AddPlayTime, ply:EntIndex() )
 end
-hook.Add( "PlayerInitialSpawn", "WelcomeHook", WelcomeMessage )
+if SERVER then hook.Add( "PlayerInitialSpawn", "WelcomeHook", WelcomeMessage ) end
+
+function AddPlayTime( plyid )
+	local pl = player.GetByID(plyid)
+	
+	if pl ~= NULL then
+		for i, v in pairs(plinfo) do
+			if v.SteamID == pl:SteamID() then
+				plinfo[i].PlayTime = plinfo[i].PlayTime + 1
+			end
+		end
+		timer.Simple( 1, AddPlayTime, pl:EntIndex() )
+	end
+end
+
+//Remember people's info
+plinfo = {}
+
+function SaveInfo(Hide)
+	local tfile = ""
+	for _, v in pairs(plinfo) do
+		tfile = tfile .. v.SteamID .. "\n" .. v.PrevNick .. "\n" .. v.PrevDate .. "\n" .. v.PlayTime .. "\n"
+	end
+	
+	file.Write( "NewAdmin/userinfo.txt", tfile )
+	
+	if Hide then return true end
+	Log( "Saved user info file!" )
+end
+if SERVER then timer.Create( "UpdateInfo", 30, 0, SaveInfo, true )  end
+
+function LoadInfo()
+	if file.Exists("NewAdmin/userinfo.txt") then
+		local lines = string.Explode( "\n", file.Read("NewAdmin/userinfo.txt") )
+		for k = 1, #lines-1, 4 do		
+			local item = {}
+			item.SteamID = lines[k]
+			item.PrevNick = lines[k+1]
+			item.PrevDate = lines[k+2]
+			item.PlayTime = lines[k+3]
+			
+			table.insert( plinfo, item )
+		end
+		
+		Log( "Loaded " .. #plinfo .. " userinfo entries!" )
+	else
+		Log("No user info file found, making one.")
+		SaveInfo()
+	end
+end
+LoadInfo()
 
 //Reload map
 function ReloadMap( ply, params )
 	RunConsoleCommand( "changelevel", game.GetMap() )
 end
 RegisterCommand( "Reload map", "Reload the map", "reload", "reload", 2, "Overv", 4, 0, ReloadMap )
+if SERVER then concommand.Add( "Reload", ReloadMap ) end
 
 //Cleanup everything
 //When the first player spawns it will save all the entities that are in the map by default, eg the player spawns. Those should not be removed ofcourse!
@@ -136,7 +218,7 @@ end
 hook.Add("PlayerNoClip", "AdminOnly", BlockNoclip)
 
 function AdminNoclip( ply, params )
-	if params[1] == "1" then
+	if tonumber(params[1]) == 1 then
 		activated = true
 		Notify( "Admin only noclip has been enabled by " .. ply:Nick() )
 		
@@ -144,7 +226,7 @@ function AdminNoclip( ply, params )
 		for _, v in pairs(player.GetAll()) do
 			v:SetMoveType( MOVETYPE_WALK )
 		end
-	elseif params[1] == "0" then
+	else
 		activated = false
 		Notify( "Admin only noclip has been disabled by " .. ply:Nick() )
 	end

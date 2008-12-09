@@ -7,6 +7,7 @@ include( "plugin_manager.lua" )
 include( "framework.lua" )
 
 //Loading message start
+EngineLoading = true
 Msg( "\n===================================================\n" )
 Msg( "NewAdmin 1.0\n\n" )
 
@@ -21,6 +22,7 @@ end
 
 //End loading message
 Msg( "===================================================\n\n" )
+EngineLoading = false
 
 //Scan chatmessages for function calls
 function CheckCalls( ply, Message )
@@ -28,13 +30,8 @@ function CheckCalls( ply, Message )
 	if string.Left( Message, 1 ) == "!" then
 		for _, v in pairs( Commands ) do
 			if GetCommand(Message) == v.ChatCommand then
-				if tonumber(Flag(ply)) < tonumber(v.Flag) then
-					Notify( "Only " .. FlagName(v.Flag) .. " are allowed to use this command!", "NOTIFY_ERROR", ply )
-					return ""
-				else
-					CallCommand( GetCommand(Message), ply, GetArguments(Message) )
-					return ""
-				end
+				CallCommand( GetCommand(Message), ply, GetArguments(Message) )
+				return ""
 			end
 		end
 		

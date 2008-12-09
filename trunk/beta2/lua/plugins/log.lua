@@ -17,11 +17,16 @@ if SERVER then
 	end
 	hook.Add( "PlayerConnect", "LogConnect", LogConnect )
 
-	Log( "Server started in map '" .. game.GetMap() .. "'"  )
+	Log( "Server started in map '" .. game.GetMap() .. "' running gamemode '" .. gmod.GetGamemode().Name .. "'"  )
 
 	function LogShutDown()
-		Log( "Server shutdown while running map '" .. game.GetMap() .. "' with " .. table.Count(player.GetAll()) .. " players" )
+		Log( "Server shutdown while running map '" .. game.GetMap() .. "' using gamemode '" .. gmod.GetGamemode().Name .. "' with " .. table.Count(player.GetAll()) .. " players" )
 	end
 	hook.Add( "ShutDown", "LogShutdown", LogShutdown )
+	
+	function LogChat( ply, text )
+		Log( ply:Nick() .. ": " .. text, true ) //Hide it from the log, cause seeing the same chat message twice is confusing D:
+	end
+	hook.Add( "PlayerSay", "LogChat", LogChat )
 
 end
