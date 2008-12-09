@@ -99,6 +99,7 @@ function DrawPlayers()
 				end
 				
 				//Draw the box with the playername
+				surface.SetFont( "ScoreboardText" )
 				local w = surface.GetTextSize(v:Nick())
 				local teamColor = team.GetColor( v:Team() )
 				ow = w

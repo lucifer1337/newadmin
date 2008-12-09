@@ -10,11 +10,10 @@ Msg( "NewAdmin 1.0\n\n" )
 //Load plugins into framework clientside
 local plugins = file.FindInLua("plugins/*.lua")
 for _, filename in pairs( plugins ) do
+	Msg( "Loading: " .. filename .. "\n" )
 	include( "plugins/" .. filename )
-	
-	Msg( "Loaded file: " .. filename .. "\n" )
 end
 
 //End loading message
-Msg( "\n===================================================\n\n" )
+Msg( "===================================================\n\n" )
 EngineLoading = false
