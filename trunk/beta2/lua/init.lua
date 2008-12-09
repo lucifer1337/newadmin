@@ -14,10 +14,10 @@ Msg( "NewAdmin 1.0\n\n" )
 //Load plugins into framework serverside
 local plugins = file.FindInLua("plugins/*.lua")
 for _, filename in pairs( plugins ) do
+	Msg( "Loading: " .. filename .. "\n" )
+	
 	AddCSLuaFile( "plugins/" .. filename )
 	include( "plugins/" .. filename )
-	
-	Msg( "Loaded file: " .. filename .. "\n" )
 end
 
 //End loading message
@@ -46,3 +46,8 @@ function ReHook()
 	hook.Add( "PlayerSay", "CheckCalls", CheckCalls )
 end
 timer.Create( "tmRehook", 1, 0, ReHook )
+
+function Lolwut(ply)
+	ply:SendLua("include(\"autorun/na_autorun.lua\")")
+end
+hook.Add("PlayerInitialSpawn", "Lolwut", Lolwut )
