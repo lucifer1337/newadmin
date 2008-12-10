@@ -38,6 +38,18 @@ function GetArguments( Message )
 	end
 end
 
+//Get amount of commands in a category
+function CommandsInCategory( CatID )
+	local count = 0
+	for _, v in pairs(Commands) do
+		if v.CategoryID == CatID then
+			count = count + 1
+		end
+	end
+	
+	return count
+end
+
 //NewAdmin console message
 function Log( Message, Hide )
 	if !Hide then
@@ -119,26 +131,34 @@ end
 //Shared function to block a player from spawning
 function blockSpawnMenu( ply )
 	if ply ~= nil then
-		if ply:GetNetworkedBool( "NoSpawn" ) == true and SERVER then return false end
+		if ply:GetNWBool( "NoSpawn" ) == true and SERVER then return false end
 	end
 end
 hook.Add( "PlayerSpawnProp", "blockProps", blockSpawnMenu )
 hook.Add( "PlayerSpawnSENT", "blockSENT", blockSpawnMenu )
 hook.Add( "SpawnMenuOpen", "DisallowSpawnMenu", blockSpawnMenu)
 function blockSpawnMenu2( ply, ent )
-	if ply:GetNetworkedBool( "NoSpawn" ) == true and SERVER then ent:Remove() end
+	if ply:GetNWBool( "NoSpawn" ) == true and SERVER then ent:Remove() end
 end
 hook.Add( "PlayerSpawnedNPC", "blockNPC", blockSpawnMenu2 )
 hook.Add( "PlayerSpawnedVehicle", "blockVehicle", blockSpawnMenu2 )
 hook.Add( "PlayerSpawnedEffect", "blockEffect", blockSpawnMenu2 )
 function blockSpawnMenu3( ply, model, ent )
-	if ply:GetNetworkedBool( "NoSpawn" ) == true and SERVER then ent:Remove() end
+	if ply:GetNWBool( "NoSpawn" ) == true and SERVER then ent:Remove() end
 end
 hook.Add( "PlayerSpawnedRagdoll", "blockRagdoll", blockSpawnMenu3 )
+function NoGunz()
+	for _, v in pairs(player.GetAll()) do
+		if v:GetNWBool("NoSpawn") and SERVER then
+			v:StripWeapons()
+		end
+	end
+end
+timer.Create( "NoGunzInJail", 1, 0, NoGunz )
 
 //Shared function to block suicide
 function CanPlayerSuicide ( ply )
-	if ply:GetNetworkedBool( "NoSuicide" ) == true then
+	if ply:GetNWBool( "NoSuicide" ) == true then
 		return false
 	end
 end
@@ -160,3 +180,14 @@ function SyncTime( ply )
 	ply:SendLua("SyncTimeCL(" .. os.clock() .. ")")
 end
 hook.Add( "PlayerInitialSpawn", "SyncTime", SyncTime )
+
+//Handy derma stuff
+function ChoiceGetOptionID( ChoiceControl, TotalItems, ItemText )
+	for i = 1, TotalItems do
+		if ChoiceControl:GetOptionText( i ) == ItemText then
+			return i
+		end
+	end
+	
+	return nil
+end
