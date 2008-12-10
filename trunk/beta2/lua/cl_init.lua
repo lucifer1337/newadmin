@@ -1,6 +1,7 @@
 //Load all the files for the NewAdmin framework
 include( "plugin_manager.lua" )
 include( "framework.lua" )
+include( "gui_framework.lua" )
 
 //Loading message start
 EngineLoading = true
