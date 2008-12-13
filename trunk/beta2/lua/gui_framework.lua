@@ -1,6 +1,8 @@
 //This is like the plugin manager, but allows plugins to add controls to the gui
 function ShowMenu()
 	if !AdminPanel then BuildMenu() end
+	
+	RefillPlayers()
 	AdminPanel:SetVisible( true )
 end
 concommand.Add( "+NA_Menu", ShowMenu )
@@ -32,6 +34,7 @@ function BuildMenu()
 	Tabs:SetPos( 0, 0 )
 	Tabs:SetSize( w, h )
 	
+	PlayerTab()
 	PluginTab()
 end
 
@@ -71,7 +74,7 @@ function PluginTab()
 	Plugins = vgui.Create("DListView") 
 	Plugins:SetParent( TabPlugin )
 	Plugins:SetPos( 0, 25 )
-	Plugins:SetSize( TabPlugin:GetWide(), TabPlugin:GetTall() - 46 )
+	Plugins:SetSize( TabPlugin:GetWide(), TabPlugin:GetTall() - 42 )
 	Plugins:SetMultiSelect( false )
 	local colTitl = Plugins:AddColumn( "Title" )
 	local colDesc = Plugins:AddColumn( "Description" )
@@ -97,4 +100,46 @@ function FillPluginList( FilterCat )
 	end
 	Plugins:SortByColumn( 1 )
 	Plugins:SelectFirstItem()
+end
+
+//Tab with all the player functions including actions and punishment
+function PlayerTab()
+	//Main panel
+	TabPlayers = vgui.Create( "DPanel", Tabs )
+	TabPlayers:SetPos( 5, 10 )
+	TabPlayers:SetSize( w - 10, h - 15 )
+	TabPlayers.Paint = function()
+		surface.SetDrawColor( 171, 171, 171, 255 )
+		surface.DrawRect( 0, 0, TabPlayers:GetWide(), TabPlayers:GetTall() )
+	end
+	
+	Players = vgui.Create( "DComboBox", TabPlayers )
+	Players:SetPos( 0, 0 )
+	Players:SetSize( TabPlayers:GetWide() - 150 , TabPlayers:GetTall() - 17 ) 
+	Players:SetMultiple( false )
+	RefillPlayers()
+	
+	Tabs:AddSheet( "Players", TabPlayers, "gui/silkicons/user", false, false, "Apply actions and punishment to players" ) 
+end
+
+function RefillPlayers()
+	Players:Clear()
+	
+	for i, v in pairs(player.GetAll()) do
+		if Flag(v) < 1 then
+			FPlayer = Players:AddItem( v:Nick() )
+		else
+			if Flag( v ) == 1 then
+				Class = "Admin"
+			elseif Flag( v ) == 2 then
+				Class = "Superadmin"
+			elseif Flag( v ) == 3 then
+				Class = "Owner"
+			end
+			
+			FPlayer = Players:AddItem( v:Nick() .. " (" .. Class .. ")" )
+		end
+		
+		if i == 1 then Players:SelectItem( FPlayer ) end
+	end
 end
