@@ -112,7 +112,7 @@ function KickBan( ply )
 			Log( "Ban for '" .. v.Nick .. "' has expired!" )
 		end
 	
-		if v.SteamID == ply:SteamID() and v.EndTime > os.time() then
+		if v.SteamID == ply:SteamID() and (v.EndTime > os.time() or tonumber(v.EndTime) == 0) then
 			if tonumber(v.EndTime) == 0 then
 				RunConsoleCommand("kickid", ply:UserID(), "Permabanned!" )
 			end

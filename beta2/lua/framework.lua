@@ -106,11 +106,6 @@ function GetPlayer( Part )
 end
 
 function Flag( ply )
-	//Old chizzle D:
-	//local flags = 0
-	//if ply:IsAdmin() then flags = 1 end
-	//if ply:IsSuperAdmin() then flags = 2 end
-	
 	return tonumber( ply:GetNWInt( "Flag" ) )
 end
 

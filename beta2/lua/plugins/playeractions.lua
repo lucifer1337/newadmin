@@ -131,6 +131,7 @@ function Ghost( ply, params )
 	params[1]:SetRenderMode( RENDERMODE_NONE )
 	params[1]:SetColor(255, 255, 255, 0)
 	params[1]:SetNetworkedBool( "Ghosted", true )
+	params[1]:SetCollisionGroup( COLLISION_GROUP_WEAPON )
 	
 	//Make weapons invisible too
 	for _, v in pairs(params[1]:GetWeapons()) do
@@ -140,13 +141,14 @@ function Ghost( ply, params )
 	
 	Notify( ply:Nick() .. " has ghosted " .. params[1]:Nick() )
 end
-RegisterCommand( "Ghost", "Turn a player into a ghost (invisible", "ghost", "ghost [name]", 1, "Overv", 2, 0, Ghost )
+RegisterCommand( "Ghost", "Turn a player into a ghost (invisible)", "ghost", "ghost [name]", 1, "Overv", 2, 0, Ghost )
 RegisterCheck( "Ghost", 1, 3, "Player '%arg%' not found!" )
 
 function UnGhost( ply, params )
 	params[1]:SetRenderMode( RENDERMODE_NORMAL )
 	params[1]:SetColor(255, 255, 255, 255)
 	params[1]:SetNetworkedBool( "Ghosted", false )
+	params[1]:SetCollisionGroup( COLLISION_GROUP_PLAYER )
 	
 	//Make weapons visible again
 	for _, v in pairs(params[1]:GetWeapons()) do
