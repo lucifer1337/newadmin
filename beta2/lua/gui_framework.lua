@@ -1,16 +1,31 @@
 //This is like the plugin manager, but allows plugins to add controls to the gui
-function ShowMenu()
+function ShowMenu( ply )
+	if Flag(LocalPlayer()) < 1 then return false end
 	if !AdminPanel then BuildMenu() end
 	
 	RefillPlayers()
 	AdminPanel:SetVisible( true )
+	AllowClose = true
 end
 concommand.Add( "+NA_Menu", ShowMenu )
 
 function HideMenu()
-	AdminPanel:SetVisible( false )
+	if AllowClose then AdminPanel:SetVisible( false ) end
 end
 concommand.Add( "-NA_Menu", HideMenu )
+
+//Hooks for keeping the menu open when the cursor is in a textbox
+function KeyboardFocusOn( pnl )
+	AllowClose = false
+	AdminPanel:SetKeyboardInputEnabled( true )
+end
+hook.Add( "OnTextEntryGetFocus", "KeyboardFocusOn", KeyboardFocusOn )
+
+function KeyboardFocusOff( pnl )
+	AllowClose = true
+	AdminPanel:SetKeyboardInputEnabled( false )
+end
+hook.Add( "OnTextEntryLoseFocus", "KeyboardFocusOff", KeyboardFocusOff )
 
 //Building the menu
 function BuildMenu()
@@ -113,11 +128,18 @@ function PlayerTab()
 		surface.DrawRect( 0, 0, TabPlayers:GetWide(), TabPlayers:GetTall() )
 	end
 	
+	//Playerlist
 	Players = vgui.Create( "DComboBox", TabPlayers )
 	Players:SetPos( 0, 0 )
-	Players:SetSize( TabPlayers:GetWide() - 150 , TabPlayers:GetTall() - 17 ) 
+	Players:SetSize( TabPlayers:GetWide() - 150 , TabPlayers:GetTall() - 42 ) 
 	Players:SetMultiple( false )
 	RefillPlayers()
+	
+	//Filter textbox
+	PlayerFilter = vgui.Create( "DTextEntry", TabPlayers )
+	PlayerFilter:SetPos( 0, TabPlayers:GetTall() - 37 )
+	PlayerFilter:SetTall( 20 )
+	PlayerFilter:SetWide( TabPlayers:GetWide() - 150 )
 	
 	Tabs:AddSheet( "Players", TabPlayers, "gui/silkicons/user", false, false, "Apply actions and punishment to players" ) 
 end

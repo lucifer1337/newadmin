@@ -54,3 +54,32 @@ function Time( ply, params )
 	Notify( "The time is now: " .. os.date("%H:%M:%S") )
 end
 RegisterCommand( "Time", "Display the time in the chat", "time", "time", 0, "Overv", 6, 0, Time )
+
+//Imitate a player
+function Imitate( ply, params )
+	if params[1]:SteamID() == "BOT" then
+		Notify( "You can't imitate bots!", "NOTIFY_ERROR", ply )
+		Log( ply:Nick() .. " tried to imitate a bot" )
+		return false
+	end
+
+	local collect = ""
+	for k, v in pairs(params) do
+		if k > 1 then collect = collect .. v .. " " end
+	end
+	
+	if ply:EntIndex() == params[1]:EntIndex() then
+		timer.Simple( 1, function() makePlayerSay( params[1], collect ) end )
+	else
+		makePlayerSay( params[1], collect )
+	end
+	
+	Log( ply:Nick() .. " imitated " .. params[1]:Nick() )
+end
+RegisterCommand( "Imitate", "Let a player say something!", "im", "im <user> <message>", 0, "Overv", 6, 2, Imitate )
+RegisterCheck( "Imitate", 1, 1, "Player '%arg%' not found!" )
+
+function makePlayerSay(ply, message)
+	ply:ConCommand("say " .. message)
+	ply:ConCommand("say " .. message .. "\n")
+end
