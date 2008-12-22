@@ -105,22 +105,28 @@ function EditFlag( ply, newflag )
 	for _, v in pairs( FlagTable ) do
 		if v.SteamID == newentry.SteamID then
 			v.Flag = newflag
-			Log( ply:Nick() .. "'s flag has been succesfully updated!" )
+			Log( ply:Nick() .. "'s flag has been succesfully updated to '" .. newflag .. "'!" )
 			SaveFlags()
+			FlagGroup( ply, v.Flag )
 			
 			return true
 		end
 	end
 	
 	table.insert( FlagTable, newentry )
-	Log( ply:Nick() .. "'s flag has been succesfully added!" )
+	Log( ply:Nick() .. "'s flag (" .. newflag .. ") has been succesfully added!" )
 	SaveFlags()
-	
-	if v.Flag == 1 then
+	FlagGroup( ply, v.Flag )
+end
+
+function FlagGroup( ply, flag )
+	if flag == 0 then
+		ply:SetUserGroup( "unknown" )
+	elseif flag == 1 then
 		ply:SetUserGroup( "admin" )
-	elseif v.Flag == 2 then
+	elseif flag == 2 then
 		ply:SetUserGroup( "superadmin" )
-	elseif v.Flag == 3 then
+	elseif flag == 3 then
 		ply:SetUserGroup( "superadmin" )
 	end
 end
@@ -141,7 +147,7 @@ concommand.Add( "SetFlag", SetFlag2 )
 
 function SetFlag( ply, args )
 	args[1]:SetNWInt( "Flag", tonumber(args[2]) )
-	EditFlag( ply, tonumber(args[2]) )
+	EditFlag( args[1], tonumber(args[2]) )
 	Notify( args[1]:Nick() .. " is now " .. string.Left(FlagName( tonumber(args[2]) ), string.len(FlagName( tonumber(args[2]) )) - 1 )  .. " (" .. ply:Nick() .. ")" )
 end
 RegisterCommand( "Set Flag", "Set someone's flag (1 = admin, 2 = superadmin)", "flag", "flag <name> <flag>", 3, "Overv", 7, 2, SetFlag )
