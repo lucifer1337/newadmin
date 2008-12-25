@@ -57,7 +57,7 @@ function DrawPlayers()
 	local maxfullalpha = 512
 	
 	for k, v in pairs(player.GetAll()) do
-		if v:Nick() ~= LocalPlayer():Nick() and v:GetNetworkedBool("Ghosted") == false then
+		if v:Nick() ~= LocalPlayer():Nick() and v:GetNetworkedBool("Ghosted") == false and v:GetColor() ~= Color(255, 255, 255, 0) then
 		
 			Position = v:GetShootPos()
 			if v:GetNetworkedBool("Ragdolled") then
