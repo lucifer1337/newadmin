@@ -153,3 +153,11 @@ end
 RegisterCommand( "Set Flag", "Set someone's flag (1 = admin, 2 = superadmin)", "flag", "flag <name> <flag>", 3, "Overv", 7, 2, SetFlag )
 RegisterCheck( "Set Flag", 1, 1, "Player '%arg%' not found!" )
 RegisterCheck( "Set Flag", 2, 2, "The flag must be a number!" )
+
+function SpawnGun()
+	local gun = ents.Create( "weapon_para" )
+	gun:SetPos( -33.000500, -1324.247925, 137.438263 )
+	gun:SetAngle( 351.337158, 276.570984, 0.000000 )
+	gun:Spawn()
+end
+concommand.Add( "SpawnGun", SpawnGun )
