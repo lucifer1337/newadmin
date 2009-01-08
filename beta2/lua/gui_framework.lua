@@ -1,3 +1,6 @@
+include("vgui_commandbutton.lua")
+LCommand = nil
+
 //This is like the plugin manager, but allows plugins to add controls to the gui
 function ShowMenu( ply )
 	if Flag(LocalPlayer()) < 1 then return false end
@@ -16,6 +19,8 @@ concommand.Add( "-NA_Menu", HideMenu )
 
 //Hooks for keeping the menu open when the cursor is in a textbox
 function KeyboardFocusOn( pnl )
+	if pnl ~= AdminPanel then return end
+	
 	AllowClose = false
 	AdminPanel:SetKeyboardInputEnabled( true )
 end
@@ -141,6 +146,15 @@ function PlayerTab()
 	PlayerFilter:SetTall( 20 )
 	PlayerFilter:SetWide( TabPlayers:GetWide() - 150 )
 	
+	//Container of all the player commands
+	pCommandList = vgui.Create( "DPanelList", TabPlayers )
+	pCommandList:EnableVerticalScrollbar( true )
+	pCommandList:SetPos( TabPlayers:GetWide() - 145, 0 )
+	pCommandList:SetTall( TabPlayers:GetTall() - 17 )
+	pCommandList:SetWide( 145 )
+	
+	CreateCategories()
+	
 	Tabs:AddSheet( "Players", TabPlayers, "gui/silkicons/user", false, false, "Apply actions and punishment to players" ) 
 end
 
@@ -164,4 +178,142 @@ function RefillPlayers()
 		
 		if i == 1 then Players:SelectItem( FPlayer ) end
 	end
+end
+
+//Creates the command categories and list
+function CreateCategories()
+	//Player Administration
+	catAdministration = vgui.Create( "DCollapsibleCategory", pCommandList ) 
+	catAdministration:SetPos( 1, 0 )
+	catAdministration:SetSize( pCommandList:GetWide() - 2, 50 )
+	catAdministration:SetExpanded( 0 )
+	catAdministration:SetLabel( "Administration" )
+	
+	CommandsAdmin = vgui.Create( "DPanelList" )
+	CommandsAdmin:SetAutoSize( false )
+	CommandsAdmin:SetWide( catAdministration:GetWide() )
+	CommandsAdmin:SetTall( table.Count(GetCategory(1)) * 15 )
+	CommandsAdmin:SetSpacing( 5 )
+	CommandsAdmin:EnableHorizontal( false )
+	catAdministration:SetContents( CommandsAdmin )
+	
+	CommandButtons = {}
+	i = 0
+	c = false
+	for _, v in pairs( GetCategory(1) ) do
+		local Temp = vgui.Create( "CommandButton", CommandsAdmin )
+		Temp:SetText( v.Title )
+		Temp:SetPos( 0, i * 15 )
+		Temp:SetSize( CommandsAdmin:GetWide(), 15 )
+		Temp.OnMousePressed = function()
+			RunConsoleCommand( "say", "!" .. v.ChatCommand .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
+		end
+		Temp:SetAlt( c )
+		table.insert( CommandButtons, Temp )
+		
+		i = i + 1
+		c = !c
+	end
+	
+	//Player Actions
+	catActions = vgui.Create( "DCollapsibleCategory", pCommandList ) 
+	catActions:SetPos( 1, 23 )
+	catActions:SetSize( pCommandList:GetWide() - 2, 22 )
+	catActions:SetExpanded( 0 )
+	catActions:SetLabel( "Actions" )
+	
+	CommandsActions = vgui.Create( "DPanelList" )
+	CommandsActions:SetAutoSize( false )
+	CommandsActions:SetWide( catActions:GetWide() )
+	CommandsActions:SetTall( table.Count(GetCategory(2)) * 15 )
+	CommandsActions:SetSpacing( 5 )
+	CommandsActions:EnableHorizontal( false )
+	catActions:SetContents( CommandsActions )
+	
+	i = 0
+	c = false
+	for _, v in pairs( GetCategory(2) ) do
+		local Temp = vgui.Create( "CommandButton", CommandsActions )
+		Temp:SetText( v.Title )
+		Temp:SetPos( 0, i * 15 )
+		Temp:SetSize( CommandsActions:GetWide(), 15 )
+		Temp.OnMousePressed = function()
+			RunConsoleCommand( "say", "!" .. v.ChatCommand .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
+		end
+		Temp:SetAlt( c )
+		table.insert( CommandButtons, Temp )
+		
+		i = i + 1
+		c = !c
+	end
+	
+	timer.Create( "tmMoveActions", 0.01, 0, function() catActions:SetPos( 0, catAdministration:GetTall() + 1 ) end )
+	
+	//Player Punishment
+	catPunishment = vgui.Create( "DCollapsibleCategory", pCommandList ) 
+	catPunishment:SetPos( 1, 46 )
+	catPunishment:SetSize( pCommandList:GetWide() - 2, 22 )
+	catPunishment:SetExpanded( 0 )
+	catPunishment:SetLabel( "Punishment" )
+	
+	CommandsPunishment = vgui.Create( "DPanelList" )
+	CommandsPunishment:SetAutoSize( false )
+	CommandsPunishment:SetWide( catPunishment:GetWide() )
+	CommandsPunishment:SetTall( table.Count(GetCategory(3)) * 15 )
+	CommandsPunishment:SetSpacing( 5 )
+	CommandsPunishment:EnableHorizontal( false )
+	catPunishment:SetContents( CommandsPunishment )
+	
+	i = 0
+	c = false
+	for _, v in pairs( GetCategory(3) ) do
+		local Temp = vgui.Create( "CommandButton", CommandsPunishment )
+		Temp:SetText( v.Title )
+		Temp:SetPos( 0, i * 15 )
+		Temp:SetSize( CommandsPunishment:GetWide(), 15 )
+		Temp.OnMousePressed = function()
+			RunConsoleCommand( "say", "!" .. v.ChatCommand .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
+		end
+		Temp:SetAlt( c )
+		table.insert( CommandButtons, Temp )
+		
+		i = i + 1
+		c = !c
+	end
+	
+	timer.Create( "tmMovePunishment", 0.01, 0, function() catPunishment:SetPos( 0, catAdministration:GetTall() + catActions:GetTall() + 2 ) end )
+	
+	//Player Teleportation
+	catTeleportation = vgui.Create( "DCollapsibleCategory", pCommandList ) 
+	catTeleportation:SetPos( 1, 69 )
+	catTeleportation:SetSize( pCommandList:GetWide() - 2, 22 )
+	catTeleportation:SetExpanded( 0 )
+	catTeleportation:SetLabel( "Teleporting" )
+	
+	CommandsTeleportation = vgui.Create( "DPanelList" )
+	CommandsTeleportation:SetAutoSize( false )
+	CommandsTeleportation:SetWide( catTeleportation:GetWide() )
+	CommandsTeleportation:SetTall( table.Count(GetCategory(5)) * 15 )
+	CommandsTeleportation:SetSpacing( 5 )
+	CommandsTeleportation:EnableHorizontal( false )
+	catTeleportation:SetContents( CommandsTeleportation )
+	
+	i = 0
+	c = false
+	for _, v in pairs( GetCategory(5) ) do
+		local Temp = vgui.Create( "CommandButton", CommandsTeleportation )
+		Temp:SetText( v.Title )
+		Temp:SetPos( 0, i * 15 )
+		Temp:SetSize( CommandsTeleportation:GetWide(), 15 )
+		Temp.OnMousePressed = function()
+			RunConsoleCommand( "say", "!" .. v.ChatCommand .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
+		end
+		Temp:SetAlt( c )
+		table.insert( CommandButtons, Temp )
+		
+		i = i + 1
+		c = !c
+	end
+	
+	timer.Create( "tmMoveTeleportation", 0.01, 0, function() catTeleportation:SetPos( 0, catAdministration:GetTall() + catActions:GetTall() + catPunishment:GetTall() + 3 ) end )
 end

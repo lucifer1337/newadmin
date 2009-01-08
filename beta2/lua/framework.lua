@@ -186,3 +186,12 @@ function ChoiceGetOptionID( ChoiceControl, TotalItems, ItemText )
 	
 	return nil
 end
+
+function GetCategory( cat )
+	Temp = {}
+	for _, v in pairs(Commands) do
+		if v.CategoryID == cat then table.insert( Temp, v ) end
+	end
+	
+	return Temp
+end
