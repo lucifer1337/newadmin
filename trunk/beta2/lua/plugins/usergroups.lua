@@ -116,7 +116,7 @@ function EditFlag( ply, newflag )
 	table.insert( FlagTable, newentry )
 	Log( ply:Nick() .. "'s flag (" .. newflag .. ") has been succesfully added!" )
 	SaveFlags()
-	FlagGroup( ply, v.Flag )
+	FlagGroup( ply, newflag )
 end
 
 function FlagGroup( ply, flag )

@@ -9,6 +9,25 @@ end
 RegisterCommand( "Slay", "Kill a player", "slay", "slay [name]", 1, "Overv", 3, 0, Slay )
 RegisterCheck( "Slay", 1, 3, "Player '%arg%' not found!" )
 
+//Slap
+function Slap( ply, params )
+		params[1]:TakeDamage( params[2] )
+		Notify( ply:Nick() .. " slapped " .. params[1]:Nick() .. " with " .. params[2] .. " HP", "NOTIFY_CLEANUP" )
+end
+RegisterCommand( "Slap", "Damage a player", "slap", "slap <name> <damage>", 1, "Overv", 3, 0, Slap )
+RegisterCheck( "Slap", 1, 3, "Player '%arg%' not found!" )
+RegisterCheck( "Slap", 2, 2, "Damage must be a number!" )
+
+//Mass Slap
+function MassSlap( ply, params )
+		timer.Create( "tmSlap" .. params[1]:Nick(), 0.5, params[3], function() params[1]:TakeDamage( params[2] ) end )  
+		Notify( ply:Nick() .. " slaps " .. params[1]:Nick() .. " " .. params[3] .. " times with " .. params[2] .. " HP", "NOTIFY_CLEANUP" )
+end
+RegisterCommand( "MassSlap", "Damages a player multiple times with a short interval", "mslap", "mslap <name> <damage> <times>", 1, "Overv", 3, 0, MassSlap )
+RegisterCheck( "MassSlap", 1, 3, "Player '%arg%' not found!" )
+RegisterCheck( "MassSlap", 2, 2, "Damage must be a number!" )
+RegisterCheck( "MassSlap", 3, 2, "Amount of times must be a number!" )
+
 //Strip weapons
 function Strip( ply, params )
 	params[1]:StripWeapons()
