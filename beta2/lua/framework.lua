@@ -6,7 +6,7 @@ function Notify( Message, Icon, Filter )
 		//Player passes filter or no filter?
 		if Filter == nil or v:UserID() == Filter:UserID() then
 			if Icon == nil then Icon = "NOTIFY_GENERIC" end
-			v:SendLua("GAMEMODE:AddNotify(\"".. Message .."\", " .. Icon .. ", 8); surface.PlaySound( \"".. "ambient/water/drip" .. math.random(1, 4) .. ".wav" .."\" )")
+			v:SendLua("NA_AddNotify(\"".. Message .."\", " .. Icon .. ", 8); surface.PlaySound( \"".. "ambient/water/drip" .. math.random(1, 4) .. ".wav" .."\" )")
 		end
 	end
 end
