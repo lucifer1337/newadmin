@@ -5,6 +5,7 @@ AddCSLuaFile( "plugin_manager.lua" )
 AddCSLuaFile( "framework.lua" )
 AddCSLuaFile( "gui_framework.lua" ) //No include, cause this is client only ;)
 AddCSLuaFile( "vgui_commandbutton.lua" )
+AddCSLuaFile( "cl_notify.lua" )
 include( "plugin_manager.lua" )
 include( "framework.lua" )
 

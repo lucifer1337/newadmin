@@ -1,5 +1,6 @@
 //Load all the files for the NewAdmin framework
 include( "plugin_manager.lua" )
+include( "cl_notify.lua" )
 include( "framework.lua" )
 include( "gui_framework.lua" )
 
