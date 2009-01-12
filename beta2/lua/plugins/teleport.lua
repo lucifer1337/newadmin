@@ -11,6 +11,7 @@ function Goto( ply, params )
 end
 RegisterCommand( "Goto", "Teleport to a player", "goto", "goto <name>", 1, "Overv", 5, 1, Goto )
 RegisterCheck( "Goto", 1, 1, "Player '%arg%' not found!" )
+AddPlayerMenu( "Go to", 5, "goto" )
 
 //Bring
 function Bring( ply, params )
@@ -25,6 +26,7 @@ function Bring( ply, params )
 end
 RegisterCommand( "Bring", "Teleport a player to you", "bring", "bring <name>", 1, "Overv", 5, 1, Bring )
 RegisterCheck( "Bring", 1, 1, "Player '%arg%' not found!" )
+AddPlayerMenu( "Bring", 5, "bring" )
 
 //Send
 function Send( ply, params )
@@ -36,6 +38,7 @@ end
 RegisterCommand( "Send", "Teleport a player to another player", "send", "send <player1> <player2>", 1, "Overv", 5, 2, Send )
 RegisterCheck( "Send", 1, 1, "Player '%arg%' not found!" )
 RegisterCheck( "Send", 2, 1, "Player '%arg%' not found!" )
+AddPlayerMenu( "Send", 5, "send" )
 
 //Teleport to aimed position
 function Teleport( ply, params )
@@ -45,3 +48,4 @@ function Teleport( ply, params )
 end
 RegisterCommand( "Teleport", "Teleport a player to the position you look at", "tp", "tp [name]", 1, "Overv", 5, 0, Teleport )
 RegisterCheck( "Teleport", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Teleport", 5, "tp" )

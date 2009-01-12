@@ -8,6 +8,7 @@ function God( ply, params )
 end
 RegisterCommand( "God", "Enable godmode for a player", "god", "god [name]", 1, "Overv", 2, 0, God )
 RegisterCheck( "God", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "God", 2, "god" )
 
 function UnGod( ply, params )
 	params[1]:GodDisable()
@@ -16,6 +17,7 @@ function UnGod( ply, params )
 end
 RegisterCommand( "UnGod", "Disable godmode for a player", "ungod", "ungod [name]", 1, "Overv", 2, 0, UnGod )
 RegisterCheck( "UnGod", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Un-God", 2, "ungod" )
 
 //When you respawn godmode gets disabled, this will re-enable it :)
 function RestartGod( ply )
@@ -45,6 +47,7 @@ function SetHealth( ply, params )
 end
 RegisterCommand( "SetHealth", "Set health for a player", "hp", "hp [name] [amount]", 1, "Overv", 2, 0, SetHealth )
 RegisterCheck( "SetHealth", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Health", 2, "hp" )
 
 //Unlimited ammo
 function uAmmo( ply, params )
@@ -53,6 +56,7 @@ function uAmmo( ply, params )
 end
 RegisterCommand( "Unlimited Ammo", "Enables unlimited ammo for the player", "uammo", "uammo [name]", 1, "Overv", 2, 0, uAmmo )
 RegisterCheck( "Unlimited Ammo", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Unlimited Ammo", 2, "uammo" )
 
 function UnuAmmo( ply, params )
 	params[1]:SetNetworkedBool( "uAmmo", false)
@@ -60,6 +64,7 @@ function UnuAmmo( ply, params )
 end
 RegisterCommand( "Limited Ammo", "Disables unlimited ammo for the player", "unuammo", "unuammo [name]", 1, "Overv", 2, 0, UnuAmmo )
 RegisterCheck( "Limited Ammo", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Limited Ammo", 2, "unuammo" )
 
 function uAmmoGive()
 	for k, v in pairs(player.GetAll()) do
@@ -90,6 +95,7 @@ end
 RegisterCommand( "SetFrags", "Set the frags of a player", "frags", "frags <name> <frags>", 2, "Overv", 2, 2, SetFrags )
 RegisterCheck( "SetFrags", 1, 1, "Player '%arg%' not found!" )
 RegisterCheck( "SetFrags", 2, 2, "Amount of frags must be a number!" )
+AddPlayerMenu( "Set Frags", 2, "frags" )
 
 //Set frags
 function SetDeaths( ply, params )
@@ -99,6 +105,7 @@ end
 RegisterCommand( "SetDeaths", "Set the deaths of a player", "deaths", "deaths <name> <deaths>", 2, "Overv", 2, 2, SetDeaths )
 RegisterCheck( "SetDeaths", 1, 1, "Player '%arg%' not found!" )
 RegisterCheck( "SetDeaths", 2, 2, "Amount of deaths must be a number!" )
+AddPlayerMenu( "Set Deaths", 2, "deaths" )
 
 //Collect default weapons
 local defweapons = {}
@@ -125,6 +132,7 @@ function Arm( ply, params )
 end
 RegisterCommand( "Arm", "Gives a player all the weapons", "arm", "arm [name]", 1, "Overv", 2, 0, Arm )
 RegisterCheck( "Arm", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Arm", 2, "arm" )
 
 //Ghosting
 function Ghost( ply, params )
@@ -143,6 +151,7 @@ function Ghost( ply, params )
 end
 RegisterCommand( "Ghost", "Turn a player into a ghost (invisible)", "ghost", "ghost [name]", 1, "Overv", 2, 0, Ghost )
 RegisterCheck( "Ghost", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Ghost", 2, "ghost" )
 
 function UnGhost( ply, params )
 	params[1]:SetRenderMode( RENDERMODE_NORMAL )
@@ -160,6 +169,7 @@ function UnGhost( ply, params )
 end
 RegisterCommand( "UnGhost", "Turn a ghost into a player again", "unghost", "unghost [name]", 1, "Overv", 2, 0, UnGhost )
 RegisterCheck( "UnGhost", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Un-Ghost", 2, "unghost" )
 
 //When you respawn you get new weapons and they're not invisible yet D:
 function RestartGhost( ply )

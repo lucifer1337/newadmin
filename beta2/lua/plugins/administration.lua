@@ -24,6 +24,7 @@ function Kick( ply, params )
 end
 RegisterCommand( "Kick", "Kick a player", "kick", "kick <name> [reason]", 1, "Overv", 1, 1, Kick )
 RegisterCheck( "Kick", 1, 1, "Player '%arg%' not found!" )
+AddPlayerMenu( "Kick", 1, "kick" )
 
 //Ban system
 //Load saved bans from file
@@ -102,6 +103,7 @@ function Ban( ply, params )
 end
 RegisterCommand( "Ban", "Ban a player for a certain amount of time or permanent", "ban", "ban <name> [time in minutes, 0 = perma] [reason]", 2, "Overv", 1, 1, Ban )
 RegisterCheck( "Ban", 1, 1, "Player '%arg%' not found!" )
+AddPlayerMenu( "Ban", 1, "ban" )
 
 function KickBan( ply )
 	for k, v in pairs( BannedPlayers ) do
@@ -115,16 +117,26 @@ function KickBan( ply )
 		if v.SteamID == ply:SteamID() and (v.EndTime > os.time() or tonumber(v.EndTime) == 0) then
 			if tonumber(v.EndTime) == 0 then
 				RunConsoleCommand("kickid", ply:UserID(), "Permabanned!" )
+				return 
 			end
 		
-			local timeleft = math.floor((v.EndTime - os.time()) / 60)
+			local timeleft = math.ceil((v.EndTime - os.time()) / 60)
 						
 			if timeleft != 1 then
 				RunConsoleCommand("kickid", ply:UserID(), "Banned for " .. timeleft .. " minutes" )
+				return 
 			else
 				RunConsoleCommand("kickid", ply:UserID(), "Banned for " .. timeleft .. " minute" )
+				return 
 			end
 		end
 	end
+	
+	Log( "No ban entry found for " .. ply:Nick() )
 end
-hook.Add( "PlayerInitialSpawn", "KickBan", KickBan )
+hook.Add( "PlayerSpawn", "KickBan", KickBan )
+
+function LolDeb()
+	Msg( table.Count(BannedPlayers) .. "\n" )
+end
+concommand.Add( "Debug", LolDeb )
