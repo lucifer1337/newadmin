@@ -1,5 +1,6 @@
 include("vgui_commandbutton.lua")
 LCommand = nil
+CommandList = {}
 
 //This is like the plugin manager, but allows plugins to add controls to the gui
 function ShowMenu( ply )
@@ -56,6 +57,11 @@ function BuildMenu()
 	
 	PlayerTab()
 	PluginTab()
+	
+	//Building command list
+	for _, v in pairs(CommandList) do
+		RegisterPlayerMenu( v.Text, v.CategoryID, v.ChatString )
+	end
 end
 
 //Tab showing all plugins
@@ -180,140 +186,109 @@ function RefillPlayers()
 	end
 end
 
-//Creates the command categories and list
-function CreateCategories()
-	//Player Administration
-	catAdministration = vgui.Create( "DCollapsibleCategory", pCommandList ) 
-	catAdministration:SetPos( 1, 0 )
-	catAdministration:SetSize( pCommandList:GetWide() - 2, 50 )
-	catAdministration:SetExpanded( 0 )
-	catAdministration:SetLabel( "Administration" )
+//Functions to handle the player command list
+//ChatString should be like this for for example !god:
+//!god [gui.playername]
+//The framework will then automatically fill in [gui.playername] :)
+PlayerMenuItems = {}
+Categories = {}
+function RegisterPlayerMenu( Text, CategoryID, ChatString )
+	if !AdminPanel then BuildMenu() end
+
+	//First collect some info
+	local temp = {}
+	temp.Text = Text
+	temp.CategoryID = CategoryID
+	temp.ChatString = ChatString
 	
-	CommandsAdmin = vgui.Create( "DPanelList" )
-	CommandsAdmin:SetAutoSize( false )
-	CommandsAdmin:SetWide( catAdministration:GetWide() )
-	CommandsAdmin:SetTall( table.Count(GetCategory(1)) * 15 )
-	CommandsAdmin:SetSpacing( 5 )
-	CommandsAdmin:EnableHorizontal( false )
-	catAdministration:SetContents( CommandsAdmin )
-	
-	CommandButtons = {}
-	i = 0
-	c = false
-	for _, v in pairs( GetCategory(1) ) do
-		local Temp = vgui.Create( "CommandButton", CommandsAdmin )
-		Temp:SetText( v.Title )
-		Temp:SetPos( 0, i * 15 )
-		Temp:SetSize( CommandsAdmin:GetWide(), 15 )
-		Temp.OnMousePressed = function()
-			RunConsoleCommand( "say", "!" .. v.ChatCommand .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
-		end
-		Temp:SetAlt( c )
-		table.insert( CommandButtons, Temp )
-		
-		i = i + 1
-		c = !c
+	//Now make the item itself
+	local Temp = vgui.Create( "CommandButton", GetCategoryControlByCategoryID(CategoryID) )
+	Temp:SetText( Text )
+	Temp:SetPos( 0, MenuItemsInCategory(CategoryID) * 15 )
+	Temp:SetSize( pCommandList:GetWide() - 2, 15 )
+	Temp.OnMousePressed = function()
+		RunConsoleCommand( "say", "!" .. ChatString .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
+	end
+	if MenuItemsInCategory(CategoryID) / 2 == math.floor(MenuItemsInCategory(CategoryID) / 2) then
+		Temp:SetAlt( true )
 	end
 	
-	//Player Actions
-	catActions = vgui.Create( "DCollapsibleCategory", pCommandList ) 
-	catActions:SetPos( 1, 23 )
-	catActions:SetSize( pCommandList:GetWide() - 2, 22 )
-	catActions:SetExpanded( 0 )
-	catActions:SetLabel( "Actions" )
-	
-	CommandsActions = vgui.Create( "DPanelList" )
-	CommandsActions:SetAutoSize( false )
-	CommandsActions:SetWide( catActions:GetWide() )
-	CommandsActions:SetTall( table.Count(GetCategory(2)) * 15 )
-	CommandsActions:SetSpacing( 5 )
-	CommandsActions:EnableHorizontal( false )
-	catActions:SetContents( CommandsActions )
-	
-	i = 0
-	c = false
-	for _, v in pairs( GetCategory(2) ) do
-		local Temp = vgui.Create( "CommandButton", CommandsActions )
-		Temp:SetText( v.Title )
-		Temp:SetPos( 0, i * 15 )
-		Temp:SetSize( CommandsActions:GetWide(), 15 )
-		Temp.OnMousePressed = function()
-			RunConsoleCommand( "say", "!" .. v.ChatCommand .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
-		end
-		Temp:SetAlt( c )
-		table.insert( CommandButtons, Temp )
-		
-		i = i + 1
-		c = !c
-	end
-	
-	timer.Create( "tmMoveActions", 0.01, 0, function() catActions:SetPos( 0, catAdministration:GetTall() + 1 ) end )
-	
-	//Player Punishment
-	catPunishment = vgui.Create( "DCollapsibleCategory", pCommandList ) 
-	catPunishment:SetPos( 1, 46 )
-	catPunishment:SetSize( pCommandList:GetWide() - 2, 22 )
-	catPunishment:SetExpanded( 0 )
-	catPunishment:SetLabel( "Punishment" )
-	
-	CommandsPunishment = vgui.Create( "DPanelList" )
-	CommandsPunishment:SetAutoSize( false )
-	CommandsPunishment:SetWide( catPunishment:GetWide() )
-	CommandsPunishment:SetTall( table.Count(GetCategory(3)) * 15 )
-	CommandsPunishment:SetSpacing( 5 )
-	CommandsPunishment:EnableHorizontal( false )
-	catPunishment:SetContents( CommandsPunishment )
-	
-	i = 0
-	c = false
-	for _, v in pairs( GetCategory(3) ) do
-		local Temp = vgui.Create( "CommandButton", CommandsPunishment )
-		Temp:SetText( v.Title )
-		Temp:SetPos( 0, i * 15 )
-		Temp:SetSize( CommandsPunishment:GetWide(), 15 )
-		Temp.OnMousePressed = function()
-			RunConsoleCommand( "say", "!" .. v.ChatCommand .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
-		end
-		Temp:SetAlt( c )
-		table.insert( CommandButtons, Temp )
-		
-		i = i + 1
-		c = !c
-	end
-	
-	timer.Create( "tmMovePunishment", 0.01, 0, function() catPunishment:SetPos( 0, catAdministration:GetTall() + catActions:GetTall() + 2 ) end )
-	
-	//Player Teleportation
-	catTeleportation = vgui.Create( "DCollapsibleCategory", pCommandList ) 
-	catTeleportation:SetPos( 1, 69 )
-	catTeleportation:SetSize( pCommandList:GetWide() - 2, 22 )
-	catTeleportation:SetExpanded( 0 )
-	catTeleportation:SetLabel( "Teleporting" )
-	
-	CommandsTeleportation = vgui.Create( "DPanelList" )
-	CommandsTeleportation:SetAutoSize( false )
-	CommandsTeleportation:SetWide( catTeleportation:GetWide() )
-	CommandsTeleportation:SetTall( table.Count(GetCategory(5)) * 15 )
-	CommandsTeleportation:SetSpacing( 5 )
-	CommandsTeleportation:EnableHorizontal( false )
-	catTeleportation:SetContents( CommandsTeleportation )
-	
-	i = 0
-	c = false
-	for _, v in pairs( GetCategory(5) ) do
-		local Temp = vgui.Create( "CommandButton", CommandsTeleportation )
-		Temp:SetText( v.Title )
-		Temp:SetPos( 0, i * 15 )
-		Temp:SetSize( CommandsTeleportation:GetWide(), 15 )
-		Temp.OnMousePressed = function()
-			RunConsoleCommand( "say", "!" .. v.ChatCommand .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
-		end
-		Temp:SetAlt( c )
-		table.insert( CommandButtons, Temp )
-		
-		i = i + 1
-		c = !c
-	end
-	
-	timer.Create( "tmMoveTeleportation", 0.01, 0, function() catTeleportation:SetPos( 0, catAdministration:GetTall() + catActions:GetTall() + catPunishment:GetTall() + 3 ) end )
+	temp.Control = Temp
+	table.insert( PlayerMenuItems, temp )
+	Temp = nil
+	GetCategoryControlByCategoryID(CategoryID):SetTall( 15 * MenuItemsInCategory(CategoryID) )
 end
+
+//The delay system that unfortunately is nescesarry
+function AddPlayerMenu( Text, CategoryID, ChatString )
+	if !CLIENT then return false end
+	
+	local Temp = {}
+	Temp.Text = Text
+	Temp.CategoryID = CategoryID
+	Temp.ChatString = ChatString
+	table.insert( CommandList, Temp )
+end
+
+//Add a category header like "Administration"
+function AddCategory( Text, CategoryID )
+	local CatTempHeader = vgui.Create( "DCollapsibleCategory", pCommandList ) 
+	CatTempHeader:SetPos( 1, #Categories * 23 )
+	CatTempHeader:SetSize( pCommandList:GetWide() - 2, 50 )
+	CatTempHeader:SetExpanded( 0 )
+	CatTempHeader:SetLabel( Text )
+	
+	local CatTempContainer = vgui.Create( "DPanelList" )
+	CatTempContainer:SetAutoSize( false )
+	CatTempContainer:SetWide( CatTempHeader:GetWide() )
+	CatTempContainer:SetTall( 0 )
+	CatTempContainer:SetSpacing( 5 )
+	CatTempContainer:EnableHorizontal( false )
+	
+	CatTempHeader:SetContents( CatTempContainer )
+	
+	local Temp = {}
+	Temp.Text = Text
+	Temp.CategoryID = CategoryID
+	Temp.Header = CatTempHeader
+	Temp.Container = CatTempContainer
+	
+	table.insert( Categories, Temp )
+end
+
+//Get a category control by its category ID
+function GetCategoryControlByCategoryID( CategoryID )
+	for _, i in pairs( Categories ) do
+		if i.CategoryID == CategoryID then
+			return i.Container
+		end
+	end
+end
+
+//Get the amount of menu items in a category
+function MenuItemsInCategory( CategoryID )
+	amount = 0
+	for _, i in pairs(PlayerMenuItems) do
+		if i.CategoryID == CategoryID then amount = amount + 1 end
+	end
+	
+	return amount
+end
+
+//Create the base categories
+function CreateCategories()
+	AddCategory( "Administration", 1 )
+	AddCategory( "Actions", 2 )
+	AddCategory( "Teleportation", 5 )
+	AddCategory( "Punishment", 3 )
+end
+
+//Timer to move the categories when expanding etc.
+function MoveCategories()
+	local CurrentTop = 0
+	for _, v in pairs(Categories) do
+		v.Header:SetPos( 0, CurrentTop )
+		CurrentTop = CurrentTop + v.Header:GetTall() + 1
+	end
+end
+timer.Create( "MoveStuff", 0.01, 0, MoveCategories )

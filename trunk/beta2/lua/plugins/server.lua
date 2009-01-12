@@ -156,7 +156,7 @@ function Message( ply, params )
 		end
 	end
 end
-RegisterCommand( "Message", "Send a message to all players (type 1 = Notification, 2 = Chat, 3 = Center)", "msg", "msg <type> <message>", 2, "Overv", 4, 2, Message )
+RegisterCommand( "Message", "Send a message to all players (type 1 = Notification, 2 = Chat, 3 = Center)", "msg", "msg <type> <message>", 3, "Overv", 4, 2, Message )
 RegisterCheck( "Message", 1, 2, "The message type must be a number!" )
 
 local maps = {}
@@ -203,11 +203,17 @@ function ListMaps()
 	Msg("\n")
 end
 
+//Change gamemode and map
+function ChangeGM( ply, params )
+	RunConsoleCommand("changegamemode", params[1], params[2])
+end
+RegisterCommand( "Gamemode", "Use this command to change the map and gamemode", "gm", "gm <mapname> <gamemode folder name>", 2, "Overv", 4, 2, ChangeGM )
+
 //Admin only noclip
 local activated = false
 function BlockNoclip( ply )
 	if activated == true then
-		if ply:IsAdmin() then
+		if Flag(ply) > 0 then
 			return true
 		else
 			Notify( "Only admins are allowed to noclip!", "NOTIFY_ERROR", ply )

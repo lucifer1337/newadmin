@@ -73,11 +73,11 @@ function PANEL:AddCheckBox( strConVar )
 end
 
 function ResetFocus( Except )
-	for _, v in pairs(CommandButtons) do
-		if v ~= Except then
-			v:SetSelected( false )
+	for _, v in pairs(PlayerMenuItems) do
+		if v.Control ~= Except then
+			v.Control:SetSelected( false )
 		else
-			v:SetSelected( true )
+			v.Control:SetSelected( true )
 		end
 	end
 end

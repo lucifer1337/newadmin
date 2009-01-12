@@ -8,6 +8,7 @@ function Slay( ply, params )
 end
 RegisterCommand( "Slay", "Kill a player", "slay", "slay [name]", 1, "Overv", 3, 0, Slay )
 RegisterCheck( "Slay", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Slay", 3, "slay" )
 
 //Slap
 function Slap( ply, params )
@@ -17,6 +18,7 @@ end
 RegisterCommand( "Slap", "Damage a player", "slap", "slap <name> <damage>", 1, "Overv", 3, 0, Slap )
 RegisterCheck( "Slap", 1, 3, "Player '%arg%' not found!" )
 RegisterCheck( "Slap", 2, 2, "Damage must be a number!" )
+AddPlayerMenu( "Slap", 3, "slap" )
 
 //Mass Slap
 function MassSlap( ply, params )
@@ -27,6 +29,7 @@ RegisterCommand( "MassSlap", "Damages a player multiple times with a short inter
 RegisterCheck( "MassSlap", 1, 3, "Player '%arg%' not found!" )
 RegisterCheck( "MassSlap", 2, 2, "Damage must be a number!" )
 RegisterCheck( "MassSlap", 3, 2, "Amount of times must be a number!" )
+AddPlayerMenu( "Mass Slap", 3, "mslap" )
 
 //Strip weapons
 function Strip( ply, params )
@@ -35,6 +38,7 @@ function Strip( ply, params )
 end
 RegisterCommand( "Strip", "Strip weapons from a player", "strip", "strip [name]", 1, "Overv", 3, 0, Strip )
 RegisterCheck( "Strip", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Strip Weapons", 3, "strip" )
 
 //Jail
 local JailPos = nil
@@ -43,6 +47,7 @@ function SetJailPos( ply, params )
 	Notify( "Jail position set to your current position!", "NOTIFY_ERROR", ply )
 end
 RegisterCommand( "Set jail position", "Set the jail position to your current position", "setjail", "setjail", 1, "Overv", 3, 0, SetJailPos )
+AddPlayerMenu( "Set Jail", 3, "setjail" )
 
 function Jail( ply, params )
 	//Check if we have a jail position yet
@@ -67,6 +72,7 @@ function Jail( ply, params )
 end
 RegisterCommand( "Jail", "Jail the specified player", "jail", "jail [name]", 1, "Overv", 3, 0, Jail )
 RegisterCheck( "Jail", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Jail", 3, "jail" )
 
 function UnJail( ply, params )
 	if params[1]:GetNetworkedBool( "Jailed" ) == true then
@@ -92,6 +98,7 @@ function UnJail( ply, params )
 end
 RegisterCommand( "UnJail", "Unjail the specified player and respawn him", "unjail", "unjail [name]", 1, "Overv", 3, 0, UnJail )
 RegisterCheck( "UnJail", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Un-Jail", 3, "unjail" )
 
 //Ignite
 function Ignite( ply, params )
@@ -100,6 +107,7 @@ function Ignite( ply, params )
 end
 RegisterCommand( "Ignite", "Ignite a player", "ignite", "ignite [name]", 1, "Overv", 3, 0, Ignite )
 RegisterCheck( "Ignite", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Ignite", 3, "ignite" )
 
 function UnIgnite( ply, params )
 	params[1]:Extinguish()
@@ -107,6 +115,7 @@ function UnIgnite( ply, params )
 end
 RegisterCommand( "Extinguish", "Extinguish a player", "unignite", "unignite [name]", 1, "Overv", 3, 0, UnIgnite )
 RegisterCheck( "Extinguish", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Extinguish", 3, "unignite" )
 
 //Blind
 function Blind( ply, params )
@@ -115,6 +124,7 @@ function Blind( ply, params )
 end
 RegisterCommand( "Blind", "Blind a player", "blind", "blind [name]", 1, "Overv", 3, 0, Blind )
 RegisterCheck( "Blind", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Blind", 3, "blind" )
 
 function UnBlind( ply, params )
 	params[1]:SetNetworkedBool( "Blinded", false )
@@ -122,6 +132,7 @@ function UnBlind( ply, params )
 end
 RegisterCommand( "UnBlind", "Unblind a player", "unblind", "unblind [name]", 1, "Overv", 3, 0, UnBlind )
 RegisterCheck( "UnBlind", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Un-Blind", 3, "unblind" )
 
 if CLIENT then
 	function BlindCheck()
@@ -140,6 +151,7 @@ function Freeze( ply, params )
 end
 RegisterCommand( "Freeze", "Freeze a player", "freeze", "freeze [name]", 1, "Overv", 3, 0, Freeze )
 RegisterCheck( "Freeze", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Freeze", 3, "freeze" )
 
 function UnFreeze( ply, params )
 	params[1]:SetNetworkedBool( "Frozen", false )
@@ -147,6 +159,7 @@ function UnFreeze( ply, params )
 end
 RegisterCommand( "UnFreeze", "Unfreeze a player", "unfreeze", "unfreeze [name]", 1, "Overv", 3, 0, UnFreeze )
 RegisterCheck( "UnFreeze", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "UnFreeze", 3, "unfreeze" )
 
 //Ragdolling
 function Ragdoll( ply, params )
@@ -183,6 +196,7 @@ function Ragdoll( ply, params )
 end
 RegisterCommand( "Ragdoll", "Turn a player into a ragdoll", "ragdoll", "ragdoll [name]", 1, "Overv", 3, 0, Ragdoll )
 RegisterCheck( "Ragdoll", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Ragdoll", 3, "ragdoll" )
 
 function UnRagdoll( ply, params )
 	if params[1]:GetNWBool("Ragdolled") == false then
@@ -210,6 +224,7 @@ function UnRagdoll( ply, params )
 end
 RegisterCommand( "UnRagdoll", "Turn a ragdoll into a player again", "unragdoll", "unragdoll [name]", 1, "Overv", 3, 0, UnRagdoll )
 RegisterCheck( "UnRagdoll", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Un-Ragdoll", 3, "unragdoll" )
 
 //If a player is in jail or frozen he may not move
 function BlockMove( ply )

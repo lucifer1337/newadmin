@@ -8,6 +8,7 @@ AddCSLuaFile( "vgui_commandbutton.lua" )
 AddCSLuaFile( "cl_notify.lua" )
 include( "plugin_manager.lua" )
 include( "framework.lua" )
+include( "gui_framework.lua" )
 
 //Loading message start
 EngineLoading = true
