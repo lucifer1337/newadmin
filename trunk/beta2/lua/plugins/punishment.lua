@@ -137,7 +137,7 @@ AddPlayerMenu( "Un-Blind", 3, "unblind" )
 if CLIENT then
 	function BlindCheck()
 		if LocalPlayer():GetNetworkedBool( "Blinded" ) then
-			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.SetDrawColor( 0, 0, 0, 255 )
 			surface.DrawRect( 0, 0, ScrW(), ScrH() )
 		end
 	end
@@ -228,7 +228,9 @@ AddPlayerMenu( "Un-Ragdoll", 3, "unragdoll" )
 
 //If a player is in jail or frozen he may not move
 function BlockMove( ply )
-	if ply:GetNetworkedBool( "Jailed" ) == true or ply:GetNetworkedBool("Frozen") == true then
+	if ply:GetNetworkedBool("Frozen") == true then
+		return true
+	elseif ply:GetNetworkedBool( "Jailed" ) == true and ply:GetMoveType() ~= MOVETYPE_WALK then
 		return true
 	end
 end
