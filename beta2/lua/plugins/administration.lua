@@ -98,7 +98,7 @@ function Ban( ply, params )
 	else
 		Notify( params[1]:Nick() .. " has been permabanned by " .. ply:Nick(), "NOTIFY_CLEANUP" )
 		
-		RunConsoleCommand("kickid", params[1]:UserID(), "Permanently banned! (" .. reason .. ")")
+		RunConsoleCommand("kickid", params[1]:UserID(), "Permabanned! (" .. reason .. ")")
 	end
 end
 RegisterCommand( "Ban", "Ban a player for a certain amount of time or permanent", "ban", "ban <name> [time in minutes, 0 = perma] [reason]", 2, "Overv", 1, 1, Ban )
