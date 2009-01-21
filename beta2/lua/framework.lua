@@ -7,8 +7,10 @@ function Notify( Message, Icon, Filter )
 		if Filter == nil or v:UserID() == Filter:UserID() then
 			if Icon == nil then Icon = "NOTIFY_GENERIC" end
 			v:SendLua("NA_AddNotify(\"".. Message .."\", " .. Icon .. ", 8); surface.PlaySound( \"".. "ambient/water/drip" .. math.random(1, 4) .. ".wav" .."\" )")
+			if Filter ~= nil then Log( "Notification to " .. v:Nick() .. ": " .. Message ) end
 		end
 	end
+	if Filter == nil then Log( "Notification to everyone: " .. Message ) end
 end
 
 //Get command name from chat message

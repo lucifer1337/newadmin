@@ -23,6 +23,8 @@ concommand.Add( "SetGroup", SetGroup2 )
 local FlagTable = {}
 
 function LoadFlags()
+	FlagTable = {}
+	
 	if file.Exists( "NewAdmin/flags.txt" ) then
 		local tfile = file.Read( "NewAdmin/flags.txt" )
 		local entries = string.Explode( "\n", tfile )
@@ -44,6 +46,7 @@ function LoadFlags()
 	end
 end
 LoadFlags()
+concommand.Add( "ReloadFlags", LoadFlags )
 
 function SaveFlags()
 	local tfile = ""
@@ -57,6 +60,8 @@ function SaveFlags()
 end
 
 function AssignFlags( ply )
+	if ply:GetNWBool( "Flagged" ) == true then return  end
+
 	//Some weird bug with keeping the player in TEAM_CONNECTING
 	if ply:Team() == TEAM_CONNECTING then
 		ply:SetTeam( TEAM_UNASSIGNED )
@@ -64,22 +69,28 @@ function AssignFlags( ply )
 
 	for _, v in pairs( FlagTable ) do
 		if v.SteamID == ply:SteamID() then
-			ply:SetNWInt( "Flag", v.Flag )
+			local Flag = tonumber(v.Flag)
+			ply:SetNWInt( "Flag", Flag )
 			
-			if v.Flag == 1 then
+			if Flag == 1 then
 				ply:SetUserGroup( "admin" )
-			elseif v.Flag == 2 then
+				Log( "Automatically moved '" .. ply:Nick() .. "' into the group 'admin'" )
+			elseif Flag == 2 then
 				ply:SetUserGroup( "superadmin" )
-			elseif v.Flag == 3 then
+				Log( "Automatically moved '" .. ply:Nick() .. "' into the group 'superadmin'" )
+			elseif Flag == 3 then
 				ply:SetUserGroup( "superadmin" )
+				Log( "Automatically moved '" .. ply:Nick() .. "' into the group 'superadmin'" )
 			end
 			
 			Log( "Assigned the flag '" .. v.Flag .. "' to '" .. ply:Nick() .. "'" )
-			return true
+			ply:SetNWBool( "Flagged", true )
+			return 
 		end
 	end
 	
 	Log( "No flag entry found for '" .. ply:Nick() .. "'" )
+	ply:SetNWBool( "Flagged", true )
 	
 	if !ply:IsAdmin() and !ply:IsSuperAdmin() then
 		ply:SetNWInt( "Flag", 0 ) //User
@@ -95,7 +106,7 @@ function AssignFlags( ply )
 	end
 	SaveFlags()
 end
-hook.Add( "PlayerInitialSpawn", "AssignFlags", AssignFlags )
+hook.Add( "PlayerSpawn", "AssignFlags", AssignFlags )
 
 function EditFlag( ply, newflag )
 	local newentry = {}
@@ -153,11 +164,3 @@ end
 RegisterCommand( "Set Flag", "Set someone's flag (1 = admin, 2 = superadmin)", "flag", "flag <name> <flag>", 3, "Overv", 7, 2, SetFlag )
 RegisterCheck( "Set Flag", 1, 1, "Player '%arg%' not found!" )
 RegisterCheck( "Set Flag", 2, 2, "The flag must be a number!" )
-
-function SpawnGun()
-	local gun = ents.Create( "weapon_para" )
-	gun:SetPos( -33.000500, -1324.247925, 137.438263 )
-	gun:SetAngle( 351.337158, 276.570984, 0.000000 )
-	gun:Spawn()
-end
-concommand.Add( "SpawnGun", SpawnGun )

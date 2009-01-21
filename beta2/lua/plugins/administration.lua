@@ -106,6 +106,8 @@ RegisterCheck( "Ban", 1, 1, "Player '%arg%' not found!" )
 AddPlayerMenu( "Ban", 1, "ban" )
 
 function KickBan( ply )
+	if ply:GetNWBool("BanChecked") ~= true then return  end
+
 	for k, v in pairs( BannedPlayers ) do
 		//Ban done?
 		if v.EndTime < os.time() and tonumber(v.EndTime) > 0 then
@@ -133,6 +135,7 @@ function KickBan( ply )
 	end
 	
 	Log( "No ban entry found for " .. ply:Nick() )
+	ply:SetNWBool( "BanChecked", true )
 end
 hook.Add( "PlayerSpawn", "KickBan", KickBan )
 

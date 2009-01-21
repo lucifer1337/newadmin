@@ -169,7 +169,7 @@ function RefillPlayers()
 	
 	for i, v in pairs(player.GetAll()) do
 		if Flag(v) < 1 then
-			FPlayer = Players:AddItem( v:Nick() )
+			FPlayer = Players:AddItem( v:Nick() .. " (User)" )
 		else
 			if Flag( v ) == 1 then
 				Class = "Admin"

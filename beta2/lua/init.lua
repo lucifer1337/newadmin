@@ -9,6 +9,7 @@ AddCSLuaFile( "cl_notify.lua" )
 include( "plugin_manager.lua" )
 include( "framework.lua" )
 include( "gui_framework.lua" )
+include( "beta_manager.lua" ) //BETA FUNCTIONS
 
 //Loading message start
 EngineLoading = true
@@ -50,8 +51,3 @@ function ReHook()
 	hook.Add( "PlayerSay", "CheckCalls", CheckCalls )
 end
 timer.Create( "tmRehook", 1, 0, ReHook )
-
-function Lolwut(ply)
-	ply:SendLua("include(\"autorun/na_autorun.lua\")")
-end
-hook.Add("PlayerInitialSpawn", "Lolwut", Lolwut )
