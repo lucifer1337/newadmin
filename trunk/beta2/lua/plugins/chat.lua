@@ -49,6 +49,15 @@ function Whisper( ply, params )
 end
 RegisterCommand( "Whisper", "Whisper messages to people close to you", "w", "w <message>", 0, "Overv", 6, 1, Whisper )
 
+//Admin talk
+function ChatAdmin( ply, params )
+	local Message = table.concat( params, " " )
+	for _, v in pairs(player.GetAll()) do
+		if Flag(v) > 0 then v:PrintMessage( HUD_PRINTTALK, "(ADMIN - " .. ply:Nick() .. ") " .. Message ) end
+	end
+end
+RegisterCommand( "Admin Chat", "Send a message to all admins", "a", "a <message>", 1, "Overv", 6, 1, ChatAdmin )
+
 //Display the time
 function Time( ply, params )
 	Notify( "The time is now: " .. os.date("%H:%M:%S") )
@@ -76,10 +85,9 @@ function Imitate( ply, params )
 	
 	Log( ply:Nick() .. " imitated " .. params[1]:Nick() )
 end
-RegisterCommand( "Imitate", "Let a player say something!", "im", "im <user> <message>", 0, "Overv", 6, 2, Imitate )
+RegisterCommand( "Imitate", "Let a player say something!", "im", "im <user> <message>", 2, "Overv", 6, 2, Imitate )
 RegisterCheck( "Imitate", 1, 1, "Player '%arg%' not found!" )
 
 function makePlayerSay(ply, message)
-	ply:ConCommand("say " .. message)
 	ply:ConCommand("say " .. message .. "\n")
 end

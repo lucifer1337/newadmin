@@ -181,3 +181,12 @@ function RestartGhost( ply )
 	end
 end
 hook.Add( "PlayerSpawn", "RestartGhost", RestartGhost )
+
+//Force a player to respawn
+function Spawn( ply, params )
+	params[1]:Spawn()
+	Notify( ply:Nick() .. " has respawned " .. params[1]:Nick() )
+end
+RegisterCommand( "Spawn", "Force a player to respawn", "spawn", "spawn [name]", 1, "Overv", 2, 0, Spawn )
+RegisterCheck( "Spawn", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Spawn", 2, "spawn" )

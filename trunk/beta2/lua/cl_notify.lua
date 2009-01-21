@@ -15,7 +15,13 @@ local HUDNote_c = 0
 local HUDNote_i = 1 
 local HUDNotes = {} 
 
-function NA_AddNotify( str, type, length ) 
+function NA_AddNotify( str, type, length )
+	Msg( "NOTIFICATION: " .. str .. "\n" )
+	if GAMEMODE.AddNotify then
+		GAMEMODE:AddNotify( str, type, length )
+		return true
+	end
+
 	local tab = {}
 	tab.text 	= str
 	tab.recv 	= SysTime()
@@ -40,7 +46,7 @@ local function NA_DrawNotice( self, k, v, i )
 	local y = v.y - 300 * H
 	
 	if ( !v.w ) then
-		surface.SetFont( "GModNotify" )
+		surface.SetFont( "ScoreboardText" )
 		v.w, v.h = surface.GetTextSize( v.text )
 	end
 	
@@ -58,11 +64,11 @@ local function NA_DrawNotice( self, k, v, i )
 	surface.SetTexture( NoticeMaterial[ v.type ] )
 	surface.DrawTexturedRect( x - w - h + 16, y - 4, h - 8, h - 8 )
 	
-	draw.SimpleText( v.text, "GModNotify", x+1, y+1, Color(0,0,0,v.a*0.8), TEXT_ALIGN_RIGHT )
-	draw.SimpleText( v.text, "GModNotify", x-1, y-1, Color(0,0,0,v.a*0.5), TEXT_ALIGN_RIGHT )
-	draw.SimpleText( v.text, "GModNotify", x+1, y-1, Color(0,0,0,v.a*0.6), TEXT_ALIGN_RIGHT )
-	draw.SimpleText( v.text, "GModNotify", x-1, y+1, Color(0,0,0,v.a*0.6), TEXT_ALIGN_RIGHT )
-	draw.SimpleText( v.text, "GModNotify", x, y, Color(255,255,255,v.a), TEXT_ALIGN_RIGHT )
+	draw.SimpleText( v.text, "ScoreboardText", x+1, y+1, Color(0,0,0,v.a*0.8), TEXT_ALIGN_RIGHT )
+	draw.SimpleText( v.text, "ScoreboardText", x-1, y-1, Color(0,0,0,v.a*0.5), TEXT_ALIGN_RIGHT )
+	draw.SimpleText( v.text, "ScoreboardText", x+1, y-1, Color(0,0,0,v.a*0.6), TEXT_ALIGN_RIGHT )
+	draw.SimpleText( v.text, "ScoreboardText", x-1, y+1, Color(0,0,0,v.a*0.6), TEXT_ALIGN_RIGHT )
+	draw.SimpleText( v.text, "ScoreboardText", x, y, Color(255,255,255,v.a), TEXT_ALIGN_RIGHT )
 	
 	local ideal_y = ScrH() - (HUDNote_c - i) * (h + 4)
 	local ideal_x = ScrW()
