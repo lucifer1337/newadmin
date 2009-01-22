@@ -22,7 +22,7 @@ AddPlayerMenu( "Slap", 3, "slap" )
 
 //Mass Slap
 function MassSlap( ply, params )
-		timer.Create( "tmSlap" .. params[1]:Nick(), 0.5, params[3], function() params[1]:TakeDamage( params[2] ) end )  
+		timer.Create( "tmSlap" .. params[1]:Nick(), 0.5, params[3], function() if params[1] ~= NULL then params[1]:TakeDamage( params[2] ) end end )  
 		Notify( ply:Nick() .. " slaps " .. params[1]:Nick() .. " " .. params[3] .. " times with " .. params[2] .. " HP", "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "MassSlap", "Damages a player multiple times with a short interval", "mslap", "mslap <name> <damage> <times>", 1, "Overv", 3, 0, MassSlap )
