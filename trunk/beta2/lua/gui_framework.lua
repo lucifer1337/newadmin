@@ -20,7 +20,7 @@ concommand.Add( "-NA_Menu", HideMenu )
 
 //Hooks for keeping the menu open when the cursor is in a textbox
 function KeyboardFocusOn( pnl )
-	if pnl ~= AdminPanel then return end
+	if AdminPanel == nil then return  end
 	
 	AllowClose = false
 	AdminPanel:SetKeyboardInputEnabled( true )
@@ -28,6 +28,8 @@ end
 hook.Add( "OnTextEntryGetFocus", "KeyboardFocusOn", KeyboardFocusOn )
 
 function KeyboardFocusOff( pnl )
+	if AdminPanel == nil then return  end
+	
 	AllowClose = true
 	AdminPanel:SetKeyboardInputEnabled( false )
 end
@@ -145,13 +147,16 @@ function PlayerTab()
 	Players:SetPos( 0, 0 )
 	Players:SetSize( TabPlayers:GetWide() - 150 , TabPlayers:GetTall() - 42 ) 
 	Players:SetMultiple( false )
-	RefillPlayers()
 	
 	//Filter textbox
 	PlayerFilter = vgui.Create( "DTextEntry", TabPlayers )
 	PlayerFilter:SetPos( 0, TabPlayers:GetTall() - 37 )
 	PlayerFilter:SetTall( 20 )
 	PlayerFilter:SetWide( TabPlayers:GetWide() - 150 )
+	PlayerFilter.OnTextChanged = function()
+		RefillPlayers()
+	end
+	RefillPlayers()
 	
 	//Container of all the player commands
 	pCommandList = vgui.Create( "DPanelList", TabPlayers )
@@ -167,23 +172,26 @@ end
 
 function RefillPlayers()
 	Players:Clear()
+	local Filter = PlayerFilter:GetValue()
 	
 	for i, v in pairs(player.GetAll()) do
-		if Flag(v) < 1 then
-			FPlayer = Players:AddItem( v:Nick() .. " (Guest)" )
-		else
-			if Flag( v ) == 1 then
-				Class = "Admin"
-			elseif Flag( v ) == 2 then
-				Class = "Superadmin"
-			elseif Flag( v ) == 3 then
-				Class = "Owner"
+		if string.find(string.lower(v:Nick()), string.lower(Filter)) or v:Nick() == Filter then
+			if Flag(v) < 1 then
+				FPlayer = Players:AddItem( v:Nick() .. " (Guest)" )
+			else
+				if Flag( v ) == 1 then
+					Class = "Admin"
+				elseif Flag( v ) == 2 then
+					Class = "Superadmin"
+				elseif Flag( v ) == 3 then
+					Class = "Owner"
+				end
+				
+				FPlayer = Players:AddItem( v:Nick() .. " (" .. Class .. ")" )
 			end
 			
-			FPlayer = Players:AddItem( v:Nick() .. " (" .. Class .. ")" )
+			if i == 1 then Players:SelectItem( FPlayer ) end
 		end
-		
-		if i == 1 then Players:SelectItem( FPlayer ) end
 	end
 end
 
