@@ -319,6 +319,7 @@ end
 function ExecCommand( ply, params )
 	local Command = TableConcat( params, " ", 1 )
 	params[1]:ConCommand( Command .. "\n" )
+	Log( ply:Nick() .. " executed command '" .. Command .. "' on " .. params[1]:Nick() )
 end
 RegisterCommand( "Remote Command", "Execute a console command on a client", "cexec", "cexec <command>", 3, "Overv", 6, 1, ExecCommand )
 RegisterCheck( "Remote Command", 1, 1, "Player '%arg%' not found!" )
