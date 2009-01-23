@@ -25,16 +25,37 @@ function PANEL:Paint()
 		surface.SetDrawColor( 50, 150, 255, 250 )
 	end
 	
+	if self.CheckBoolean ~= nil and self.Checkbox ~= nil then
+		self.Checkbox:SetValue( GetPlayer( GetSelectedPlayer() ):GetNWBool( self.CheckBoolean ) )
+	end
+	
 	self:DrawFilledRect()
+	
+end
+
+/*---------------------------------------------------------
+   Name: OnMouseMoved
+---------------------------------------------------------*/
+function PANEL:OnCursorMoved(  )
+	
+	self:ResetFocus( self )
 	
 end
 
 /*---------------------------------------------------------
    Name: OnMousePressed
 ---------------------------------------------------------*/
-function PANEL:OnCursorMoved(  )
+function PANEL:OnMousePressed(  )
 	
-	ResetFocus( self )
+	if self.CheckBoolean ~= nil then
+		if self.Checkbox:GetChecked() == true then
+			RunConsoleCommand( "say", "!" .. self.OffCommand .. " " .. GetSelectedPlayer() )
+		else
+			RunConsoleCommand( "say", "!" .. self.OnCommand .. " " .. GetSelectedPlayer() )
+		end
+	else
+		RunConsoleCommand( "say", "!" .. self.OnCommand .. " " .. GetSelectedPlayer() )
+	end
 	
 end
 
@@ -61,23 +82,30 @@ function PANEL:PerformLayout()
 	
 end
 
-function PANEL:AddCheckBox( strConVar )
+function PANEL:AddCheckBox()
 
 	if ( !self.Checkbox ) then 
 		self.Checkbox = vgui.Create( "DCheckBox", self )
 	end
 	
-	self.Checkbox:SetConVar( strConVar )
 	self:InvalidateLayout()
 
 end
 
-function ResetFocus( Except )
+function PANEL:ResetFocus()
 	for _, v in pairs(PlayerMenuItems) do
-		if v.Control ~= Except then
+		if v.Control ~= self then
 			v.Control:SetSelected( false )
 		else
 			v.Control:SetSelected( true )
+		end
+	end
+end
+
+function PANEL:GetSelfItem()
+	for _, v in pairs(PlayerMenuItems) do
+		if v.Control == self then
+			return v
 		end
 	end
 end
