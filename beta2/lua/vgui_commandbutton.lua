@@ -86,6 +86,7 @@ function PANEL:AddCheckBox()
 
 	if ( !self.Checkbox ) then 
 		self.Checkbox = vgui.Create( "DCheckBox", self )
+		self.Checkbox.OnMousePressed = function() self:OnMousePressed() end
 	end
 	
 	self:InvalidateLayout()
