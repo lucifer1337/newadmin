@@ -99,12 +99,10 @@ end
 //Get player by part of name
 function GetPlayer( Part )
 	for _, v in pairs(player.GetAll()) do
-		if string.find(string.lower(v:Nick()), string.lower(Part)) then
+		if string.find(string.lower(v:Nick()), string.lower(Part)) or v:Nick() == Part then
 			return v
 		end
 	end
-	
-	return nil
 end
 
 function Flag( ply )
@@ -113,7 +111,7 @@ end
 
 function FlagName( flagID )
 	if flagID == 0 then
-		return "Users"
+		return "Guests"
 	elseif flagID == 1 then
 		return "Administrators"
 	elseif flagID == 2 then
@@ -196,4 +194,16 @@ function GetCategory( cat )
 	end
 	
 	return Temp
+end
+
+function TableConcat( Table, Divider, Start )
+	local Str = ""
+	local C = 0
+	for _, v in pairs(Table) do
+		C = C + 1
+		if C > Start then
+			Str = Str .. v .. Divider
+		end
+	end
+	return string.Left( Str, string.len(Str) - string.len(Divider) )
 end

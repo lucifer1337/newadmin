@@ -35,7 +35,7 @@ function Whisper( ply, params )
 		//Find players near you
 		local hearit = false
 		for k, v in pairs(player.GetAll()) do
-			if v:GetPos():Distance( ply:GetPos() ) <= 64 and ply:UserID() ~= v:UserID() then
+			if v:GetPos():Distance( ply:GetPos() ) <= 128 and ply:UserID() ~= v:UserID() then
 				v:PrintMessage( HUD_PRINTTALK, "(" .. ply:Nick() .. " whispers) " .. message )
 				hearit = true
 			end

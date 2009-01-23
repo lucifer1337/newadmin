@@ -93,7 +93,7 @@ function AssignFlags( ply )
 	ply:SetNWBool( "Flagged", true )
 	
 	if !ply:IsAdmin() and !ply:IsSuperAdmin() then
-		ply:SetNWInt( "Flag", 0 ) //User
+		ply:SetNWInt( "Flag", 0 ) //Guest
 	end
 	if ply:IsAdmin() then
 		ply:SetNWInt( "Flag", 1 )

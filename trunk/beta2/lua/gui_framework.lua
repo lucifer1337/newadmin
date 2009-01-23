@@ -59,8 +59,9 @@ function BuildMenu()
 	PluginTab()
 	
 	//Building command list
+	table.SortByMember( CommandList, "Text", true )
 	for _, v in pairs(CommandList) do
-		RegisterPlayerMenu( v.Text, v.CategoryID, v.ChatString )
+		RegisterPlayerMenu( v.Text, v.CategoryID, v.OnCommand, v.OffCommand, v.CheckBoolean )
 	end
 end
 
@@ -169,7 +170,7 @@ function RefillPlayers()
 	
 	for i, v in pairs(player.GetAll()) do
 		if Flag(v) < 1 then
-			FPlayer = Players:AddItem( v:Nick() .. " (User)" )
+			FPlayer = Players:AddItem( v:Nick() .. " (Guest)" )
 		else
 			if Flag( v ) == 1 then
 				Class = "Admin"
@@ -192,23 +193,30 @@ end
 //The framework will then automatically fill in [gui.playername] :)
 PlayerMenuItems = {}
 Categories = {}
-function RegisterPlayerMenu( Text, CategoryID, ChatString )
+function RegisterPlayerMenu( Text, CategoryID, OnCommand, OffCommand, CheckBoolean )
 	if !AdminPanel then BuildMenu() end
 
 	//First collect some info
 	local temp = {}
 	temp.Text = Text
 	temp.CategoryID = CategoryID
-	temp.ChatString = ChatString
+	temp.CheckBoolean = CheckBoolean
+	temp.OnCommand = OnCommand
+	temp.OffCommand = OffCommand
 	
 	//Now make the item itself
 	local Temp = vgui.Create( "CommandButton", GetCategoryControlByCategoryID(CategoryID) )
 	Temp:SetText( Text )
 	Temp:SetPos( 0, MenuItemsInCategory(CategoryID) * 15 )
 	Temp:SetSize( pCommandList:GetWide() - 2, 15 )
-	Temp.OnMousePressed = function()
-		RunConsoleCommand( "say", "!" .. ChatString .. " " .. string.Explode( " (", Players:GetSelectedItems()[1]:GetValue() )[1] )
+	if CheckBoolean ~= nil then
+		Temp:AddCheckBox()
+		Temp.OffCommand = OffCommand
+		Temp.CheckBoolean = CheckBoolean
 	end
+	Temp.OnCommand = OnCommand
+	
+	//Set the color
 	if MenuItemsInCategory(CategoryID) / 2 == math.floor(MenuItemsInCategory(CategoryID) / 2) then
 		Temp:SetAlt( true )
 	end
@@ -220,13 +228,16 @@ function RegisterPlayerMenu( Text, CategoryID, ChatString )
 end
 
 //The delay system that unfortunately is nescesarry
-function AddPlayerMenu( Text, CategoryID, ChatString )
+function AddPlayerMenu( Text, CategoryID, OnCommand, OffCommand, CheckBoolean )
 	if !CLIENT then return false end
 	
 	local Temp = {}
 	Temp.Text = Text
 	Temp.CategoryID = CategoryID
-	Temp.ChatString = ChatString
+	Temp.CheckBoolean = CheckBoolean
+	Temp.OnCommand = OnCommand
+	Temp.OffCommand = OffCommand
+	
 	table.insert( CommandList, Temp )
 end
 
@@ -273,6 +284,46 @@ function MenuItemsInCategory( CategoryID )
 	end
 	
 	return amount
+end
+
+//Get the real nick from the listbox
+function GetSelectedPlayer()
+	//Get the raw item from the listbox
+	local SelItem = Players:GetSelectedItems()[1]:GetValue()
+	
+	//Filter out the class
+	local Class = "Guest"
+	if string.Right( SelItem, 8 ) == " (Admin)" then
+		Class = "Admin"
+	elseif string.Right( SelItem, 13 ) == " (Superadmin)" then
+		Class = "Superadmin"
+	elseif string.Right( SelItem, 8 ) == " (Owner)" then
+		Class = "Owner"
+	end
+	Class = " (" .. Class .. ")"
+	SelItem = string.Left( SelItem, string.len(SelItem) - string.len(Class) )
+	
+	//Grab a part of it
+	if string.find(SelItem, " ") ~= nil then
+		local FoundMax = 99
+		for _, p in pairs(string.Explode(" ", SelItem)) do
+			if PlayersWithPart( p ) < FoundMax then
+				SelItem = p
+			end
+		end
+	end
+	
+	return SelItem
+end
+
+function PlayersWithPart( Part )
+	local Count = 0
+	for _, v in pairs(player.GetAll()) do
+		if string.find(string.lower(v:Nick()), string.lower(Part)) or v:Nick() == Part then
+			Count = Count + 1
+		end
+	end
+	return Count
 end
 
 //Create the base categories

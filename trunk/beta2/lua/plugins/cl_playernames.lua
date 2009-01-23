@@ -38,7 +38,7 @@ hook.Add("PlayerInitialSpawn", "SyncInfo", Sync)
 //Load icons
 if CLIENT then
 	Owner = surface.GetTextureID("gui/silkicons/star")
-	User = surface.GetTextureID("gui/silkicons/user")
+	Guest = surface.GetTextureID("gui/silkicons/user")
 	Admin = surface.GetTextureID("gui/silkicons/shield")
 end
 
@@ -91,7 +91,7 @@ function DrawPlayers()
 				
 				//Icon
 				if Flag(v) == 0 then
-					Icon = User
+					Icon = Guest
 				elseif Flag(v) > 0 and Flag(v) < 3 then
 					Icon = Admin
 				elseif Flag(v) == 3 then
