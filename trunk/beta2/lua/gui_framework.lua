@@ -147,6 +147,10 @@ function PlayerTab()
 	Players:SetPos( 0, 0 )
 	Players:SetSize( TabPlayers:GetWide() - 150 , TabPlayers:GetTall() - 42 ) 
 	Players:SetMultiple( false )
+	Players.OnMousePressed = function()
+		for _, v in pairs(PlayerMenuItems) do v:InvalidateLayout() end
+		Msg( "Redrawn!\n" )
+	end
 	
 	//Filter textbox
 	PlayerFilter = vgui.Create( "DTextEntry", TabPlayers )
