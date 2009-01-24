@@ -119,7 +119,7 @@ RegisterCheck( "Extinguish", 1, 3, "Player '%arg%' not found!" )
 
 //Blind
 function Blind( ply, params )
-	params[1]:SetNetworkedBool( "Blinded", true )
+	params[1]:SetNWBool( "Blinded", true )
 	Notify( ply:Nick() .. " has blinded " .. params[1]:Nick() )
 end
 RegisterCommand( "Blind", "Blind a player", "blind", "blind [name]", 1, "Overv", 3, 0, Blind )
@@ -127,7 +127,7 @@ RegisterCheck( "Blind", 1, 3, "Player '%arg%' not found!" )
 AddPlayerMenu( "Blind", 3, "blind", "unblind", "Blinded" )
 
 function UnBlind( ply, params )
-	params[1]:SetNetworkedBool( "Blinded", false )
+	params[1]:SetNWBool( "Blinded", false )
 	Notify( ply:Nick() .. " has unblinded " .. params[1]:Nick() )
 end
 RegisterCommand( "UnBlind", "Unblind a player", "unblind", "unblind [name]", 1, "Overv", 3, 0, UnBlind )
@@ -135,7 +135,7 @@ RegisterCheck( "UnBlind", 1, 3, "Player '%arg%' not found!" )
 
 if CLIENT then
 	function BlindCheck()
-		if LocalPlayer():GetNetworkedBool( "Blinded" ) then
+		if LocalPlayer():GetNWBool( "Blinded" ) then
 			surface.SetDrawColor( 0, 0, 0, 255 )
 			surface.DrawRect( 0, 0, ScrW(), ScrH() )
 		end
@@ -145,7 +145,7 @@ end
 
 //Freeze
 function Freeze( ply, params )
-	params[1]:SetNetworkedBool( "Frozen", true )
+	params[1]:SetNWBool( "Frozen", true )
 	Notify( ply:Nick() .. " has frozen " .. params[1]:Nick() )
 end
 RegisterCommand( "Freeze", "Freeze a player", "freeze", "freeze [name]", 1, "Overv", 3, 0, Freeze )
@@ -153,7 +153,7 @@ RegisterCheck( "Freeze", 1, 3, "Player '%arg%' not found!" )
 AddPlayerMenu( "Freeze", 3, "freeze", "unfreeze", "Frozen" )
 
 function UnFreeze( ply, params )
-	params[1]:SetNetworkedBool( "Frozen", false )
+	params[1]:SetNWBool( "Frozen", false )
 	Notify( ply:Nick() .. " has unfrozen " .. params[1]:Nick() )
 end
 RegisterCommand( "UnFreeze", "Unfreeze a player", "unfreeze", "unfreeze [name]", 1, "Overv", 3, 0, UnFreeze )
