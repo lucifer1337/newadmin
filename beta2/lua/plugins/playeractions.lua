@@ -187,3 +187,26 @@ end
 RegisterCommand( "Spawn", "Force a player to respawn", "spawn", "spawn [name]", 1, "Overv", 2, 0, Spawn )
 RegisterCheck( "Spawn", 1, 3, "Player '%arg%' not found!" )
 AddPlayerMenu( "Spawn", 2, "spawn" )
+
+//Force a player to exit a vehicle
+function ExitVehicle( ply, params )
+	params[1]:ExitVehicle()
+	Notify( ply:Nick() .. " has kicked " .. params[1]:Nick() .. " out of his vehicle", "NOTIFY_CLEANUP" )
+end
+RegisterCommand( "ExitVehicle", "Force a player to exit a vehicle", "exit", "exit [name]", 1, "Overv", 2, 0, ExitVehicle )
+RegisterCheck( "ExitVehicle", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Exit Vehicle", 2, "exit" )
+
+//Force a player to exit a vehicle
+function EnterVehicle( ply, params )
+	local tr = ply:GetEyeTrace()
+	local Ent = tr.Entity
+	
+	if Ent ~= NULL and Ent:IsValid() and Ent:IsVehicle() then
+		params[1]:EnterVehicle( Ent )
+		Notify( ply:Nick() .. " has put " .. params[1]:Nick() .. " into a vehicle", "NOTIFY_UNDO" )
+	end
+end
+RegisterCommand( "EnterVehicle", "Force a player to enter a vehicle", "enter", "enter [name]", 1, "Overv", 2, 0, EnterVehicle )
+RegisterCheck( "EnterVehicle", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Enter Vehicle", 2, "enter" )

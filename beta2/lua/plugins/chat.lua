@@ -91,3 +91,29 @@ RegisterCheck( "Imitate", 1, 1, "Player '%arg%' not found!" )
 function makePlayerSay(ply, message)
 	ply:ConCommand("say " .. message .. "\n")
 end
+
+//Muting
+function Mute( ply, params )
+	params[1]:SetNWBool( "Muted", true )
+	Notify( ply:Nick() .. " has muted " .. params[1]:Nick() )
+end
+RegisterCommand( "Mute", "Mute a player", "mute", "mute [name]", 1, "Overv", 3, 0, Mute )
+RegisterCheck( "Mute", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Mute", 3, "mute", "unmute", "Muted" )
+
+function UnMute( ply, params )
+	params[1]:SetNWBool( "Muted", false )
+	Notify( ply:Nick() .. " has unmuted " .. params[1]:Nick() )
+end
+RegisterCommand( "UnMute", "Unmute a player", "unmute", "unmute [name]", 1, "Overv", 3, 0, UnMute )
+RegisterCheck( "UnMute", 1, 3, "Player '%arg%' not found!" )
+
+if SERVER then
+	function MuteCheck( ply, msg )
+		if ply:GetNWBool("Muted") and string.Left(msg, 1) != "!" then
+			ply:PrintMessage( HUD_PRINTTALK, "You are muted!" )
+			return ""
+		end
+	end
+	hook.Add("PlayerSay", "MuteCheck", MuteCheck)
+end
