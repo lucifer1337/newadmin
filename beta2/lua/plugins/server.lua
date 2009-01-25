@@ -246,29 +246,32 @@ local c_text = "CountdownText"
 local c_notedstop = false
 
 if SERVER then
+	local CCommand = ""
+	local CommandPlayer = nil
+
 	function CreateCountdown( ply, params )
-		if tonumber(params[1]) ~= nil then
-			if tonumber(params[1]) > 86400 then
-				Notify( "You can't make countdowns longer than 24 hours!", "NOTIFY_ERROR", ply )
-				return 
-			end
+		if params[1] > 86400 then
+			Notify( "You can't make countdowns longer than 24 hours!", "NOTIFY_ERROR", ply )
+			return 
+		elseif params[1] < 0 then
+			Notify( "The countdown has been ended by " .. ply:Nick(), "NOTIFY_CLEANUP" )
+			return 
+		end
+	
+		c_finishtime = os.time() + params[1]
 		
-			c_finishtime = os.time() + tonumber(params[1])
-			
-			local reason = ""
-			for k, v in pairs(params) do
-				if k > 1 then reason = reason .. v .. " " end
-			end
-			
-			if reason == "" then reason = "Countdown" end
-			
-			c_text = reason
-			
-			Notify( ply:Nick() .. " has started a new countdown")
-			c_notedstop = false
-			for _, v in pairs(player.GetAll()) do
-				v:SendLua("CreateCountdown(" .. params[1] .. ", \"" .. c_text .. "\")")
-			end
+		local reason = ""
+		for k, v in pairs(params) do
+			if k > 1 then reason = reason .. v .. " " end
+		end
+		if reason == "" then reason = "Countdown" end
+		
+		c_text = reason
+		
+		Notify( ply:Nick() .. " has started a new countdown")
+		c_notedstop = false
+		for _, v in pairs(player.GetAll()) do
+			v:SendLua("CreateCountdown(" .. params[1] .. ", \"" .. c_text .. "\")")
 		end
 	end
 	
@@ -283,12 +286,29 @@ if SERVER then
 		if os.time() == c_finishtime and c_notedstop == false then
 			c_notedstop = true
 			Notify( "The countdown has ended", "NOTIFY_CLEANUP" )
+			
+			if CCommand != nil then
+				Log( "Calling command..." )
+				CallCommand( string.sub(CCommand[1], 2), CommandPlayer, string.Explode( " ", table.concat( CCommand, " ", 2 ) ) )
+			else
+				Log( "It's nil wtf" )
+			end
+			
+			CCommand = ""
+			CommandPlayer = nil
 		end
 	end
-	timer.Create("tmCheckCountdown", 1, 0, CheckCountdown)  
+	timer.Create("tmCheckCountdown", 1, 0, CheckCountdown)
+	
+	function CountdownCommand( ply, pars )
+		CCommand = pars
+		CommandPlayer = ply
+		Notify( "After countdown calling command '" .. string.sub(CCommand[1], 2) .. "' with the parameters '" .. table.concat( CCommand, " ", 2 ) .. "'", "NOTIFY_GENERIC", ply )
+	end
 end
-RegisterCommand( "Countdown", "Create a countdown", "countdown", "countdown <seconds> <text>", 2, "Overv", 4, 0, CreateCountdown )
+RegisterCommand( "Countdown", "Create a countdown", "countdown", "countdown <seconds> <text>", 3, "Overv", 4, 1, CreateCountdown )
 RegisterCheck( "Countdown", 1, 2, "The number of seconds must be a number!" )
+RegisterCommand( "CountdownCommand", "Set a command which runs when the countdown has finished", "countdownc", "countdownc <command>", 3, "Overv", 4, 1, CountdownCommand )
 
 if CLIENT then
 	//Create countdown on client
