@@ -1,4 +1,4 @@
-include("vgui_commandbutton.lua")
+if CLIENT then include("vgui_commandbutton.lua") end
 RTabs = {}
 EOnOpen = {}
 
