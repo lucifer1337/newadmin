@@ -17,10 +17,16 @@ Msg( "\n===================================================\n" )
 Msg( "NewAdmin 1.0\n\n" )
 
 //Load plugins into framework serverside
+local gui_plugins = file.FindInLua("gui_plugins/*.lua")
+for _, filename in pairs( gui_plugins ) do
+	Msg( "Loading: " .. filename .. "\n" )
+	AddCSLuaFile( "gui_plugins/" .. filename )
+	include( "gui_plugins/" .. filename )
+end
+
 local plugins = file.FindInLua("plugins/*.lua")
 for _, filename in pairs( plugins ) do
 	Msg( "Loading: " .. filename .. "\n" )
-	
 	AddCSLuaFile( "plugins/" .. filename )
 	include( "plugins/" .. filename )
 end
