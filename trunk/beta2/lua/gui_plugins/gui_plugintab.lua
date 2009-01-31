@@ -48,9 +48,9 @@ function PluginTab()
 	Plugins:SortByColumn( 1 )
 	Plugins:SelectFirstItem()
 	
-	Tabs:AddSheet( "Plugins", TabPlugin, "gui/silkicons/plugin", false, false, "List of all loaded plugins" ) 
+	Tabs:AddSheet( "Plugins", TabPlugin, "gui/silkicons/plugin", false, false, "List of all loaded plugins" )
 end
-RegisterTab( PluginTab )
+RegisterTab( PluginTab, 2 )
 
 function FillPluginList( FilterCat )
 	Plugins:Clear()

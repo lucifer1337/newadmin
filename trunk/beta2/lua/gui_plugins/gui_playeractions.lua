@@ -49,7 +49,7 @@ function PlayerTab()
 	
 	Tabs:AddSheet( "Players", TabPlayers, "gui/silkicons/user", false, false, "Apply actions and punishment to players" ) 
 end
-RegisterTab( PlayerTab )
+RegisterTab( PlayerTab, 1 )
 
 function RefillPlayers()
 	Players:Clear()
@@ -72,6 +72,7 @@ function RefillPlayers()
 			end
 			
 			if i == 1 then Players:SelectItem( FPlayer ) end
+			if v == LocalPlayer() then Players:SelectItem( FPlayer ) end
 		end
 	end
 end

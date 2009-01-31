@@ -31,23 +31,19 @@ AddPlayerMenu( "Kick", 1, "kick" )
 function LoadBans()
 	if file.Exists("NewAdmin/bans.txt") then
 		local banfile = file.Read("NewAdmin/bans.txt")
-		temp = string.Explode("\n", banfile)
+		Lines = string.Explode("\n", banfile)
 		
 		BannedPlayers = {}
 		
-		for k, v in pairs(temp) do
-			if string.find( v, "[split]" ) ~= nil then
-				local params = string.Explode( "[split]", v )
-				local item = {}
-				
-				item.Nick = string.sub( params[1], string.len("[split]") )
-				item.SteamID = string.sub( params[2], string.len("[split]") )
-				item.Reason = string.sub( params[3], string.len("[split]") )
-				item.EndTime = tonumber( string.sub( params[4], string.len("[split]") ) )
-				item.Banner = string.sub( params[5], string.len("[split]") )
-				
-				table.insert( BannedPlayers, item )
-			end
+		for i=1, math.floor(#Lines/5), 5 do
+			local item = {}
+			item.Nick = Lines[i]
+			item.SteamID = Lines[i+1]
+			item.Reason = Lines[i+2]
+			item.EndTime = tonumber(Lines[i+3])
+			item.Banner = Lines[i+4]
+			
+			table.insert( BannedPlayers, item )
 		end
 		
 		Log( "Banfile found and loaded -> Found " .. table.Count(BannedPlayers) .. " entries" )
@@ -62,7 +58,7 @@ concommand.Add( "ReloadBans", LoadBans ) //Console command to reload bans
 function SaveBans()
 	local ftext = ""
 	for _, v in pairs( BannedPlayers ) do
-		ftext = ftext .. v.Nick .. "[split]" .. v.SteamID .. "[split]" .. v.Reason .. "[split]" .. v.EndTime .. "[split]" .. v.Banner .. "\n"
+		ftext = ftext .. v.Nick .. "\n" .. v.SteamID .. "\n" .. v.Reason .. "\n" .. v.EndTime .. "\n" .. v.Banner .. "\n"
 	end
 	
 	file.Write( "NewAdmin/bans.txt", ftext )
@@ -106,8 +102,6 @@ RegisterCheck( "Ban", 1, 1, "Player '%arg%' not found!" )
 AddPlayerMenu( "Ban", 1, "ban" )
 
 function KickBan( ply )
-	if ply:GetNWBool("BanChecked") ~= true then return  end
-
 	for k, v in pairs( BannedPlayers ) do
 		//Ban done?
 		if v.EndTime < os.time() and tonumber(v.EndTime) > 0 then
@@ -135,9 +129,8 @@ function KickBan( ply )
 	end
 	
 	Log( "No ban entry found for " .. ply:Nick() )
-	ply:SetNWBool( "BanChecked", true )
 end
-hook.Add( "PlayerSpawn", "KickBan", KickBan )
+hook.Add( "PlayerInitialSpawn", "KickBan", KickBan )
 
 function LolDeb()
 	Msg( table.Count(BannedPlayers) .. "\n" )
