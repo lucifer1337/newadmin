@@ -126,7 +126,7 @@ if SERVER then
 			CurMessageID = CurMessageID + 1
 		end
 	end
-	timer.Create( "MessageScroller", 60, 0, NextMessage )
+	timer.Create( "MessageScroller", 120, 0, NextMessage )
 end
 
 function AddMessage()
