@@ -164,3 +164,33 @@ end
 RegisterCommand( "Set Flag", "Set someone's flag (1 = admin, 2 = superadmin)", "flag", "flag <name> <flag>", 3, "Overv", 7, 2, SetFlag )
 RegisterCheck( "Set Flag", 1, 1, "Player '%arg%' not found!" )
 RegisterCheck( "Set Flag", 2, 2, "The flag must be a number!" )
+
+//Limit weapons to admins
+function LimitGuns( ply )
+	if Flag( ply ) < 1 then
+		ply:Give( "weapon_physcannon" )
+		ply:Give( "weapon_physgun" )
+		ply:Give( "gmod_tool" )
+		ply:Give( "gmod_camera" )
+		ply:SelectWeapon( "weapon_physgun" )
+		
+		return true
+	end
+end
+hook.Add( "PlayerLoadout", "LimitGuns", LimitGuns )
+
+function BlockGuns( ply, wep )
+	if Flag( ply ) < 1 then
+		local wep2 = wep:GetClass()
+		if wep2 != "weapon_physcannon" and wep2 != "weapon_physgun" and wep2 != "gmod_tool" and wep2 != "gmod_camera" then
+			wep:Remove()
+			return false
+		end
+	end
+end
+hook.Add( "PlayerCanPickupWeapon", "NoGuns", BlockGuns )
+
+function NoSENTs( ply )
+	if Flag( ply ) < 1 then return false end
+end
+hook.Add( "PlayerSpawnSENT", "NoSENTs", NoSENTs )

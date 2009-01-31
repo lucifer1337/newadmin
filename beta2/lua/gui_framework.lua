@@ -61,14 +61,18 @@ function BuildMenu()
 	Tabs:SetPos( 0, 0 )
 	Tabs:SetSize( w, h )
 	
+	table.SortByMember( RTabs, "Position", true )
 	for _, t in pairs(RTabs) do
-		t() //Build the tab with the registered function
+		t.Function() //Build the tab with the registered function
 	end
 end
 
 //Register a tab you want to add
-function RegisterTab( TabBuildFunction )
-	table.insert( RTabs, TabBuildFunction )
+function RegisterTab( TabBuildFunction, Position )
+	local Temp = {}
+	Temp.Function = TabBuildFunction
+	Temp.Position = Position
+	table.insert( RTabs, Temp )
 end
 
 //Register a function you want to run when a player re-opens the menu

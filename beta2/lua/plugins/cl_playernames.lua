@@ -60,9 +60,9 @@ function DrawPlayers()
 		if v:Nick() ~= LocalPlayer():Nick() and v:GetNetworkedBool("Ghosted") == false and v:GetColor() ~= Color(255, 255, 255, 0) then
 		
 			Position = v:GetShootPos()
-			if v:GetNetworkedBool("Ragdolled") then
+			if v:GetNetworkedBool("Ragdolled") and ents.GetByIndex( v:GetNetworkedInt( "Ragdoll" ) ) != NULL then
 				r = ents.GetByIndex( v:GetNetworkedInt( "Ragdoll" ) )
-				if r ~= NULL then Position = r:GetPos() end
+				if r != NULL then Position = r:GetPos() end
 			end
 		
 			local pDistance = LocalPlayer():GetShootPos():Distance( Position )

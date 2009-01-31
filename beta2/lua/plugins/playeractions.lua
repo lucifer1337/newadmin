@@ -210,3 +210,27 @@ end
 RegisterCommand( "EnterVehicle", "Force a player to enter a vehicle", "enter", "enter [name]", 1, "Overv", 2, 0, EnterVehicle )
 RegisterCheck( "EnterVehicle", 1, 3, "Player '%arg%' not found!" )
 AddPlayerMenu( "Enter Vehicle", 2, "enter" )
+
+//Spectate a player
+function Spectate( ply, params )
+	if params[1] == ply then
+		Notify( "You can't spectate yourself!", "NOTIFY_ERROR", ply )
+	else
+		ply:Spectate( OBS_MODE_CHASE )
+		ply:SpectateEntity( params[1] )
+		ply:StripWeapons()
+	end
+end
+RegisterCommand( "Spectate", "Spectate a player in third person", "spec", "spec [name]", 1, "Overv", 2, 0, Spectate )
+RegisterCheck( "Spectate", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Spectate", 2, "spec" )
+
+//Unspectate
+function UnSpectate( ply, params )
+	ply:UnSpectate()
+	local ppos = ply:GetPos()
+	ply:Spawn()
+	timer.Simple( .05, function() ply:SetPos( ppos + Vector( 0, 0, 10 ) ) end )
+end
+RegisterCommand( "UnSpectate", "Stop spectating", "unspec", "unspec", 1, "Overv", 2, 0, UnSpectate )
+AddPlayerMenu( "Stop Spectating", 2, "unspec" )
