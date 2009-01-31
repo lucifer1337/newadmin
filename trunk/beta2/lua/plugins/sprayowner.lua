@@ -23,7 +23,7 @@ function ShowSprayOwner()
 			w = w + 5
 			h = h + 5
 			
-			draw.WordBox( 8, ScrW() / 2 - w / 2, ScrH() / 2 - h / 2, Text, "ScoreboardText", Color( 0, 0, 0, 128 ), Color( 255, 255, 255, 255 ) )
+			draw.WordBox( 8, ScrW() / 2 - w / 2, ScrH() / 2 - h / 2, Text, "ScoreboardText", Color( 0, 0, 0, 128 ), team.GetColor( pl:Team() ) )
 		end
 	end
 end
