@@ -1,3 +1,8 @@
+resource.AddFile( "materials/gui/silkicons/comment.vmt" )
+resource.AddFile( "materials/gui/silkicons/comment.vtf" )
+resource.AddFile( "materials/gui/silkicons/user_suit.vmt" )
+resource.AddFile( "materials/gui/silkicons/user_suit.vtf" )
+
 //Drawing function
 function DrawHUD()
 	if pn_enabled then DrawPlayers() end
@@ -37,9 +42,11 @@ hook.Add("PlayerInitialSpawn", "SyncInfo", Sync)
 
 //Load icons
 if CLIENT then
-	Owner = surface.GetTextureID("gui/silkicons/star")
 	Guest = surface.GetTextureID("gui/silkicons/user")
-	Admin = surface.GetTextureID("gui/silkicons/shield")
+	Admin = surface.GetTextureID("gui/silkicons/user_suit")
+	SAdmin = surface.GetTextureID("gui/silkicons/shield")
+	Owner = surface.GetTextureID("gui/silkicons/star")
+	Typing = surface.GetTextureID("gui/silkicons/comment")
 end
 
 //All the functions for the things drawn in DrawHUD()
@@ -90,12 +97,18 @@ function DrawPlayers()
 				dPos.y = dPos.y + (100 * (GetHeadPos(v):Distance(LocalPlayer():GetShootPos()) / 2048)) * 0.5
 				
 				//Icon
-				if Flag(v) == 0 then
-					Icon = Guest
-				elseif Flag(v) > 0 and Flag(v) < 3 then
-					Icon = Admin
-				elseif Flag(v) == 3 then
-					Icon = Owner
+				if v:GetNWBool("Typing") != true then
+					if Flag(v) == 0 then
+						Icon = Guest
+					elseif Flag(v) == 1 then
+						Icon = Admin
+					elseif Flag(v) == 2 then
+						Icon = SAdmin
+					elseif Flag(v) == 3 then
+						Icon = Owner
+					end
+				else
+					Icon = Typing
 				end
 				
 				//Draw the box with the playername
@@ -121,3 +134,19 @@ function DrawReHook()
 	hook.Add("HUDPaint", "DrawHud", DrawHUD)
 end
 timer.Create( "DrawRehook", 1, 0, DrawReHook )
+
+//Show a chat icon when the user is typing a message
+if SERVER then
+	function NA_TypeStart( ply )
+		ply:SetNWBool( "Typing", true )
+	end
+	concommand.Add( "NA_TypeStart", NA_TypeStart )
+	
+	function NA_TypeStop( ply )
+		ply:SetNWBool( "Typing", false )
+	end
+	concommand.Add( "NA_TypeStop", NA_TypeStop )
+else
+	hook.Add( "StartChat", "TypeStart", function() RunConsoleCommand("NA_TypeStart") end )
+	hook.Add( "FinishChat", "TypeStop", function() RunConsoleCommand("NA_TypeStop") end )
+end
