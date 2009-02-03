@@ -78,11 +78,13 @@ function CallCommand( ChatCommand, Caller, Args )
 						if Args[c.Argument] ~= nil then ErrorMsg = string.Replace( c.ErrorMsg, "%arg%", Args[ c.Argument ] ) end
 					
 						if c.CheckType == 1 then
-							if GetPlayer( Args[ c.Argument ] ) == nil then
+							if GetPlayer( Args[ c.Argument ] ) then
+								Args[ c.Argument ] = GetPlayer( Args[ c.Argument ] )
+							elseif tonumber(Args[c.Argument]) and player.GetByID(Args[c.Argument]) != NULL then
+								Args[ c.Argument ] = player.GetByID(Args[c.Argument])
+							else
 								Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
 								return false
-							else
-								Args[ c.Argument ] = GetPlayer( Args[ c.Argument ] )
 							end
 						elseif c.CheckType == 2 then
 							if tonumber( Args[ c.Argument ] ) == nil then
@@ -98,6 +100,8 @@ function CallCommand( ChatCommand, Caller, Args )
 							else
 								if GetPlayer( Args[ c.Argument ] ) then
 									Args[ c.Argument ] = GetPlayer( Args[ c.Argument ] )
+								elseif tonumber(Args[c.Argument]) and player.GetByID(Args[c.Argument]) != NULL then
+									Args[ c.Argument ] = player.GetByID(Args[c.Argument])
 								else
 									Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
 									return false

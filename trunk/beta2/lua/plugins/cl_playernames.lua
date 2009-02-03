@@ -87,7 +87,7 @@ function DrawPlayers()
 					dAlpha = 128 - math.Clamp((pDistance - maxfullalpha) / (maxdistance-maxfullalpha)*128, 0, 128)
 				end
 				
-				if v:GetNetworkedBool("Ragdolled") then
+				if v:GetNetworkedBool("Ragdolled") and ents.GetByIndex( v:GetNetworkedInt( "Ragdoll" ) ) != NULL then
 					dPos = GetHeadPos( r ):ToScreen()
 				else
 					dPos = GetHeadPos( v ):ToScreen()
