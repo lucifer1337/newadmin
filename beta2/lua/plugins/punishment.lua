@@ -232,3 +232,23 @@ function BlockMove( ply )
 	end
 end
 hook.Add( "Move", "BlockMove", BlockMove )
+
+//Slay
+function Explode( ply, params )
+	//Spawn the dynamite
+	local explosive = ents.Create( "env_explosion" )
+	explosive:SetPos( params[1]:GetPos() )
+	explosive:SetOwner( params[1] )
+	explosive:Spawn()
+	explosive:SetKeyValue( "iMagnitude", "1" )
+	explosive:Fire( "Explode", 0, 0 )
+	explosive:EmitSound( "ambient/explosions/explode_4.wav", 500, 500 )
+	
+	//Kill the player
+	params[1]:Kill()
+	params[1]:AddFrags( 1 )
+	Notify( ply:Nick() .. " exploded " .. params[1]:Nick(), "NOTIFY_CLEANUP" )
+end
+RegisterCommand( "Explode", "Explode a player", "explode", "explode [name]", 1, "Overv", 3, 0, Explode )
+RegisterCheck( "Explode", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Explode", 3, "explode" )

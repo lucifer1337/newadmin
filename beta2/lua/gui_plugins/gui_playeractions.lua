@@ -51,6 +51,7 @@ function PlayerTab()
 end
 RegisterTab( PlayerTab, 1 )
 
+PListItems = {}
 function RefillPlayers()
 	Players:Clear()
 	local Filter = PlayerFilter:GetValue()
@@ -69,6 +70,11 @@ function RefillPlayers()
 				end
 				
 				FPlayer = Players:AddItem( v:Nick() .. " (" .. Class .. ")" )
+				
+				local ListItem = {}
+				ListItem.Item = FPlayer
+				ListItem.Ply = v
+				table.insert( PListItems, ListItem )
 			end
 			
 			if i == 1 then Players:SelectItem( FPlayer ) end
@@ -177,31 +183,12 @@ end
 //Get the real nick from the listbox
 function GetSelectedPlayer()
 	//Get the raw item from the listbox
-	local SelItem = Players:GetSelectedItems()[1]:GetValue()
-	
-	//Filter out the class
-	local Class = "Guest"
-	if string.Right( SelItem, 8 ) == " (Admin)" then
-		Class = "Admin"
-	elseif string.Right( SelItem, 13 ) == " (Superadmin)" then
-		Class = "Superadmin"
-	elseif string.Right( SelItem, 8 ) == " (Owner)" then
-		Class = "Owner"
-	end
-	Class = " (" .. Class .. ")"
-	SelItem = string.Left( SelItem, string.len(SelItem) - string.len(Class) )
-	
-	//Grab a part of it
-	if string.find(SelItem, " ") ~= nil then
-		local FoundMax = 99
-		for _, p in pairs(string.Explode(" ", SelItem)) do
-			if PlayersWithPart( p ) < FoundMax then
-				SelItem = p
-			end
+	local SelItem = Players:GetSelectedItems()[1]
+	for _, v in pairs(PListItems) do
+		if v.Item == SelItem then
+			return v.Ply
 		end
 	end
-	
-	return SelItem
 end
 
 function PlayersWithPart( Part )

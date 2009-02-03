@@ -47,5 +47,5 @@ if CLIENT then
 	function SetSTime()
 		local StTime = os.time()
 	end
-	timer.Simple( SetSTime, 1 )
+	timer.Simple( 1, SetSTime )
 end
