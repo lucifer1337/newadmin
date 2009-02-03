@@ -46,9 +46,11 @@ function MessagesTab()
 end
 RegisterTab( MessagesTab, 2 )
 
-function UpdateMessageList()
-	cbMessages:Clear()
-	RunConsoleCommand( "NA_UpdateMessages" )
+function UpdateMessageList( ForceUpdate )
+	if !LocalPlayer():GetNWBool("MessagesUp2Date") or ForceUpdate then
+		cbMessages:Clear()
+		RunConsoleCommand( "NA_UpdateMessages" )
+	end
 end
 RegisterOnOpen( UpdateMessageList )
 
@@ -91,6 +93,8 @@ if SERVER then
 				ply:SendLua( "cbMessages:AddItem( \"" .. m .. "\" )" )
 			end
 		end
+		//Tell ply's client he has the up to date message list now!
+		ply:SetNWBool( "MessagesUp2Date", true )
 	end
 	concommand.Add( "NA_UpdateMessages", NA_UpdateMessages )
 	
@@ -98,6 +102,11 @@ if SERVER then
 		if Flag(ply) < 3 then return false end
 		table.insert( Messages, args[1] )
 		SaveMessages()
+		
+		//Tell everyone the message list has changed
+		for _, v in pairs(player.GetAll()) do
+			ply:SetNWBool( "MessagesUp2Date", false )
+		end
 	end
 	concommand.Add( "NA_AddMessage", NA_AddMessage )
 	
@@ -107,15 +116,13 @@ if SERVER then
 			if e == args[1] then table.remove( Messages, i ) end
 		end
 		SaveMessages()
-	end
-	concommand.Add( "NA_RemoveMessage", NA_RemoveMessage )
-	
-	function NA_ShowMessages( ply, com, args )
-		for _, m in pairs(Messages) do
-			Msg( m .. "\n" )
+		
+		//Tell everyone the message list has changed (Works kind of like Invalidate)
+		for _, v in pairs(player.GetAll()) do
+			ply:SetNWBool( "MessagesUp2Date", false )
 		end
 	end
-	concommand.Add( "NA_ShowMessages", NA_ShowMessages )
+	concommand.Add( "NA_RemoveMessage", NA_RemoveMessage )
 	
 	CurMessageID = 1
 	function NextMessage()
@@ -133,12 +140,12 @@ function AddMessage()
 	if txtMessage:GetValue() == "" then return false end
 	RunConsoleCommand( "NA_AddMessage", txtMessage:GetValue() )
 	txtMessage:SetText( "" )
-	UpdateMessageList()
+	UpdateMessageList( true )
 end
 
 function RemoveMessage()
 	if cbMessages:GetSelectedItems()[1] ~= nil then
 		RunConsoleCommand( "NA_RemoveMessage", cbMessages:GetSelectedItems()[1]:GetValue() )
-		UpdateMessageList()
+		UpdateMessageList( true )
 	end
 end

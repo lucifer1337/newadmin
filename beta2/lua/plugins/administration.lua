@@ -1,5 +1,5 @@
 //This module takes care of kicking and banning
-local BannedPlayers = {}
+BannedPlayers = {}
 
 function GetReason( params, offset )
 	local reason = ""
@@ -51,6 +51,10 @@ function LoadBans()
 		Log( "No banfile found -> Starting with empty ban table" )
 		BannedPlayers = {}
 	end
+	
+	for _, v in pairs(player.GetAll()) do
+		ply:SetNWBool( "BansUp2Date", false )
+	end
 end
 if SERVER then LoadBans() end
 concommand.Add( "ReloadBans", LoadBans ) //Console command to reload bans
@@ -96,6 +100,10 @@ function Ban( ply, params )
 		
 		RunConsoleCommand("kickid", params[1]:UserID(), "Permabanned! (" .. reason .. ")")
 	end
+	
+	for _, v in pairs(player.GetAll()) do
+		ply:SetNWBool( "BansUp2Date", false )
+	end
 end
 RegisterCommand( "Ban", "Ban a player for a certain amount of time or permanent", "ban", "ban <name> [time in minutes, 0 = perma] [reason]", 2, "Overv", 1, 1, Ban )
 RegisterCheck( "Ban", 1, 1, "Player '%arg%' not found!" )
@@ -108,6 +116,10 @@ function KickBan( ply )
 			table.remove( BannedPlayers, k )
 			SaveBans()
 			Log( "Ban for '" .. v.Nick .. "' has expired!" )
+			
+			for _, v in pairs(player.GetAll()) do
+				ply:SetNWBool( "BansUp2Date", false )
+			end
 		end
 	
 		if v.SteamID == ply:SteamID() and (v.EndTime > os.time() or tonumber(v.EndTime) == 0) then
@@ -131,8 +143,3 @@ function KickBan( ply )
 	Log( "No ban entry found for " .. ply:Nick() )
 end
 hook.Add( "PlayerInitialSpawn", "KickBan", KickBan )
-
-function LolDeb()
-	Msg( table.Count(BannedPlayers) .. "\n" )
-end
-concommand.Add( "Debug", LolDeb )
