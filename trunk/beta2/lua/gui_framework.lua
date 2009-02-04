@@ -4,6 +4,12 @@ EOnOpen = {}
 
 //This is like the plugin manager, but allows plugins to add controls to the gui
 function ShowMenu( ply )
+	//Listen server hack
+	if LocalPlayer == nil then
+		ply:SendLua( "ShowMenu()" )
+		return false
+	end
+
 	if Flag(LocalPlayer()) < 1 then return false end
 	if !AdminPanel then BuildMenu() end
 	
@@ -17,7 +23,13 @@ function ShowMenu( ply )
 end
 concommand.Add( "+NA_Menu", ShowMenu )
 
-function HideMenu()
+function HideMenu( ply )
+	//Listen server hack
+	if LocalPlayer == nil then
+		ply:SendLua( "HideMenu()" )
+		return false
+	end
+	
 	if AllowClose then AdminPanel:SetVisible( false ) end
 end
 concommand.Add( "-NA_Menu", HideMenu )
