@@ -1,5 +1,6 @@
 resource.AddFile( "materials/gui/silkicons/bans.vmt" )
 resource.AddFile( "materials/gui/silkicons/bans.vtf" )
+BanIDs = {}
 
 function BanTab()
 	//Main panel
@@ -15,7 +16,7 @@ function BanTab()
 	Bans = vgui.Create("DListView") 
 	Bans:SetParent( TabBans )
 	Bans:SetPos( 0, 0 )
-	Bans:SetSize( TabBans:GetWide(), TabBans:GetTall() - 17 )
+	Bans:SetSize( TabBans:GetWide(), TabBans:GetTall() - 42 )
 	Bans:SetMultiSelect( false )
 	
 	local colUsername = Bans:AddColumn( "Username" )
@@ -29,12 +30,22 @@ function BanTab()
 	colReason:SetWide( 200 )
 	colBanner:SetWide( 100 )
 	
+	//Unban button
+	cmdUnban = vgui.Create( "DButton", TabBans )
+	cmdUnban:SetPos( 0, TabBans:GetTall() - 37 )
+	cmdUnban:SetSize( 80, 20 )
+	cmdUnban:SetText( "Unban" )
+	cmdUnban.DoClick = function() Unban() end
+	cmdUnban:SetEnabled( false )
+	if Flag(LocalPlayer()) > 2 then cmdUnban:SetEnabled( true ) end
+	
 	Tabs:AddSheet( "Bans", TabBans, "gui/silkicons/bans", false, false, "Manage current bans" )
 end
 RegisterTab( BanTab, 2 )
 
-function UpdateBanlist()
-	if !LocalPlayer():GetNWBool("BansUp2Date") then
+function UpdateBanlist( ForceUpdate )
+	if !LocalPlayer():GetNWBool("BansUp2Date") or ForceUpdate then
+		BanIDs = {}
 		Bans:Clear()
 		RunConsoleCommand( "NA_UpdateBanlist" )
 	end
@@ -52,6 +63,7 @@ if SERVER then
 		for i, m in pairs(BannedPlayers) do
 			if tonumber(m.EndTime) == 0 then EndTime = "Permanent" else EndTime = math.ceil((m.EndTime - os.time()) / 60) .. " Minutes" end
 			ply:SendLua( "Bans:AddLine( \"" .. m.Nick .. "\", \"" .. m.SteamID .. "\", \"" .. EndTime .. "\", \"" .. m.Reason .. "\", \"" .. GetNickBySteamID(m.Banner) .. "\" )" )
+			ply:SendLua( "table.insert( BanIDs, \"" .. m.SteamID .. "\" )" )
 		end
 		ply:SendLua( "Bans:SelectFirstItem()" )
 		
@@ -59,13 +71,21 @@ if SERVER then
 		ply:SetNWBool( "BansUp2Date", true )
 	end
 	concommand.Add( "NA_UpdateBanlist", NA_UpdateBanlist )
-end
-
-function EntDamaged( ent, ply, attacker, dmg )
-	if ply != NULL and ply:IsValid() and ply:IsPlayer() and !ent:IsPlayer() then
-		if dmg >= ent:Health() and ent:Health() > 0 then
-			Msg( ply:Nick() .. " killed the entity " .. ent:GetClass() .. "\n" )
+	
+	function NA_Unban( ply, com, args )
+		for i, v in pairs(BannedPlayers) do
+			if v.SteamID == args[1] then
+				table.remove( BannedPlayers, i )
+				SaveBans()
+			end
 		end
 	end
+	concommand.Add( "NA_Unban", NA_Unban )
 end
-hook.Add( "EntityTakeDamage", "EntDamaged", EntDamaged )
+
+function Unban()
+	if Bans:GetSelectedLine() ~= nil then
+		RunConsoleCommand( "NA_Unban", BanIDs[Bans:GetSelectedLine()] )
+		UpdateBanlist( true )
+	end
+end
