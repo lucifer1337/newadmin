@@ -53,7 +53,7 @@ function LoadBans()
 	end
 	
 	for _, v in pairs(player.GetAll()) do
-		ply:SetNWBool( "BansUp2Date", false )
+		v:SetNWBool( "BansUp2Date", false )
 	end
 end
 if SERVER then LoadBans() end
@@ -102,7 +102,7 @@ function Ban( ply, params )
 	end
 	
 	for _, v in pairs(player.GetAll()) do
-		ply:SetNWBool( "BansUp2Date", false )
+		v:SetNWBool( "BansUp2Date", false )
 	end
 end
 RegisterCommand( "Ban", "Ban a player for a certain amount of time or permanent", "ban", "ban <name> [time in minutes, 0 = perma] [reason]", 2, "Overv", 1, 1, Ban )
