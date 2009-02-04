@@ -146,6 +146,7 @@ end
 //Freeze
 function Freeze( ply, params )
 	params[1]:SetNWBool( "Frozen", true )
+	params[1]:SetSolid( false )
 	Notify( ply:Nick() .. " has frozen " .. params[1]:Nick() )
 end
 RegisterCommand( "Freeze", "Freeze a player", "freeze", "freeze [name]", 1, "Overv", 3, 0, Freeze )
@@ -154,6 +155,7 @@ AddPlayerMenu( "Freeze", 3, "freeze", "unfreeze", "Frozen" )
 
 function UnFreeze( ply, params )
 	params[1]:SetNWBool( "Frozen", false )
+	params[1]:SetSolid( true )
 	Notify( ply:Nick() .. " has unfrozen " .. params[1]:Nick() )
 end
 RegisterCommand( "UnFreeze", "Unfreeze a player", "unfreeze", "unfreeze [name]", 1, "Overv", 3, 0, UnFreeze )
