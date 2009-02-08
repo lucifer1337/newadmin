@@ -9,7 +9,7 @@ if SERVER then
 	concommand.Add( "PingServer", Ping )
 end
 
-if CLIENT then
+if CLIENT and NAOnServer then
 	local PrevTime = -1
 	local LastTime = 0
 	local Disconnected = false
