@@ -52,6 +52,12 @@ function CheckCalls( ply, Message )
 end
 hook.Add( "PlayerSay", "CheckCalls", CheckCalls )
 
+//Let clients know we're running NewAdmin on the server
+function EnableNA( ply )
+	ply:SendLua( "NAOnServer = true" )
+end
+hook.Add( "PlayerInitialSpawn", "EnableNA", EnableNA )
+
 function ReHook()
 	hook.Remove( "PlayerSay", "CheckCalls" )
 	hook.Add( "PlayerSay", "CheckCalls", CheckCalls )
