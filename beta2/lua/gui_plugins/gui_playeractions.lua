@@ -51,10 +51,10 @@ function PlayerTab()
 end
 RegisterTab( PlayerTab, 1 )
 
-PListItems = {}
 function RefillPlayers()
 	Players:Clear()
 	local Filter = PlayerFilter:GetValue()
+	PListItems = {}
 	
 	for i, v in pairs(player.GetAll()) do
 		if string.find(string.lower(v:Nick()), string.lower(Filter)) or v:Nick() == Filter then
@@ -70,12 +70,12 @@ function RefillPlayers()
 				end
 				
 				FPlayer = Players:AddItem( v:Nick() .. " (" .. Class .. ")" )
-				
-				local ListItem = {}
-				ListItem.Item = FPlayer
-				ListItem.Ply = v
-				table.insert( PListItems, ListItem )
 			end
+			
+			local ListItem = {}
+			ListItem.Item = FPlayer
+			ListItem.Ply = v:EntIndex()
+			table.insert( PListItems, ListItem )
 			
 			if i == 1 then Players:SelectItem( FPlayer ) end
 			if v == LocalPlayer() then Players:SelectItem( FPlayer ) end
@@ -183,22 +183,12 @@ end
 //Get the real nick from the listbox
 function GetSelectedPlayer()
 	//Get the raw item from the listbox
-	local SelItem = Players:GetSelectedItems()[1]
+	local SelItem = Players:GetSelected()
 	for _, v in pairs(PListItems) do
 		if v.Item == SelItem then
-			return v.Ply
+			return player.GetByID(v.Ply)
 		end
 	end
-end
-
-function PlayersWithPart( Part )
-	local Count = 0
-	for _, v in pairs(player.GetAll()) do
-		if string.find(string.lower(v:Nick()), string.lower(Part)) or v:Nick() == Part then
-			Count = Count + 1
-		end
-	end
-	return Count
 end
 
 //Create the base categories
