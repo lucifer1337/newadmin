@@ -50,7 +50,7 @@ function PluginTab()
 	
 	Tabs:AddSheet( "Plugins", TabPlugin, "gui/silkicons/plugin", false, false, "List of all loaded plugins" )
 end
-RegisterTab( PluginTab, 2 )
+RegisterTab( PluginTab, 3 )
 
 function FillPluginList( FilterCat )
 	Plugins:Clear()
