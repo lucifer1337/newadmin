@@ -108,9 +108,9 @@ end
 function Flag( ply )
 	if ply:GetNWString("Rank") == "Owner" then
 		return 3
-	elseif ply:GetNWString("Rank") == "Super Administrator" then
+	elseif ply:GetNWString("Rank") == "Super Admin" then
 		return 2
-	elseif ply:GetNWString("Rank") == "Administrator" then
+	elseif ply:GetNWString("Rank") == "Admin" then
 		return 1
 	else
 		return 0
