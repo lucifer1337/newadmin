@@ -59,7 +59,7 @@ function CallCommand( ChatCommand, Caller, Args )
 
 	for _, v in pairs( Commands ) do
 		if v.ChatCommand == ChatCommand then
-			if tonumber( Flag(Caller) ) < tonumber( v.Flag ) then
+			if !HasPrivilege( Caller:GetNWString("Rank"), v.Title ) then
 				Notify( "Only " .. FlagName(v.Flag) .. " are allowed to use this command!", "NOTIFY_ERROR", Caller )
 				return false
 			end

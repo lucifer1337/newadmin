@@ -19,7 +19,6 @@ function PlayerTab()
 	Players:SetMultiple( false )
 	Players.OnMousePressed = function()
 		for _, v in pairs(PlayerMenuItems) do v:InvalidateLayout() end
-		Msg( "Redrawn!\n" )
 	end
 	
 	//Filter textbox
@@ -58,28 +57,24 @@ function RefillPlayers()
 	
 	for i, v in pairs(player.GetAll()) do
 		if string.find(string.lower(v:Nick()), string.lower(Filter)) or v:Nick() == Filter then
-			if Flag(v) < 1 then
+			if string.len(v:GetNWString("Rank")) == 0 then
 				FPlayer = Players:AddItem( v:Nick() .. " (Guest)" )
 			else
-				if Flag( v ) == 1 then
-					Class = "Admin"
-				elseif Flag( v ) == 2 then
-					Class = "Superadmin"
-				elseif Flag( v ) == 3 then
-					Class = "Owner"
-				end
-				
-				FPlayer = Players:AddItem( v:Nick() .. " (" .. Class .. ")" )
+				FPlayer = Players:AddItem( v:Nick() .. " (" .. v:GetNWString("Rank") .. ")" )
 			end
 			
 			local ListItem = {}
 			ListItem.Item = FPlayer
-			ListItem.Ply = v:EntIndex()
+			ListItem.Ply = v
 			table.insert( PListItems, ListItem )
 			
 			if i == 1 then Players:SelectItem( FPlayer ) end
 			if v == LocalPlayer() then Players:SelectItem( FPlayer ) end
 		end
+	end
+	
+	for i, v in pairs(PListItems) do
+		Msg( i .. ": " .. v.Ply:Nick() .. "\n" )
 	end
 end
 RegisterOnOpen( RefillPlayers )
@@ -186,7 +181,7 @@ function GetSelectedPlayer()
 	local SelItem = Players:GetSelected()
 	for _, v in pairs(PListItems) do
 		if v.Item == SelItem then
-			return player.GetByID(v.Ply)
+			return v.Ply
 		end
 	end
 end

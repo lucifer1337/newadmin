@@ -26,7 +26,11 @@ function PANEL:Paint()
 	end
 	
 	if self.CheckBoolean ~= nil and self.Checkbox ~= nil then
-		self.Checkbox:SetValue( GetSelectedPlayer():GetNWBool( self.CheckBoolean ) )
+		if GetSelectedPlayer() == nil then
+			self.Checkbox:SetValue( false )
+		else
+			self.Checkbox:SetValue( GetSelectedPlayer():GetNWBool( self.CheckBoolean ) )
+		end
 	end
 	
 	self:DrawFilledRect()
@@ -47,6 +51,7 @@ end
 ---------------------------------------------------------*/
 function PANEL:OnMousePressed(  )
 	
+	if GetSelectedPlayer() == nil then return  end
 	if self.CheckBoolean == nil or !self.Checkbox:GetChecked() then
 		RunConsoleCommand( "say", "!" .. self.OnCommand .. " " .. GetSelectedPlayer():EntIndex() )
 	else

@@ -52,6 +52,12 @@ function UpdateBanlist( ForceUpdate )
 end
 RegisterOnOpen( UpdateBanlist )
 
+function SetButtonsBan()
+	cmdUnban:SetEnabled( false )
+	if Flag(LocalPlayer()) > 2 then cmdUnban:SetEnabled( true ) end
+end
+RegisterOnOpen( SetButtonsBan )
+
 if SERVER then
 	function GetNickBySteamID( SteamID )
 		for _, v in pairs(plinfo) do
