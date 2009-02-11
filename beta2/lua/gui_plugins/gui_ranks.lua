@@ -1,52 +1,7 @@
 //Table that holds all rank information
 Ranks = {}
 
-function RanksTab()
-	//Main panel
-	TabRanks = vgui.Create( "DPanel", Tabs )
-	TabRanks:SetPos( 5, 10 )
-	TabRanks:SetSize( w - 10, h - 15 )
-	TabRanks.Paint = function()
-		surface.SetDrawColor( 171, 171, 171, 255 )
-		surface.DrawRect( 0, 0, TabRanks:GetWide(), TabRanks:GetTall() )
-	end
-	
-	//Group selection
-	Groups = vgui.Create( "DMultiChoice", TabRanks )
-	Groups:SetPos( 0, 0 )
-	Groups:SetSize( TabRanks:GetWide(), 20 )
-	Groups:SetEditable( false )
-	Groups.OnSelect = function()
-		local RankID = GetRankID(Groups.TextEntry:GetValue())
-		ListPrivileges()
-	end
-	
-	//Privileges listview
-	Privileges = vgui.Create("DListView") 
-	Privileges:SetParent( TabRanks )
-	Privileges:SetPos( 0, 25 )
-	Privileges:SetSize( TabRanks:GetWide(), TabRanks:GetTall() - 42 )
-	Privileges:SetMultiSelect( false )
-	Privileges.DoDoubleClick = function() PrivilegeToggle() end
-	local colPrivilege = Privileges:AddColumn( "Privilege" )
-	local colEnabled = Privileges:AddColumn( "Enabled" )
-	colPrivilege:SetWide( 450 )
-	colEnabled:SetWide( 50 )
-	ListPrivileges()
-	
-	Tabs:AddSheet( "Ranks", TabRanks, "gui/silkicons/group", false, false, "Manage ranks/user groups" )
-end
-RegisterTab( RanksTab, 2 )
-
-function BuildRankList()
-	Groups:Clear()
-	for _, r in pairs(Ranks) do
-		Groups:AddChoice( r.Title )
-		Groups:ChooseOptionID( 1 )
-	end
-end
-RegisterOnOpen( BuildRankList )
-
+//Ranking code
 function LoadRanks()
 	if file.Exists("NewAdmin/ranks.txt") then
 		local File = file.Read("NewAdmin/ranks.txt")
@@ -142,3 +97,50 @@ function PrivilegeToggle()
 		SaveRanks()
 	end
 end
+
+//GUI
+function RanksTab()
+	//Main panel
+	TabRanks = vgui.Create( "DPanel", Tabs )
+	TabRanks:SetPos( 5, 10 )
+	TabRanks:SetSize( w - 10, h - 15 )
+	TabRanks.Paint = function()
+		surface.SetDrawColor( 171, 171, 171, 255 )
+		surface.DrawRect( 0, 0, TabRanks:GetWide(), TabRanks:GetTall() )
+	end
+	
+	//Group selection
+	Groups = vgui.Create( "DMultiChoice", TabRanks )
+	Groups:SetPos( 0, 0 )
+	Groups:SetSize( TabRanks:GetWide(), 20 )
+	Groups:SetEditable( false )
+	Groups.OnSelect = function()
+		local RankID = GetRankID(Groups.TextEntry:GetValue())
+		ListPrivileges()
+	end
+	
+	//Privileges listview
+	Privileges = vgui.Create("DListView") 
+	Privileges:SetParent( TabRanks )
+	Privileges:SetPos( 0, 25 )
+	Privileges:SetSize( TabRanks:GetWide(), TabRanks:GetTall() - 42 )
+	Privileges:SetMultiSelect( false )
+	Privileges.DoDoubleClick = function() PrivilegeToggle() end
+	local colPrivilege = Privileges:AddColumn( "Privilege" )
+	local colEnabled = Privileges:AddColumn( "Enabled" )
+	colPrivilege:SetWide( 450 )
+	colEnabled:SetWide( 50 )
+	
+	Tabs:AddSheet( "Ranks", TabRanks, "gui/silkicons/group", false, false, "Manage ranks/user groups" )
+end
+RegisterTab( RanksTab, 2 )
+
+function BuildRankList()
+	ListPrivileges()
+	Groups:Clear()
+	for _, r in pairs(Ranks) do
+		Groups:AddChoice( r.Title )
+		Groups:ChooseOptionID( 1 )
+	end
+end
+RegisterOnOpen( BuildRankList )
