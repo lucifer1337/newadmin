@@ -8,7 +8,7 @@ function WelcomeMessage( ply )
 	for i, v in pairs(plinfo) do
 		if v.SteamID == ply:SteamID() then
 			for _, k in pairs(player.GetAll()) do
-				k:PrintMessage( HUD_PRINTTALK, ply:Nick() .. " has joined the server for the last time at " .. v.PrevDate .. " with the nick '" .. v.PrevNick .. "'" )
+				k:PrintMessage( HUD_PRINTTALK, ply:Nick() .. " last joined at " .. v.PrevDate .. " as " .. v.PrevNick )
 			end
 			
 			found = true

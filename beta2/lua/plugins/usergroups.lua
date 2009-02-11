@@ -20,13 +20,13 @@ end
 concommand.Add( "SetGroup", SetGroup2 )
 
 //Handle flags for players
-local FlagTable = {}
+local RankTable = {}
 
-function LoadFlags()
-	FlagTable = {}
+function LoadUserRanks()
+	RankTable = {}
 	
-	if file.Exists( "NewAdmin/flags.txt" ) then
-		local tfile = file.Read( "NewAdmin/flags.txt" )
+	if file.Exists( "NewAdmin/userranks.txt" ) then
+		local tfile = file.Read( "NewAdmin/userranks.txt" )
 		local entries = string.Explode( "\n", tfile )
 		
 		for _, v in pairs(entries) do
@@ -34,136 +34,96 @@ function LoadFlags()
 				local pars = string.Explode( " ", v )
 				local entry = {}
 				entry.SteamID = pars[1]
-				entry.Flag = pars[2]
+				entry.Rank = table.concat(pars, " ", 2)
 				
-				table.insert( FlagTable, entry )
+				table.insert( RankTable, entry )
 			end
 		end
 		
-		Log( "Flag file loaded -> Added " .. table.Count( FlagTable ) .. " entries" )
+		Log( "User ranks file loaded -> Added " .. table.Count( RankTable ) .. " entries" )
 	else
-		Log( "No flag file found -> Empty flag table" )
+		Log( "No user rank file found -> Empty rank table" )
 	end
 end
-LoadFlags()
-concommand.Add( "ReloadFlags", LoadFlags )
+LoadUserRanks()
+concommand.Add( "ReloadRanks", LoadRanks )
 
-function SaveFlags()
+function SaveUserRanks()
 	local tfile = ""
 	
-	for _, v in pairs( FlagTable ) do
-		tfile = tfile .. v.SteamID .. " " .. v.Flag .. "\n"
+	for _, v in pairs( RankTable ) do
+		tfile = tfile .. v.SteamID .. " " .. v.Rank .. "\n"
 	end
 	
-	file.Write( "NewAdmin/flags.txt", tfile )
+	file.Write( "NewAdmin/userranks.txt", tfile )
 	Log( "Flag file saved." )
 end
 
-function AssignFlags( ply )
-	if ply:GetNWBool( "Flagged" ) == true then return  end
+function AssignRanks( ply )
+	if ply:GetNWBool( "Ranked" ) == true then return  end
 
 	//Some weird bug with keeping the player in TEAM_CONNECTING
 	if ply:Team() == TEAM_CONNECTING then
 		ply:SetTeam( TEAM_UNASSIGNED )
 	end
 
-	for _, v in pairs( FlagTable ) do
+	for _, v in pairs( RankTable ) do
 		if v.SteamID == ply:SteamID() then
-			local Flag = tonumber(v.Flag)
-			ply:SetNWInt( "Flag", Flag )
-			
-			if Flag == 1 then
-				ply:SetUserGroup( "admin" )
-				Log( "Automatically moved '" .. ply:Nick() .. "' into the group 'admin'" )
-			elseif Flag == 2 then
-				ply:SetUserGroup( "superadmin" )
-				Log( "Automatically moved '" .. ply:Nick() .. "' into the group 'superadmin'" )
-			elseif Flag == 3 then
-				ply:SetUserGroup( "superadmin" )
-				Log( "Automatically moved '" .. ply:Nick() .. "' into the group 'superadmin'" )
-			end
-			
-			Log( "Assigned the flag '" .. v.Flag .. "' to '" .. ply:Nick() .. "'" )
-			ply:SetNWBool( "Flagged", true )
+			ply:SetNWString( "Rank", v.Rank )
+			Log( "Set " .. ply:Nick() .. "'s rank to '" .. v.Rank .. "'" )
+			ply:SetNWBool( "Ranked", true )
 			return 
 		end
 	end
 	
-	Log( "No flag entry found for '" .. ply:Nick() .. "'" )
-	ply:SetNWBool( "Flagged", true )
+	Log( "No rank entry found for " .. ply:Nick() )
+	ply:SetNWBool( "Ranked", true )
 	
-	if !ply:IsAdmin() and !ply:IsSuperAdmin() then
-		ply:SetNWInt( "Flag", 0 ) //Guest
-	end
-	if ply:IsAdmin() then
-		ply:SetNWInt( "Flag", 1 )
-	end
-	if ply:IsSuperAdmin() then
-		ply:SetNWInt( "Flag", 2 )
-	end
-	if ply:IsUserGroup( "owner" ) then
-		ply:SetNWInt( "Flag", 3 )
-	end
-	SaveFlags()
+	SaveUserRanks()
 end
-hook.Add( "PlayerSpawn", "AssignFlags", AssignFlags )
+hook.Add( "PlayerSpawn", "AssignRanks", AssignRanks )
 
-function EditFlag( ply, newflag )
+function EditRank( ply, newrank )
 	local newentry = {}
 	newentry.SteamID = ply:SteamID()
-	newentry.Flag = newflag
+	newentry.Rank = newrank
 	
-	for _, v in pairs( FlagTable ) do
+	for _, v in pairs( RankTable ) do
 		if v.SteamID == newentry.SteamID then
-			v.Flag = newflag
-			Log( ply:Nick() .. "'s flag has been succesfully updated to '" .. newflag .. "'!" )
-			SaveFlags()
-			FlagGroup( ply, v.Flag )
+			v.Rank = newrank
+			Log( ply:Nick() .. "'s rank has been succesfully updated to '" .. newrank .. "'!" )
+			SaveUserRanks()
 			
 			return true
 		end
 	end
 	
-	table.insert( FlagTable, newentry )
-	Log( ply:Nick() .. "'s flag (" .. newflag .. ") has been succesfully added!" )
-	SaveFlags()
-	FlagGroup( ply, newflag )
+	table.insert( RankTable, newentry )
+	Log( ply:Nick() .. "'s rank (" .. newrank .. ") has been succesfully added!" )
+	SaveUserRanks()
 end
 
-function FlagGroup( ply, flag )
-	if flag == 0 then
-		ply:SetUserGroup( "unknown" )
-	elseif flag == 1 then
-		ply:SetUserGroup( "admin" )
-	elseif flag == 2 then
-		ply:SetUserGroup( "superadmin" )
-	elseif flag == 3 then
-		ply:SetUserGroup( "superadmin" )
-	end
-end
-
-function SetFlag2( ply, command, args )
+function SetRank2( ply, command, args )
 	if GetPlayer( args[1] ) ~= nil then
-		GetPlayer( args[1] ):SetNWInt( "Flag", tonumber(args[2]) )
+		GetPlayer( args[1] ):SetNWString( "Rank", table.concat(args, " ", 2) )
 		
-		Notify( GetPlayer(args[1]):Nick() .. " is now " .. string.Left(FlagName( tonumber(args[2]) ), string.len(FlagName( tonumber(args[2]) )) - 1 ) .. " (Console)" )
-		Log( GetPlayer(args[1]):Nick() .. " is now " .. string.Left(FlagName( tonumber(args[2]) ), string.len(FlagName( tonumber(args[2]) )) - 1 ) .. " (Console)" )
+		Notify( GetPlayer(args[1]):Nick() .. " is now " .. GetPlayer(args[1]):GetNWString("Rank") .. " (Console)" )
+		Log( GetPlayer(args[1]):Nick() .. " is now " .. GetPlayer(args[1]):GetNWString("Rank") .. " (Console)" )
 		
-		EditFlag( GetPlayer(args[1]), tonumber(args[2]) )
+		EditRank( GetPlayer(args[1]), GetPlayer(args[1]):GetNWString("Rank") )
 	else
 		Log( "Player '" .. args[1] .. "' not found!" )
 	end
 end
-concommand.Add( "SetFlag", SetFlag2 )
+concommand.Add( "SetRank", SetRank2 )
 
-function SetFlag( ply, args )
-	args[1]:SetNWInt( "Flag", tonumber(args[2]) )
-	EditFlag( args[1], tonumber(args[2]) )
-	Notify( args[1]:Nick() .. " is now " .. string.Left(FlagName( tonumber(args[2]) ), string.len(FlagName( tonumber(args[2]) )) - 1 )  .. " (" .. ply:Nick() .. ")" )
+function SetRank( ply, args )
+	args[1]:SetNWString( "Rank", table.concat(args, " ", 2) )
+	EditRank( args[1], table.concat(args, " ", 2) )
+	Notify( args[1]:Nick() .. " is now " .. args[1]:GetNWString("Rank")  .. " (" .. ply:Nick() .. ")" )
 end
-RegisterCommand( "Set Flag", "Set someone's flag (1 = admin, 2 = superadmin)", "flag", "flag <name> <flag>", 3, "Overv", 7, 2, SetFlag )
-RegisterCheck( "Set Flag", 1, 1, "Player '%arg%' not found!" )
-RegisterCheck( "Set Flag", 2, 2, "The flag must be a number!" )
+RegisterCommand( "Set Rank", "Set someone's rank", "rank", "rank <name> <rank>", 3, "Overv", 7, 2, SetRank )
+RegisterCheck( "Set Rank", 1, 1, "Player '%arg%' not found!" )
 
 //Limit weapons to admins
 function LimitGuns( ply )

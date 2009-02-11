@@ -106,7 +106,15 @@ function GetPlayer( Part )
 end
 
 function Flag( ply )
-	return tonumber( ply:GetNWInt( "Flag" ) )
+	if ply:GetNWString("Rank") == "Owner" then
+		return 3
+	elseif ply:GetNWString("Rank") == "Super Administrator" then
+		return 2
+	elseif ply:GetNWString("Rank") == "Administrator" then
+		return 1
+	else
+		return 0
+	end
 end
 
 function FlagName( flagID )
