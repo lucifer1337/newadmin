@@ -113,7 +113,7 @@ function FullCleanup( ply, params )
 	//Clean up
 	for _, v in pairs(ents.GetAll()) do
 		if v:IsPlayer() == false and table.HasValue( defaultents, v ) == false and v:IsWeapon() == false and v:GetClass() ~= "predicted_viewmodel" and v:GetClass() ~= "physgun_beam" then
-			v:Remove()
+			constraint.RemoveAll( v )
 		end
 	end
 	

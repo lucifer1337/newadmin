@@ -1,3 +1,4 @@
+//Grouping
 function SetGroup( ply, args )
 	args[1]:SetUserGroup( args[2] )
 	Notify( args[1]:Nick() .. " is now in the \'" .. args[2] .. "\' group (" .. ply:Nick() .. ")" )
@@ -22,6 +23,7 @@ concommand.Add( "SetGroup", SetGroup2 )
 //Handle flags for players
 local RankTable = {}
 
+//Saving and loading ranks
 function LoadUserRanks()
 	RankTable = {}
 	
@@ -59,6 +61,7 @@ function SaveUserRanks()
 	Log( "Flag file saved." )
 end
 
+//Assigning ranks on spawning
 function AssignRanks( ply )
 	if ply:GetNWBool( "Ranked" ) == true then return  end
 
@@ -71,18 +74,33 @@ function AssignRanks( ply )
 		if v.SteamID == ply:SteamID() then
 			ply:SetNWString( "Rank", v.Rank )
 			Log( "Set " .. ply:Nick() .. "'s rank to '" .. v.Rank .. "'" )
+			RankGrouping( ply )
 			ply:SetNWBool( "Ranked", true )
 			return 
 		end
 	end
 	
 	Log( "No rank entry found for " .. ply:Nick() )
+	ply:SetNWString( "Rank", "Guest" )
+	RankGrouping( ply )
 	ply:SetNWBool( "Ranked", true )
 	
 	SaveUserRanks()
 end
 hook.Add( "PlayerSpawn", "AssignRanks", AssignRanks )
 
+//Base the group on the rank
+function RankGrouping( ply )
+	if HasPrivilege( ply, "Admin group" ) then
+		ply:SetUserGroup( "admin" )
+	elseif HasPrivilege( ply, "Super Admin group" ) then
+		ply:SetUserGroup( "superadmin" )
+	else
+		ply:SetUserGroup( "undefined" )
+	end
+end
+
+//Internal function to edit someone's rank
 function EditRank( ply, newrank )
 	local newentry = {}
 	newentry.SteamID = ply:SteamID()
@@ -92,6 +110,7 @@ function EditRank( ply, newrank )
 		if v.SteamID == newentry.SteamID then
 			v.Rank = newrank
 			Log( ply:Nick() .. "'s rank has been succesfully updated to '" .. newrank .. "'!" )
+			RankGrouping( ply )
 			SaveUserRanks()
 			
 			return true
@@ -100,17 +119,23 @@ function EditRank( ply, newrank )
 	
 	table.insert( RankTable, newentry )
 	Log( ply:Nick() .. "'s rank (" .. newrank .. ") has been succesfully added!" )
+	RankGrouping( ply )
 	SaveUserRanks()
 end
 
+//Set people's ranks
 function SetRank2( ply, command, args )
 	if GetPlayer( args[1] ) ~= nil then
-		GetPlayer( args[1] ):SetNWString( "Rank", table.concat(args, " ", 2) )
-		
-		Notify( GetPlayer(args[1]):Nick() .. " is now " .. GetPlayer(args[1]):GetNWString("Rank") .. " (Console)" )
-		Log( GetPlayer(args[1]):Nick() .. " is now " .. GetPlayer(args[1]):GetNWString("Rank") .. " (Console)" )
-		
-		EditRank( GetPlayer(args[1]), GetPlayer(args[1]):GetNWString("Rank") )
+		if RankExists(table.concat(args, " ", 2)) then
+			GetPlayer( args[1] ):SetNWString( "Rank", table.concat(args, " ", 2) )
+			
+			Notify( GetPlayer(args[1]):Nick() .. " is now " .. GetPlayer(args[1]):GetNWString("Rank") .. " (Console)" )
+			Log( GetPlayer(args[1]):Nick() .. " is now " .. GetPlayer(args[1]):GetNWString("Rank") .. " (Console)" )
+			
+			EditRank( GetPlayer(args[1]), GetPlayer(args[1]):GetNWString("Rank") )
+		else
+			Log( "The rank '" .. table.concat(args, " ", 2) .. "' doesn't exist!" )
+		end
 	else
 		Log( "Player '" .. args[1] .. "' not found!" )
 	end
@@ -118,16 +143,22 @@ end
 concommand.Add( "SetRank", SetRank2 )
 
 function SetRank( ply, args )
-	args[1]:SetNWString( "Rank", table.concat(args, " ", 2) )
-	EditRank( args[1], table.concat(args, " ", 2) )
-	Notify( args[1]:Nick() .. " is now " .. args[1]:GetNWString("Rank")  .. " (" .. ply:Nick() .. ")" )
+	if RankExists(table.concat(args, " ", 2)) then
+		args[1]:SetNWString( "Rank", table.concat(args, " ", 2) )
+		EditRank( args[1], table.concat(args, " ", 2) )
+		Notify( args[1]:Nick() .. " is now " .. args[1]:GetNWString("Rank")  .. " (" .. ply:Nick() .. ")" )
+	else
+		Notify( "The rank '" .. table.concat(args, " ", 2) .. "' doesn't exist!", "NOTIFY_ERROR", ply )
+	end
 end
 RegisterCommand( "Set Rank", "Set someone's rank", "rank", "rank <name> <rank>", 3, "Overv", 7, 2, SetRank )
 RegisterCheck( "Set Rank", 1, 1, "Player '%arg%' not found!" )
 
-//Limit weapons to admins
+//=== Special limits ===
+
+//Weapons allowed?
 function LimitGuns( ply )
-	if Flag( ply ) < 1 then
+	if !HasPrivilege( ply, "Weapons allowed" ) then
 		ply:Give( "weapon_physcannon" )
 		ply:Give( "weapon_physgun" )
 		ply:Give( "gmod_tool" )
@@ -140,9 +171,9 @@ end
 hook.Add( "PlayerLoadout", "LimitGuns", LimitGuns )
 
 function BlockGuns( ply, wep )
-	if Flag( ply ) < 1 then
-		local wep2 = wep:GetClass()
-		if wep2 != "weapon_physcannon" and wep2 != "weapon_physgun" and wep2 != "gmod_tool" and wep2 != "gmod_camera" then
+	if !HasPrivilege( ply, "Weapons allowed" ) then
+		local wepc = wep:GetClass()
+		if wepc != "weapon_physcannon" and wepc != "weapon_physgun" and wepc != "gmod_tool" and wepc != "gmod_camera" then
 			wep:Remove()
 			return false
 		end
@@ -150,7 +181,8 @@ function BlockGuns( ply, wep )
 end
 hook.Add( "PlayerCanPickupWeapon", "NoGuns", BlockGuns )
 
+//Entities allowed?
 function NoSENTs( ply )
-	if Flag( ply ) < 1 then return false end
+	if !HasPrivilege( ply, "Entities allowed" ) then return false end
 end
 hook.Add( "PlayerSpawnSENT", "NoSENTs", NoSENTs )

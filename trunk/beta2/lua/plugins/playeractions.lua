@@ -108,15 +108,9 @@ AddPlayerMenu( "Set Deaths", 2, "deaths" )
 //Collect default weapons
 local defweapons = {}
 function AddWeapons()
-	if defweapons[1] == nil then
-		for k, v in pairs(ents.GetAll()) do
-			if v:IsWeapon() then
-				table.insert( defweapons, v:GetClass() )
-			end
-		end
-		
-		if table.Count(defweapons) > 0 then
-			Log("Added " .. table.Count(defweapons) .. " default weapons!")
+	for k, v in pairs(ents.GetAll()) do
+		if v:IsWeapon() and !table.HasValue( defweapons, v:GetClass() ) then
+			table.insert( defweapons, v:GetClass() )
 		end
 	end
 end
