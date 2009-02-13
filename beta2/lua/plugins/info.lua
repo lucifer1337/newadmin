@@ -60,6 +60,6 @@ RegisterCommand( "List Commands", "List all the commands in the console", "comma
 
 //NewAdmin version
 function Info( ply, params )
-	Notify( "This server is running NewAdmin 1.0 R69", "NOTIFY_GENERIC", ply )
+	Notify( "This server is running NewAdmin 1.0 R73", "NOTIFY_GENERIC", ply )
 end
 RegisterCommand( "Info", "Shows info about NewAdmin, such as the version running", "info", "info", 0, "Overv", 8, 0, Info )
