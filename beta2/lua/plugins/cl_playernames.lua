@@ -99,13 +99,13 @@ function DrawPlayers()
 				
 				//Icon
 				if v:GetNWBool("Typing") != true then
-					if HasPrivilege(v, "Owner icon") then
+					if v:GetNWString("Rank") == "Owner" then
 						Icon = Owner
-					elseif HasPrivilege(v, "Super Admin icon") then
+					elseif v:GetNWString("Rank") == "Super Admin" then
 						Icon = SAdmin
-					elseif HasPrivilege(v, "Admin icon") then
+					elseif v:GetNWString("Rank") == "Admin" then
 						Icon = Admin
-					elseif HasPrivilege(v, "Respected icon") then
+					elseif v:GetNWString("Rank") == "Respected" then
 						Icon = Respected
 					else
 						Icon = Guest
