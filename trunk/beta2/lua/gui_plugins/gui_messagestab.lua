@@ -99,7 +99,7 @@ if SERVER then
 	concommand.Add( "NA_UpdateMessages", NA_UpdateMessages )
 	
 	function NA_AddMessage( ply, com, args )
-		if !HasPrivilege(LocalPlayer(), "Edit messages") then return false end
+		if !HasPrivilege(ply, "Edit messages") then return false end
 		table.insert( Messages, args[1] )
 		SaveMessages()
 		
@@ -111,7 +111,7 @@ if SERVER then
 	concommand.Add( "NA_AddMessage", NA_AddMessage )
 	
 	function NA_RemoveMessage( ply, com, args )
-		if !HasPrivilege(LocalPlayer(), "Edit messages") then return false end
+		if !HasPrivilege(ply, "Edit messages") then return false end
 		for i, e in pairs(Messages) do
 			if e == args[1] then table.remove( Messages, i ) end
 		end
