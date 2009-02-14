@@ -3,7 +3,7 @@ function SetGroup( ply, args )
 	args[1]:SetUserGroup( args[2] )
 	Notify( args[1]:Nick() .. " is now in the \'" .. args[2] .. "\' group (" .. ply:Nick() .. ")" )
 end
-RegisterCommand( "Set Group", "Set someone's user group (this does NOT change the flag!)", "group", "group <name> <groupname>", 3, "Overv", 7, 2, SetGroup )
+RegisterCommand( "Set Group", "Set someone's user group (this does NOT change the rank!)", "group", "group <name> <groupname>", 3, "Overv", 7, 2, SetGroup )
 RegisterCheck( "Set Group", 1, 3, "Player '%arg%' not found!" )
 
 
@@ -20,7 +20,7 @@ function SetGroup2( ply, command, args )
 end
 concommand.Add( "SetGroup", SetGroup2 )
 
-//Handle flags for players
+//Handle ranks for players
 local RankTable = {}
 
 //Saving and loading ranks
@@ -58,7 +58,7 @@ function SaveUserRanks()
 	end
 	
 	file.Write( "NewAdmin/userranks.txt", tfile )
-	Log( "Flag file saved." )
+	Log( "Rank file saved." )
 end
 
 //Assigning ranks on spawning

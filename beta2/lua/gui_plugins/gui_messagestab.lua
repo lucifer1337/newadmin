@@ -26,7 +26,7 @@ function MessagesTab()
 	cmdAdd:SetText( "Add" )
 	cmdAdd.DoClick = function() AddMessage() end
 	cmdAdd:SetEnabled( false )
-	if Flag(LocalPlayer()) > 2 then cmdAdd:SetEnabled( true ) end
+	if HasPrivilege(LocalPlayer(), "Edit messages") then cmdAdd:SetEnabled( true ) end
 	
 	cmdRemove = vgui.Create( "DButton", TabMessages )
 	cmdRemove:SetPos( TabMessages:GetWide() - 55, 0 )
@@ -34,7 +34,7 @@ function MessagesTab()
 	cmdRemove:SetText( "Remove" )
 	cmdRemove.DoClick = function() RemoveMessage() end
 	cmdRemove:SetEnabled( false )
-	if Flag(LocalPlayer()) > 2 then cmdRemove:SetEnabled( true ) end
+	if HasPrivilege(LocalPlayer(), "Edit messages") then cmdRemove:SetEnabled( true ) end
 	
 	//Current messages
 	cbMessages = vgui.Create( "DComboBox", TabMessages )
@@ -56,9 +56,9 @@ RegisterOnOpen( UpdateMessageList )
 
 function SetButtons()
 	cmdAdd:SetEnabled( false )
-	if Flag(LocalPlayer()) > 2 then cmdAdd:SetEnabled( true ) end
+	if HasPrivilege(LocalPlayer(), "Edit messages") then cmdAdd:SetEnabled( true ) end
 	cmdRemove:SetEnabled( false )
-	if Flag(LocalPlayer()) > 2 then cmdRemove:SetEnabled( true ) end
+	if HasPrivilege(LocalPlayer(), "Edit messages") then cmdRemove:SetEnabled( true ) end
 end
 RegisterOnOpen( SetButtons )
 
@@ -99,7 +99,7 @@ if SERVER then
 	concommand.Add( "NA_UpdateMessages", NA_UpdateMessages )
 	
 	function NA_AddMessage( ply, com, args )
-		if Flag(ply) < 3 then return false end
+		if !HasPrivilege(LocalPlayer(), "Edit messages") then return false end
 		table.insert( Messages, args[1] )
 		SaveMessages()
 		
@@ -111,7 +111,7 @@ if SERVER then
 	concommand.Add( "NA_AddMessage", NA_AddMessage )
 	
 	function NA_RemoveMessage( ply, com, args )
-		if Flag(ply) < 3 then return false end
+		if !HasPrivilege(LocalPlayer(), "Edit messages") then return false end
 		for i, e in pairs(Messages) do
 			if e == args[1] then table.remove( Messages, i ) end
 		end

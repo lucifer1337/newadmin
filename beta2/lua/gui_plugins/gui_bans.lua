@@ -37,7 +37,7 @@ function BanTab()
 	cmdUnban:SetText( "Unban" )
 	cmdUnban.DoClick = function() Unban() end
 	cmdUnban:SetEnabled( false )
-	if Flag(LocalPlayer()) > 2 then cmdUnban:SetEnabled( true ) end
+	if HasPrivilege(LocalPlayer(), "Can unban") then cmdUnban:SetEnabled( true ) end
 	
 	Tabs:AddSheet( "Bans", TabBans, "gui/silkicons/bans", false, false, "Manage current bans" )
 end
@@ -54,7 +54,7 @@ RegisterOnOpen( UpdateBanlist )
 
 function SetButtonsBan()
 	cmdUnban:SetEnabled( false )
-	if Flag(LocalPlayer()) > 2 then cmdUnban:SetEnabled( true ) end
+	if HasPrivilege(LocalPlayer(), "Can unban") then cmdUnban:SetEnabled( true ) end
 end
 RegisterOnOpen( SetButtonsBan )
 

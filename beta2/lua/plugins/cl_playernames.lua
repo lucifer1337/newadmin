@@ -43,6 +43,7 @@ hook.Add("PlayerInitialSpawn", "SyncInfo", Sync)
 //Load icons
 if CLIENT then
 	Guest = surface.GetTextureID("gui/silkicons/user")
+	Respected = surface.GetTextureID("gui/silkicons/heart")
 	Admin = surface.GetTextureID("gui/silkicons/user_suit")
 	SAdmin = surface.GetTextureID("gui/silkicons/shield")
 	Owner = surface.GetTextureID("gui/silkicons/star")
@@ -98,14 +99,16 @@ function DrawPlayers()
 				
 				//Icon
 				if v:GetNWBool("Typing") != true then
-					if Flag(v) == 0 then
-						Icon = Guest
-					elseif Flag(v) == 1 then
-						Icon = Admin
-					elseif Flag(v) == 2 then
-						Icon = SAdmin
-					elseif Flag(v) == 3 then
+					if HasPrivilege(v, "Owner icon") then
 						Icon = Owner
+					elseif HasPrivilege(v, "Super Admin icon") then
+						Icon = SAdmin
+					elseif HasPrivilege(v, "Admin icon") then
+						Icon = Admin
+					elseif HasPrivilege(v, "Respected icon") then
+						Icon = Respected
+					else
+						Icon = Guest
 					end
 				else
 					Icon = Typing

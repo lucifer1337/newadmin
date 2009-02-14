@@ -1,6 +1,6 @@
 //Allow admins and super admins to pick up players
 function Pickup( ply, ent )
-	if ent and ent:IsValid() and ent:IsPlayer() and Flag(ply) > 0 then
+	if ent and ent:IsValid() and ent:IsPlayer() and HasPrivilege(ply, "Player pickup") then
 		ent:GodEnable()
 		ent:SetNWBool( "PickedUp", true )
 		ent:SetMoveType( MOVETYPE_NONE )
@@ -16,7 +16,7 @@ end
 if SERVER then hook.Add("PhysgunPickup", "PhysgunPickupHook", Pickup) end
 
 function Drop( ply, ent )
-	if ent and ent:IsValid() and ent:IsPlayer() and Flag(ply) > 0 then
+	if ent and ent:IsValid() and ent:IsPlayer() and HasPrivilege(ply, "Player pickup") then
 		ent:GodDisable()
 		ent:SetNWBool( "PickedUp", false )
 		ent:SetMoveType( MOVETYPE_WALK )

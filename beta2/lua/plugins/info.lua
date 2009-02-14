@@ -37,19 +37,26 @@ function ListCommands( ply, params )
 					first = false
 				end
 			
-				if v.Flag == 0 then
-					ReqFlag = "*"
-				elseif v.Flag == 1 then
-					ReqFlag = "A"
-				elseif v.Flag == 2 then
-					ReqFlag = "SA"
-				elseif v.Flag == 3 then
-					ReqFlag = "O"
-				else
-					RegFlaq = "*"
+				//if v.Flag == 0 then
+				//	ReqFlag = "*"
+				//elseif v.Flag == 1 then
+				//	ReqFlag = "A"
+				//elseif v.Flag == 2 then
+				//	ReqFlag = "SA"
+				//elseif v.Flag == 3 then
+				//	ReqFlag = "O"
+				//else
+				//	RegFlaq = "*"
+				//end
+				local ReqFlag = {}
+				for _, r in pairs(Ranks) do
+					if RankHasPrivilege(r.Title, v.Title) then
+						table.insert( ReqFlag, r.Title )
+					end
 				end
+				local ReqFlags = table.concat( ReqFlag, ", " )
 				
-				Msg("	!" .. v.Usage .. " - " .. v.Description .. " (" .. ReqFlag .. ")\n")
+				Msg("	!" .. v.Usage .. " - " .. v.Description .. " (" .. ReqFlags .. ")\n")
 			end
 		end
 		
@@ -60,6 +67,6 @@ RegisterCommand( "List Commands", "List all the commands in the console", "comma
 
 //NewAdmin version
 function Info( ply, params )
-	Notify( "This server is running NewAdmin 1.0 R73", "NOTIFY_GENERIC", ply )
+	Notify( "This server is running NewAdmin 1.0 R74", "NOTIFY_GENERIC", ply )
 end
 RegisterCommand( "Info", "Shows info about NewAdmin, such as the version running", "info", "info", 0, "Overv", 8, 0, Info )

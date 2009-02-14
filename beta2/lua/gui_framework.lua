@@ -10,7 +10,7 @@ function ShowMenu( ply )
 		return false
 	end
 
-	if Flag(LocalPlayer()) < 1 then return false end
+	if !HasPrivilege(LocalPlayer(), "Open menu") then return false end
 	if !AdminPanel then BuildMenu() end
 	
 	//Functions that need to be ran when the menu is (re-)opened
