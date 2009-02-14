@@ -213,7 +213,7 @@ RegisterCommand( "Gamemode", "Use this command to change the map and gamemode", 
 local activated = false
 function BlockNoclip( ply )
 	if activated == true then
-		if Flag(ply) > 0 then
+		if HasPrivilege( ply, "Noclip always" ) then
 			return true
 		else
 			Notify( "Only admins are allowed to noclip!", "NOTIFY_ERROR", ply )

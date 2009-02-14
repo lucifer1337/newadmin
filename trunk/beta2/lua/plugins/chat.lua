@@ -53,7 +53,7 @@ RegisterCommand( "Whisper", "Whisper messages to people close to you", "w", "w <
 function ChatAdmin( ply, params )
 	local Message = table.concat( params, " " )
 	for _, v in pairs(player.GetAll()) do
-		if Flag(v) > 0 then v:PrintMessage( HUD_PRINTTALK, "(ADMIN - " .. ply:Nick() .. ") " .. Message ) end
+		if HasPrivilege(v, "Admin Chat") then v:PrintMessage( HUD_PRINTTALK, "(ADMIN - " .. ply:Nick() .. ") " .. Message ) end
 	end
 end
 RegisterCommand( "Admin Chat", "Send a message to all admins", "a", "a <message>", 1, "Overv", 6, 1, ChatAdmin )

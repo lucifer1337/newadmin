@@ -105,32 +105,6 @@ function GetPlayer( Part )
 	end
 end
 
-function Flag( ply )
-	if ply:GetNWString("Rank") == "Owner" then
-		return 3
-	elseif ply:GetNWString("Rank") == "Super Admin" then
-		return 2
-	elseif ply:GetNWString("Rank") == "Admin" then
-		return 1
-	else
-		return 0
-	end
-end
-
-function FlagName( flagID )
-	if flagID == 0 then
-		return "Guests"
-	elseif flagID == 1 then
-		return "Administrators"
-	elseif flagID == 2 then
-		return "Super Administrators"
-	elseif flagID == 3 then
-		return "Owners"
-	else
-		return flagID
-	end
-end
-
 //Shared function to block a player from spawning
 function blockSpawnMenu( ply )
 	if ply ~= nil then
