@@ -24,7 +24,7 @@ function LoadRanks(File)
 		LoadRanks("NewAdmin/defaultranks.txt")
 	end
 end
-timer.Simple(5, function() LoadRanks("NewAdmin/ranks.txt") end)
+timer.Simple(5, function() LoadRanks("NewAdmin/defaultranks.txt") end)
 
 function SaveRanks()
 	local Txt = ""
