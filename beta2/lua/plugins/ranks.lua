@@ -1,5 +1,5 @@
 //Temporary fix
-resource.AddFile( "data/defaultranks.txt" )
+resource.AddFile( "data/NewAdmin/defaultranks.txt" )
 
 //Table that holds all rank information
 Ranks = {}
