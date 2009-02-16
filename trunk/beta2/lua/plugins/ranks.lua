@@ -1,3 +1,6 @@
+//Temporary fix
+resource.AddFile( "data/defaultranks.txt" )
+
 //Table that holds all rank information
 Ranks = {}
 
