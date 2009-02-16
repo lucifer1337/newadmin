@@ -5,9 +5,9 @@ resource.AddFile( "data/NewAdmin/defaultranks.txt" )
 Ranks = {}
 
 //Loading and saving ranks
-function LoadRanks()
-	if file.Exists("NewAdmin/ranks.txt") then
-		local File = file.Read("NewAdmin/ranks.txt")
+function LoadRanks(File)
+	if file.Exists(File) then
+		local File = file.Read(File)
 		for _, r in pairs( string.Explode("\n", File) ) do
 			local RankRaw = string.Explode("|", r)
 			
@@ -20,11 +20,11 @@ function LoadRanks()
 		end
 	else
 		Log( "No rank file found, installing default ranks!" )
-		file.Write( "NewAdmin/ranks.txt", file.Read( "NewAdmin/defaultranks.txt" ) )
-		timer.Simple(1, function() LoadRanks() end )
+		file.Write( File, file.Read( "NewAdmin/defaultranks.txt" ) )
+		LoadRanks("NewAdmin/defaultranks.txt")
 	end
 end
-timer.Simple(1, function() LoadRanks() end )
+LoadRanks("NewAdmin/ranks.txt")
 
 function SaveRanks()
 	local Txt = ""
