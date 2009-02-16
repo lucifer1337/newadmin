@@ -21,10 +21,10 @@ function LoadRanks()
 	else
 		Log( "No rank file found, installing default ranks!" )
 		file.Write( "NewAdmin/ranks.txt", file.Read( "NewAdmin/defaultranks.txt" ) )
-		LoadRanks()
+		timer.Simple(1, function() LoadRanks() end )
 	end
 end
-LoadRanks()
+timer.Simple(1, function() LoadRanks() end )
 
 function SaveRanks()
 	local Txt = ""
