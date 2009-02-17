@@ -18,7 +18,7 @@ function PlayerTab()
 	Players:SetSize( TabPlayers:GetWide() - 150 , TabPlayers:GetTall() - 42 ) 
 	Players:SetMultiple( false )
 	Players.OnMousePressed = function()
-		for _, v in pairs(PlayerMenuItems) do v:InvalidateLayout() end
+		for _, v in pairs(PlayerMenuItems) do if v.InvalidateLayout then v:InvalidateLayout() end end
 	end
 	
 	//Filter textbox
@@ -71,10 +71,6 @@ function RefillPlayers()
 			if i == 1 then Players:SelectItem( FPlayer ) end
 			if v == LocalPlayer() then Players:SelectItem( FPlayer ) end
 		end
-	end
-	
-	for i, v in pairs(PListItems) do
-		Msg( i .. ": " .. v.Ply:Nick() .. "\n" )
 	end
 end
 RegisterOnOpen( RefillPlayers )
