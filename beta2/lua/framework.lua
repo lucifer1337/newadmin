@@ -158,6 +158,16 @@ function SyncTime( ply )
 end
 hook.Add( "PlayerInitialSpawn", "SyncTime", SyncTime )
 
+//Function to get to know if NewAdmin is on the server for people having it clientside
+NewAdminOn = false
+function NewAdmin()
+	return NewAdminOn
+end
+function SetNA( ply )
+	ply:SendLua( "NewAdminOn = true" )
+end
+if SERVER then hook.Add( "PlayerInitialSpawn", "SetNA", SetNA ) end
+
 //Handy derma stuff
 function ChoiceGetOptionID( ChoiceControl, TotalItems, ItemText )
 	for i = 1, TotalItems do

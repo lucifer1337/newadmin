@@ -7,7 +7,7 @@ resource.AddFile( "materials/gui/silkicons/user_suit.vtf" )
 function DrawHUD()
 	if pn_enabled then DrawPlayers() end
 end
-if CLIENT then hook.Add("HUDPaint", "DrawHud", DrawHUD) end
+if CLIENT and NewAdmin then hook.Add("HUDPaint", "DrawHud", DrawHUD) end
 
 //Enable and disable playernames
 pn_enabled = true
@@ -149,7 +149,7 @@ if SERVER then
 		ply:SetNWBool( "Typing", false )
 	end
 	concommand.Add( "NA_TypeStop", NA_TypeStop )
-else
+elseif NewAdmin then
 	hook.Add( "StartChat", "TypeStart", function() RunConsoleCommand("NA_TypeStart") end )
 	hook.Add( "FinishChat", "TypeStop", function() RunConsoleCommand("NA_TypeStop") end )
 end
