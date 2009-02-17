@@ -1,30 +1,47 @@
-//Temporary fix
-resource.AddFile( "data/NewAdmin/defaultranks.txt" )
+//Send the client our server ranks file as customized by the owner
+resource.AddFile( "data/NewAdmin/ranks.txt" )
 
 //Table that holds all rank information
 Ranks = {}
 
-//Loading and saving ranks
-function LoadRanks(File)
-	if file.Exists(File) then
-		local File = file.Read(File)
-		for _, r in pairs( string.Explode("\n", File) ) do
-			local RankRaw = string.Explode("|", r)
-			
-			local Rank = {}
-			Rank.Title = RankRaw[1]
-			Rank.Privileges = string.Explode(":", RankRaw[2])
-			table.insert( Ranks, Rank )
-			
-			Log( "Loaded rank '" .. Rank.Title .. "' with access to " .. #Rank.Privileges .. " privileges" )
-		end
-	else
-		Log( "No rank file found, installing default ranks!" )
-		file.Write( File, file.Read( "NewAdmin/defaultranks.txt" ) )
-		LoadRanks("NewAdmin/defaultranks.txt")
+//Parse ranks from string
+function ParseRanks( FileStr )
+	for _, r in pairs( string.Explode("\n", FileStr) ) do
+		local RankRaw = string.Explode("|", r)
+		
+		local Rank = {}
+		Rank.Title = RankRaw[1]
+		Rank.Privileges = string.Explode(":", RankRaw[2])
+		table.insert( Ranks, Rank )
+		
+		Log( "Loaded rank '" .. Rank.Title .. "' with access to " .. #Rank.Privileges .. " privileges" )
 	end
 end
-timer.Simple(5, function() LoadRanks("NewAdmin/defaultranks.txt") end)
+
+//Loading and saving ranks
+function LoadRanks()
+	if SERVER then
+		if file.Exists("NewAdmin/ranks.txt") then
+			//Load the user rank file
+			ParseRanks( file.Read("NewAdmin/ranks.txt") )
+			Log( "Loaded ranks!" )
+		else
+			//Load the default ranks and create a new ranks.txt file for the owner to modify
+			ParseRanks( file.Read("NewAdmin/defaultranks.txt") )
+			file.Write( "NewAdmin/ranks.txt", file.Read("NewAdmin/defaultranks.txt") )
+			Log( "Loaded default ranks and created a new customizable rank file!" )
+		end
+	else
+		if file.Exists("NewAdmin/ranks.txt") then
+			//Load the server rank file
+			ParseRanks( file.Read("NewAdmin/ranks.txt") )
+			Log( "Loaded ranks received from server!" )
+		else
+			Log( "Server did not send a rank file!" )
+		end
+	end
+end
+LoadRanks()
 
 function SaveRanks()
 	local Txt = ""
