@@ -8,28 +8,36 @@ function Slay( ply, params )
 end
 RegisterCommand( "Slay", "Kill a player", "slay", "slay [name]", 1, "Overv", 3, 0, Slay )
 RegisterCheck( "Slay", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Slay", 3, "slay" )
+AddPlayerMenu( "Slay", 3, "slay [PLAYER]" )
 
 //Slap
 function Slap( ply, params )
-		params[1]:TakeDamage( params[2] )
+		params[1]:SetHealth( params[1]:Health() - params[2] )
 		Notify( ply:Nick() .. " slapped " .. params[1]:Nick() .. " with " .. params[2] .. " HP", "NOTIFY_CLEANUP" )
+		
+		if params[1]:Health() < 1 then params[1]:Kill() end
 end
 RegisterCommand( "Slap", "Damage a player", "slap", "slap <name> <damage>", 1, "Overv", 3, 0, Slap )
 RegisterCheck( "Slap", 1, 3, "Player '%arg%' not found!" )
 RegisterCheck( "Slap", 2, 2, "Damage must be a number!" )
-AddPlayerMenu( "Slap", 3, "slap" )
+AddPlayerMenu( "Slap", 3, "slap [PLAYER] 10" )
 
 //Mass Slap
 function MassSlap( ply, params )
-		timer.Create( "tmSlap" .. params[1]:Nick(), 0.5, params[3], function() if params[1] ~= NULL then params[1]:TakeDamage( params[2] ) end end )  
+		timer.Create( "tmSlap" .. params[1]:Nick(), 0.5, params[3], function()
+			if params[1] ~= NULL then
+				params[1]:SetHealth( params[1]:Health() - params[2] )
+				if params[1]:Health() < 1 then params[1]:Kill() end
+			end
+		end )
+		
 		Notify( ply:Nick() .. " slaps " .. params[1]:Nick() .. " " .. params[3] .. " times with " .. params[2] .. " HP", "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "MassSlap", "Damages a player multiple times with a short interval", "mslap", "mslap <name> <damage> <times>", 1, "Overv", 3, 0, MassSlap )
 RegisterCheck( "MassSlap", 1, 3, "Player '%arg%' not found!" )
 RegisterCheck( "MassSlap", 2, 2, "Damage must be a number!" )
 RegisterCheck( "MassSlap", 3, 2, "Amount of times must be a number!" )
-AddPlayerMenu( "Mass Slap", 3, "mslap" )
+AddPlayerMenu( "Mass Slap", 3, "mslap [PLAYER] 10 10" )
 
 //Strip weapons
 function Strip( ply, params )
@@ -38,7 +46,7 @@ function Strip( ply, params )
 end
 RegisterCommand( "Strip", "Strip weapons from a player", "strip", "strip [name]", 1, "Overv", 3, 0, Strip )
 RegisterCheck( "Strip", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Strip Weapons", 3, "strip" )
+AddPlayerMenu( "Strip Weapons", 3, "strip [PLAYER]" )
 
 //Jail
 local JailPos = nil
@@ -72,7 +80,7 @@ function Jail( ply, params )
 end
 RegisterCommand( "Jail", "Jail the specified player", "jail", "jail [name]", 1, "Overv", 3, 0, Jail )
 RegisterCheck( "Jail", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Jail", 3, "jail", "unjail", "Jailed" )
+AddPlayerMenu( "Jail", 3, "jail [PLAYER]", "unjail [PLAYER]", "Jailed" )
 
 function UnJail( ply, params )
 	if params[1]:GetNetworkedBool( "Jailed" ) == true then
@@ -107,7 +115,7 @@ function Ignite( ply, params )
 end
 RegisterCommand( "Ignite", "Ignite a player", "ignite", "ignite [name]", 1, "Overv", 3, 0, Ignite )
 RegisterCheck( "Ignite", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Ignited", 3, "ignite", "unignite", "Ignited" )
+AddPlayerMenu( "Ignited", 3, "ignite [PLAYER]", "unignite [PLAYER]", "Ignited" )
 
 function UnIgnite( ply, params )
 	params[1]:Extinguish()
@@ -124,7 +132,7 @@ function Blind( ply, params )
 end
 RegisterCommand( "Blind", "Blind a player", "blind", "blind [name]", 1, "Overv", 3, 0, Blind )
 RegisterCheck( "Blind", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Blind", 3, "blind", "unblind", "Blinded" )
+AddPlayerMenu( "Blind", 3, "blind [PLAYER]", "unblind [PLAYER]", "Blinded" )
 
 function UnBlind( ply, params )
 	params[1]:SetNWBool( "Blinded", false )
@@ -151,7 +159,7 @@ function Freeze( ply, params )
 end
 RegisterCommand( "Freeze", "Freeze a player", "freeze", "freeze [name]", 1, "Overv", 3, 0, Freeze )
 RegisterCheck( "Freeze", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Freeze", 3, "freeze", "unfreeze", "Frozen" )
+AddPlayerMenu( "Freeze", 3, "freeze [PLAYER]", "unfreeze [PLAYER]", "Frozen" )
 
 function UnFreeze( ply, params )
 	params[1]:SetNWBool( "Frozen", false )
@@ -196,7 +204,7 @@ function Ragdoll( ply, params )
 end
 RegisterCommand( "Ragdoll", "Turn a player into a ragdoll", "ragdoll", "ragdoll [name]", 1, "Overv", 3, 0, Ragdoll )
 RegisterCheck( "Ragdoll", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Ragdoll", 3, "ragdoll", "unragdoll", "Ragdolled" )
+AddPlayerMenu( "Ragdoll", 3, "ragdoll [PLAYER]", "unragdoll [PLAYER]", "Ragdolled" )
 
 function UnRagdoll( ply, params )
 	if params[1]:GetNWBool("Ragdolled") == false then
@@ -253,4 +261,4 @@ function Explode( ply, params )
 end
 RegisterCommand( "Explode", "Explode a player", "explode", "explode [name]", 1, "Overv", 3, 0, Explode )
 RegisterCheck( "Explode", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Explode", 3, "explode" )
+AddPlayerMenu( "Explode", 3, "explode [PLAYER]" )

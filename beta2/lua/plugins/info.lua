@@ -36,18 +36,7 @@ function ListCommands( ply, params )
 					Msg("o " .. GetCatName(c) .. "\n\n")
 					first = false
 				end
-			
-				//if v.Flag == 0 then
-				//	ReqFlag = "*"
-				//elseif v.Flag == 1 then
-				//	ReqFlag = "A"
-				//elseif v.Flag == 2 then
-				//	ReqFlag = "SA"
-				//elseif v.Flag == 3 then
-				//	ReqFlag = "O"
-				//else
-				//	RegFlaq = "*"
-				//end
+				
 				local ReqFlag = {}
 				for _, r in pairs(Ranks) do
 					if RankHasPrivilege(r.Title, v.Title) then
@@ -67,6 +56,6 @@ RegisterCommand( "List Commands", "List all the commands in the console", "comma
 
 //NewAdmin version
 function Info( ply, params )
-	Notify( "This server is running NewAdmin 1.0 R76", "NOTIFY_GENERIC", ply )
+	Notify( "This server is running NewAdmin 1.0 R87", "NOTIFY_GENERIC", ply )
 end
 RegisterCommand( "Info", "Shows info about NewAdmin, such as the version running", "info", "info", 0, "Overv", 8, 0, Info )
