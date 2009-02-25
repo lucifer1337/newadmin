@@ -63,9 +63,11 @@ function Log( Message, Hide )
 	end
 	
 	//Add to log
-	local ftext = ""
-	if file.Exists( "NewAdmin/log.txt" ) then ftext = file.Read( "NewAdmin/log.txt" ) end
-	file.Write( "NewAdmin/log.txt", ftext .. os.date("%c") .. " : " .. Message .. "\n" )
+	if SERVER then
+		local ftext = ""
+		if file.Exists( "NewAdmin/log.txt" ) then ftext = file.Read( "NewAdmin/log.txt" ) end
+		file.Write( "NewAdmin/log.txt", ftext .. os.date("%c") .. " : " .. Message .. "\n" )
+	end
 end
 
 //Format the time in 00:00:00 format
