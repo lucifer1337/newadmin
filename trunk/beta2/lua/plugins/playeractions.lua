@@ -16,7 +16,7 @@ function UnGod( ply, params )
 end
 RegisterCommand( "UnGod", "Disable godmode for a player", "ungod", "ungod [name]", 1, "Overv", 2, 0, UnGod )
 RegisterCheck( "UnGod", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Godmode", 2, "god", "ungod", "Godded" )
+AddPlayerMenu( "Godmode", 2, "god [PLAYER]", "ungod [PLAYER]", "Godded" )
 
 //When you respawn godmode gets disabled, this will re-enable it :)
 function RestartGod( ply )
@@ -46,7 +46,7 @@ function SetHealth( ply, params )
 end
 RegisterCommand( "SetHealth", "Set health for a player", "hp", "hp [name] [amount]", 1, "Overv", 2, 0, SetHealth )
 RegisterCheck( "SetHealth", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Health", 2, "hp" )
+AddPlayerMenu( "Health", 2, "hp [PLAYER] 100" )
 
 //Unlimited ammo
 function uAmmo( ply, params )
@@ -62,7 +62,7 @@ function UnuAmmo( ply, params )
 end
 RegisterCommand( "Limited Ammo", "Disables unlimited ammo for the player", "unuammo", "unuammo [name]", 1, "Overv", 2, 0, UnuAmmo )
 RegisterCheck( "Limited Ammo", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Unlimited Ammo", 2, "uammo", "unuammo", "uAmmo" )
+AddPlayerMenu( "Unlimited Ammo", 2, "uammo [PLAYER]", "unuammo [PLAYER]", "uAmmo" )
 
 function uAmmoGive()
 	for k, v in pairs(player.GetAll()) do
@@ -93,7 +93,7 @@ end
 RegisterCommand( "SetFrags", "Set the frags of a player", "frags", "frags <name> <frags>", 2, "Overv", 2, 2, SetFrags )
 RegisterCheck( "SetFrags", 1, 1, "Player '%arg%' not found!" )
 RegisterCheck( "SetFrags", 2, 2, "Amount of frags must be a number!" )
-AddPlayerMenu( "Set Frags", 2, "frags" )
+AddPlayerMenu( "Set Frags", 2, "frags [PLAYER] 0" )
 
 //Set frags
 function SetDeaths( ply, params )
@@ -103,7 +103,7 @@ end
 RegisterCommand( "SetDeaths", "Set the deaths of a player", "deaths", "deaths <name> <deaths>", 2, "Overv", 2, 2, SetDeaths )
 RegisterCheck( "SetDeaths", 1, 1, "Player '%arg%' not found!" )
 RegisterCheck( "SetDeaths", 2, 2, "Amount of deaths must be a number!" )
-AddPlayerMenu( "Set Deaths", 2, "deaths" )
+AddPlayerMenu( "Set Deaths", 2, "deaths [PLAYER] 0" )
 
 //Collect default weapons
 local defweapons = {}
@@ -124,7 +124,7 @@ function Arm( ply, params )
 end
 RegisterCommand( "Arm", "Gives a player all the weapons", "arm", "arm [name]", 1, "Overv", 2, 0, Arm )
 RegisterCheck( "Arm", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Arm", 2, "arm" )
+AddPlayerMenu( "Arm", 2, "arm [PLAYER]" )
 
 //Ghosting
 function Ghost( ply, params )
@@ -160,7 +160,7 @@ function UnGhost( ply, params )
 end
 RegisterCommand( "UnGhost", "Turn a ghost into a player again", "unghost", "unghost [name]", 1, "Overv", 2, 0, UnGhost )
 RegisterCheck( "UnGhost", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Ghosted", 2, "ghost", "unghost", "Ghosted" )
+AddPlayerMenu( "Ghosted", 2, "ghost [PLAYER]", "unghost [PLAYER]", "Ghosted" )
 
 //When you respawn you get new weapons and they're not invisible yet D:
 function RestartGhost( ply )
@@ -180,7 +180,7 @@ function Spawn( ply, params )
 end
 RegisterCommand( "Spawn", "Force a player to respawn", "spawn", "spawn [name]", 1, "Overv", 2, 0, Spawn )
 RegisterCheck( "Spawn", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Spawn", 2, "spawn" )
+AddPlayerMenu( "Spawn", 2, "spawn [PLAYER]" )
 
 //Force a player to exit a vehicle
 function ExitVehicle( ply, params )
@@ -189,7 +189,7 @@ function ExitVehicle( ply, params )
 end
 RegisterCommand( "ExitVehicle", "Force a player to exit a vehicle", "exit", "exit [name]", 1, "Overv", 2, 0, ExitVehicle )
 RegisterCheck( "ExitVehicle", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Exit Vehicle", 2, "exit" )
+AddPlayerMenu( "Exit Vehicle", 2, "exit [PLAYER]" )
 
 //Force a player to exit a vehicle
 function EnterVehicle( ply, params )
@@ -203,7 +203,7 @@ function EnterVehicle( ply, params )
 end
 RegisterCommand( "EnterVehicle", "Force a player to enter a vehicle", "enter", "enter [name]", 1, "Overv", 2, 0, EnterVehicle )
 RegisterCheck( "EnterVehicle", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Enter Vehicle", 2, "enter" )
+AddPlayerMenu( "Enter Vehicle", 2, "enter [PLAYER]" )
 
 //Spectate a player
 function Spectate( ply, params )
@@ -217,7 +217,7 @@ function Spectate( ply, params )
 end
 RegisterCommand( "Spectate", "Spectate a player in third person", "spec", "spec [name]", 1, "Overv", 2, 0, Spectate )
 RegisterCheck( "Spectate", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Spectate", 2, "spec" )
+AddPlayerMenu( "Spectate", 2, "spec [PLAYER]" )
 
 //Unspectate
 function UnSpectate( ply, params )
@@ -227,4 +227,4 @@ function UnSpectate( ply, params )
 	timer.Simple( .05, function() ply:SetPos( ppos + Vector( 0, 0, 10 ) ) end )
 end
 RegisterCommand( "UnSpectate", "Stop spectating", "unspec", "unspec", 1, "Overv", 2, 0, UnSpectate )
-AddPlayerMenu( "Stop Spectating", 2, "unspec" )
+AddPlayerMenu( "Stop Spectating", 2, "unspec [PLAYER]" )

@@ -99,7 +99,7 @@ function Mute( ply, params )
 end
 RegisterCommand( "Mute", "Mute a player", "mute", "mute [name]", 1, "Overv", 3, 0, Mute )
 RegisterCheck( "Mute", 1, 3, "Player '%arg%' not found!" )
-AddPlayerMenu( "Mute", 3, "mute", "unmute", "Muted" )
+AddPlayerMenu( "Mute", 3, "mute [PLAYER]", "unmute [PLAYER]", "Muted" )
 
 function UnMute( ply, params )
 	params[1]:SetNWBool( "Muted", false )

@@ -24,7 +24,7 @@ function Kick( ply, params )
 end
 RegisterCommand( "Kick", "Kick a player", "kick", "kick <name> [reason]", 1, "Overv", 1, 1, Kick )
 RegisterCheck( "Kick", 1, 1, "Player '%arg%' not found!" )
-AddPlayerMenu( "Kick", 1, "kick" )
+AddPlayerMenu( "Kick", 1, "kick [PLAYER]" )
 
 //Ban system
 //Load saved bans from file
@@ -93,11 +93,10 @@ function Ban( ply, params )
 	
 	//Do it and notify
 	if time > 0 then
-		Notify( params[1]:Nick() .. " has been banned by " .. ply:Nick() .. " for " .. time .. " minutes", "NOTIFY_CLEANUP" )				
+		Notify( params[1]:Nick() .. " has been banned by " .. ply:Nick() .. " for " .. time .. " minutes (" .. reason .. ")", "NOTIFY_CLEANUP" )				
 		RunConsoleCommand("kickid", params[1]:UserID(), "Banned for " .. time .. " minutes! (" .. reason .. ")")
 	else
-		Notify( params[1]:Nick() .. " has been permabanned by " .. ply:Nick(), "NOTIFY_CLEANUP" )
-		
+		Notify( params[1]:Nick() .. " has been permabanned by " .. ply:Nick() .. " (" .. reason .. ")", "NOTIFY_CLEANUP" )
 		RunConsoleCommand("kickid", params[1]:UserID(), "Permabanned! (" .. reason .. ")")
 	end
 	
@@ -107,7 +106,7 @@ function Ban( ply, params )
 end
 RegisterCommand( "Ban", "Ban a player for a certain amount of time or permanent", "ban", "ban <name> [time in minutes, 0 = perma] [reason]", 2, "Overv", 1, 1, Ban )
 RegisterCheck( "Ban", 1, 1, "Player '%arg%' not found!" )
-AddPlayerMenu( "Ban", 1, "ban" )
+AddPlayerMenu( "Ban", 1, "ban [PLAYER] 60" )
 
 function KickBan( ply )
 	for k, v in pairs( BannedPlayers ) do
