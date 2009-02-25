@@ -1,5 +1,6 @@
 //Send the client our server ranks file as customized by the owner
-resource.AddFile( "data/NewAdmin/ranks.txt" )
+//resource.AddFile( "data/NewAdmin/ranks.txt" )
+//FAIL METHOD OF DOOM OH GOD FFFFFFFFFFUUUUUUUUUUUUUUUU
 
 //Table that holds all rank information
 Ranks = {}
@@ -18,32 +19,25 @@ function ParseRanks( FileStr )
 	end
 end
 
-//Loading and saving ranks
+//Loading and saving ranks on the server
+//On the client we don't load ranks from a file.
 function LoadRanks()
-	if SERVER then
-		if file.Exists("NewAdmin/ranks.txt") then
-			//Load the user rank file
-			ParseRanks( file.Read("NewAdmin/ranks.txt") )
-			Log( "Loaded ranks!" )
-		else
-			//Load the default ranks and create a new ranks.txt file for the owner to modify
-			ParseRanks( file.Read("NewAdmin/defaultranks.txt") )
-			file.Write( "NewAdmin/ranks.txt", file.Read("NewAdmin/defaultranks.txt") )
-			Log( "Loaded default ranks and created a new customizable rank file!" )
-		end
+	if file.Exists("NewAdmin/ranks.txt") then
+		//Load the user rank file
+		ParseRanks( file.Read("NewAdmin/ranks.txt") )
+		Log( "Loaded ranks!" )
 	else
-		if file.Exists("NewAdmin/ranks.txt") then
-			//Load the server rank file
-			ParseRanks( file.Read("NewAdmin/ranks.txt") )
-			Log( "Loaded ranks received from server!" )
-		else
-			Log( "Server did not send a rank file!" )
-		end
+		//Load the default ranks and create a new ranks.txt file for the owner to modify
+		ParseRanks( file.Read("NewAdmin/defaultranks.txt") )
+		file.Write( "NewAdmin/ranks.txt", file.Read("NewAdmin/defaultranks.txt") )
+		Log( "Loaded default ranks and created a new customizable rank file!" )
 	end
 end
-LoadRanks()
+if SERVER then LoadRanks() end
 
 function SaveRanks()
+	if !SERVER then return false end
+	
 	local Txt = ""
 	for _, v in pairs(Ranks) do
 		Txt = Txt .. v.Title .. "|"
@@ -103,7 +97,59 @@ function DHasPrivilege( ply, com, args )
 end
 concommand.Add( "DHasPrivilege", DHasPrivilege )
 
+function DListRanks( ply, com, args )
+	for _, r in pairs(Ranks) do
+		Log( r.Title )
+	end
+end
+concommand.Add( "DListRanks", DListRanks )
+
 //General useful functions
 function GetRankID( Rank )
-	for i, v in pairs(Ranks ) do if v.Title == Rank then return i end end
+	for i, v in pairs(Ranks) do if v.Title == Rank then return i end end
 end
+
+//=== Syncing ranks with clients ===
+
+//Serverside
+function SyncRanks( pl )
+	//Send the ranks and their corresponding privileges
+	for _, r in pairs(Ranks) do
+		//First create the rank
+		umsg.Start( "NA_AddRank", pl )
+			umsg.String( r.Title )
+		umsg.End()
+		
+		//Now add the privileges
+		for _, p in pairs(r.Privileges) do
+			umsg.Start( "NA_AddPrivilege", pl )
+				umsg.String( r.Title )
+				umsg.String( p )
+			umsg.End()
+		end
+	end
+end
+hook.Add( "PlayerInitialSpawn", "SyncRanks", SyncRanks )
+
+//Clientside
+function CL_AddRank( um )
+	local TempRank = {}
+	TempRank.Title = um:ReadString()
+	TempRank.Privileges = {}
+	
+	table.insert( Ranks, TempRank )
+end
+usermessage.Hook( "NA_AddRank", CL_AddRank )
+
+function CL_AddPrivilege( um )
+	local Rank = um:ReadString()
+	local Privilege = um:ReadString()
+	
+	for _, r in pairs(Ranks) do
+		if r.Title == Rank then
+			table.insert( r.Privileges, Privilege )
+			return 
+		end
+	end
+end
+usermessage.Hook( "NA_AddPrivilege", CL_AddPrivilege )

@@ -54,6 +54,8 @@ end
 plinfo = {}
 
 function SaveInfo(Hide)
+	if !SERVER then return false end
+	
 	local tfile = ""
 	for _, v in pairs(plinfo) do
 		tfile = tfile .. v.SteamID .. "\n" .. v.PrevNick .. "\n" .. v.PrevDate .. "\n" .. v.PlayTime .. "\n"
@@ -85,7 +87,7 @@ function LoadInfo()
 		SaveInfo()
 	end
 end
-LoadInfo()
+if SERVER then LoadInfo() end
 
 //Reload map
 function ReloadMap( ply, params )

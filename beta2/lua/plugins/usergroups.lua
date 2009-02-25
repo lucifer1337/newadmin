@@ -47,10 +47,14 @@ function LoadUserRanks()
 		Log( "No user rank file found -> Empty rank table" )
 	end
 end
-LoadUserRanks()
-concommand.Add( "ReloadRanks", LoadRanks )
+if SERVER then
+	LoadUserRanks()
+	concommand.Add( "ReloadRanks", LoadRanks )
+end
 
 function SaveUserRanks()
+	if !SERVER then return false end
+	
 	local tfile = ""
 	
 	for _, v in pairs( RankTable ) do
