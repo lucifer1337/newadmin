@@ -48,6 +48,28 @@ RegisterCommand( "SetHealth", "Set health for a player", "hp", "hp [name] [amoun
 RegisterCheck( "SetHealth", 1, 3, "Player '%arg%' not found!" )
 AddPlayerMenu( "Health", 2, "hp [PLAYER] 100" )
 
+//Set armor
+function SetArmor( ply, params )
+	local armor = params[2]
+	
+	if armor ~= nil then
+		if tonumber(armor) ~= nil then
+			params[1]:SetArmor( armor )
+		else
+			params[1]:SetArmor( 100 )
+			armor = 100
+		end
+	else
+		params[1]:SetArmor( 100 )
+		armor = 100
+	end
+	
+	Notify( ply:Nick() .. " has set " .. params[1]:Nick() .. "'s armor to " .. armor )
+end
+RegisterCommand( "SetArmor", "Set armor for a player", "armor", "armor [name] [amount]", 1, "Overv", 2, 0, SetArmor )
+RegisterCheck( "SetArmor", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Armor", 2, "armor [PLAYER] 100" )
+
 //Unlimited ammo
 function uAmmo( ply, params )
 	params[1]:SetNetworkedBool( "uAmmo", true)
