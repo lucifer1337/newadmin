@@ -48,6 +48,7 @@ if CLIENT then
 	SAdmin = surface.GetTextureID("gui/silkicons/shield")
 	Owner = surface.GetTextureID("gui/silkicons/star")
 	Typing = surface.GetTextureID("gui/silkicons/comment")
+	Away = surface.GetTextureID("gui/silkicons/exclamation")
 end
 
 //All the functions for the things drawn in DrawHUD()
@@ -107,6 +108,8 @@ function DrawPlayers()
 						Icon = Admin
 					elseif v:GetNWString("Rank") == "Respected" then
 						Icon = Respected
+					elseif v:GetNWBool("AFK") then
+						Icon = Away
 					else
 						Icon = Guest
 					end
@@ -115,14 +118,16 @@ function DrawPlayers()
 				end
 				
 				//Draw the box with the playername
+				if !v:GetNWBool("AFK") then Nick = v:Nick() else Nick = v:Nick() .. " (AFK)" end
+				
 				surface.SetFont( "ScoreboardText" )
-				local w = surface.GetTextSize(v:Nick())
+				local w = surface.GetTextSize( Nick )
 				local teamColor = team.GetColor( v:Team() )
 				ow = w
 				w = w + 26
 				
 				draw.RoundedBox( 6, dPos.x-((w+10)/2), dPos.y-10, w+10, 25, Color(0, 0, 0, dAlpha) )
-				draw.DrawText( v:Nick(), "ScoreboardText", dPos.x + 14, dPos.y-6, Color(teamColor.r, teamColor.g, teamColor.b, dAlpha), 1 )
+				draw.DrawText( Nick, "ScoreboardText", dPos.x + 14, dPos.y-6, Color(teamColor.r, teamColor.g, teamColor.b, dAlpha), 1 )
 				surface.SetTexture( Icon )
 				surface.SetDrawColor( 255, 255, 255, dAlpha)
 				surface.DrawTexturedRect(dPos.x - (ow / 2) - 12, dPos.y - 6, 16, 16)
