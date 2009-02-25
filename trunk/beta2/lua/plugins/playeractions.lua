@@ -228,3 +228,13 @@ function UnSpectate( ply, params )
 end
 RegisterCommand( "UnSpectate", "Stop spectating", "unspec", "unspec", 1, "Overv", 2, 0, UnSpectate )
 AddPlayerMenu( "Stop Spectating", 2, "unspec [PLAYER]" )
+
+//AFK Mode
+function AFK( ply, params )
+	ply:SetNWBool( "AFK", true )
+end
+function UnAFK( ply, params )
+	ply:SetNWBool( "AFK", false )
+end
+RegisterCommand( "AFK", "Let others know you're away", "afk", "afk", 1, "Overv", 2, 0, AFK )
+RegisterCommand( "UnAFK", "Let others know you're back", "unafk", "unafk", 1, "Overv", 2, 0, UnAFK )
