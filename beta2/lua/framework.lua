@@ -24,6 +24,14 @@ function GetCommand( Message )
 	return string.lower(Com)
 end
 
+//Get command title from chat command
+function GetCommandByChat( ChatCommand )
+	local GivenCommand = GetCommand("!" .. ChatCommand)
+	for _, v in pairs(Commands) do
+		if v.ChatCommand == GivenCommand then return v.Title end
+	end
+end
+
 //Get arguments from chat message
 function GetArguments( Message )
 	if string.find( Message, " ") ~= nil then
