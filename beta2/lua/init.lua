@@ -52,6 +52,14 @@ function CheckCalls( ply, Message )
 end
 hook.Add( "PlayerSay", "CheckCalls", CheckCalls )
 
+//Commands can also be called using a console command (used for the menu to work faster)
+function NA_CallCommand( ply, com, args )
+	local Message = args[1]
+	local Caller = ply
+	CheckCalls( Caller, Message )
+end
+concommand.Add( "NA_CallCommand", NA_CallCommand )
+
 //Let clients know we're running NewAdmin on the server
 function EnableNA( ply )
 	ply:SendLua( "NAOnServer = true" )
