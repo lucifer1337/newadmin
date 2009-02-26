@@ -262,3 +262,44 @@ end
 RegisterCommand( "Explode", "Explode a player", "explode", "explode [name]", 1, "Overv", 3, 0, Explode )
 RegisterCheck( "Explode", 1, 3, "Player '%arg%' not found!" )
 AddPlayerMenu( "Explode", 3, "explode [PLAYER]" )
+
+//Mute voice
+function VoiceMute( ply, params )
+	for _, v in pairs(player.GetAll()) do
+		umsg.Start( "NA_Mute", v )
+			umsg.Entity( params[1] )
+			umsg.Bool( true )
+		umsg.End()
+	end
+	
+	params[1]:SetNWBool( "VMuted", true )
+	NA_Notify( ply:Nick() .. " has voice muted " .. params[1]:Nick(), "NOTIFY_CLEANUP" )
+end
+RegisterCommand( "VoiceMute", "Mute the voice a player", "mutev", "mutev [name]", 1, "Overv", 3, 0, VoiceMute )
+RegisterCheck( "VoiceMute", 1, 3, "Player '%arg%' not found!" )
+
+function UnVoiceMute( ply, params )
+	for _, v in pairs(player.GetAll()) do
+		umsg.Start( "NA_Mute", v )
+			umsg.Entity( params[1] )
+			umsg.Bool( false )
+		umsg.End()
+	end
+	
+	params[1]:SetNWBool( "VMuted", false )
+	NA_Notify( ply:Nick() .. " has stopped muting " .. params[1]:Nick(), "NOTIFY_CLEANUP" )
+end
+RegisterCommand( "UnVoiceMute", "Stop muting the voice a player", "unmutev", "unmutev [name]", 1, "Overv", 3, 0, UnVoiceMute )
+RegisterCheck( "UnVoiceMute", 1, 3, "Player '%arg%' not found!" )
+AddPlayerMenu( "Mute voice", 3, "mutev [PLAYER]", "unmutev [PLAYER]", "VMuted" )
+
+function SetMuted( ply, bMuted )
+	if ply:IsMuted() != bMuted then
+		ply:SetMuted()
+	end
+end
+
+function NA_Mute( um )
+	SetMuted( um:ReadEntity(), um:ReadBool() )
+end
+usermessage.Hook( "NA_Mute", NA_Mute )
