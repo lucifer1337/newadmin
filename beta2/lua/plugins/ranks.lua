@@ -7,6 +7,8 @@ Ranks = {}
 
 //Parse ranks from string
 function ParseRanks( FileStr )
+	if !SERVER then return false end
+
 	for _, r in pairs( string.Explode("\n", FileStr) ) do
 		local RankRaw = string.Explode("|", r)
 		
@@ -72,7 +74,7 @@ function RemovePrivilege( Rank, Privilege )
 	for i, v in pairs(Ranks[GetRankID(Rank)].Privileges) do
 		if v == Privilege then table.remove( Ranks[GetRankID(Rank)].Privileges, i ) end
 	end
-	SaveRanks()
+	if SERVER then SaveRanks() end
 end
 
 function RankExists( Rank )
@@ -117,13 +119,13 @@ function SyncRanks( pl )
 	for _, r in pairs(Ranks) do
 		//First create the rank
 		umsg.Start( "NA_AddRank", pl )
-			umsg.String( r.Title )
+			umsg.String( string.Replace(r.Title, "Owner", "Owner2") )
 		umsg.End()
 		
 		//Now add the privileges
-		for _, p in pairs(r.Privileges) do
+		for o, p in pairs(r.Privileges) do
 			umsg.Start( "NA_AddPrivilege", pl )
-				umsg.String( r.Title )
+				umsg.String( string.Replace(r.Title, "Owner", "Owner2") )
 				umsg.String( p )
 			umsg.End()
 		end
@@ -134,7 +136,7 @@ hook.Add( "PlayerInitialSpawn", "SyncRanks", SyncRanks )
 //Clientside
 function CL_AddRank( um )
 	local TempRank = {}
-	TempRank.Title = um:ReadString()
+	TempRank.Title = string.Replace(um:ReadString(), "Owner2", "Owner")
 	TempRank.Privileges = {}
 	
 	table.insert( Ranks, TempRank )
@@ -142,7 +144,7 @@ end
 usermessage.Hook( "NA_AddRank", CL_AddRank )
 
 function CL_AddPrivilege( um )
-	local Rank = um:ReadString()
+	local Rank = string.Replace(um:ReadString(), "Owner2", "Owner")
 	local Privilege = um:ReadString()
 	
 	for _, r in pairs(Ranks) do

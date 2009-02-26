@@ -4,7 +4,7 @@
 function Slay( ply, params )
 		params[1]:Kill()
 		params[1]:AddFrags( 1 )
-		Notify( ply:Nick() .. " slayed " .. params[1]:Nick(), "NOTIFY_CLEANUP" )
+		NA_Notify( ply:Nick() .. " slayed " .. params[1]:Nick(), "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "Slay", "Kill a player", "slay", "slay [name]", 1, "Overv", 3, 0, Slay )
 RegisterCheck( "Slay", 1, 3, "Player '%arg%' not found!" )
@@ -13,7 +13,7 @@ AddPlayerMenu( "Slay", 3, "slay [PLAYER]" )
 //Slap
 function Slap( ply, params )
 		params[1]:SetHealth( params[1]:Health() - params[2] )
-		Notify( ply:Nick() .. " slapped " .. params[1]:Nick() .. " with " .. params[2] .. " HP", "NOTIFY_CLEANUP" )
+		NA_Notify( ply:Nick() .. " slapped " .. params[1]:Nick() .. " with " .. params[2] .. " HP", "NOTIFY_CLEANUP" )
 		
 		if params[1]:Health() < 1 then params[1]:Kill() end
 end
@@ -31,7 +31,7 @@ function MassSlap( ply, params )
 			end
 		end )
 		
-		Notify( ply:Nick() .. " slaps " .. params[1]:Nick() .. " " .. params[3] .. " times with " .. params[2] .. " HP", "NOTIFY_CLEANUP" )
+		NA_Notify( ply:Nick() .. " slaps " .. params[1]:Nick() .. " " .. params[3] .. " times with " .. params[2] .. " HP", "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "MassSlap", "Damages a player multiple times with a short interval", "mslap", "mslap <name> <damage> <times>", 1, "Overv", 3, 0, MassSlap )
 RegisterCheck( "MassSlap", 1, 3, "Player '%arg%' not found!" )
@@ -42,7 +42,7 @@ AddPlayerMenu( "Mass Slap", 3, "mslap [PLAYER] 10 10" )
 //Strip weapons
 function Strip( ply, params )
 	params[1]:StripWeapons()
-	Notify( ply:Nick() .. " stripped " .. params[1]:Nick() .. "'s weapons", "NOTIFY_CLEANUP" )
+	NA_Notify( ply:Nick() .. " stripped " .. params[1]:Nick() .. "'s weapons", "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "Strip", "Strip weapons from a player", "strip", "strip [name]", 1, "Overv", 3, 0, Strip )
 RegisterCheck( "Strip", 1, 3, "Player '%arg%' not found!" )
@@ -52,7 +52,7 @@ AddPlayerMenu( "Strip Weapons", 3, "strip [PLAYER]" )
 local JailPos = nil
 function SetJailPos( ply, params )
 	JailPos = ply:GetPos()
-	Notify( "Jail position set to your current position!", "NOTIFY_ERROR", ply )
+	NA_Notify( "Jail position set to your current position!", "NOTIFY_ERROR", ply )
 end
 RegisterCommand( "Set jail position", "Set the jail position to your current position", "setjail", "setjail", 1, "Overv", 3, 0, SetJailPos )
 AddPlayerMenu( "Set Jail", 3, "setjail" )
@@ -60,7 +60,7 @@ AddPlayerMenu( "Set Jail", 3, "setjail" )
 function Jail( ply, params )
 	//Check if we have a jail position yet
 	if JailPos == nil then
-		Notify( "The jail position hasn't been set yet!", "NOTIFY_ERROR", ply )
+		NA_Notify( "The jail position hasn't been set yet!", "NOTIFY_ERROR", ply )
 		return 
 	end
 
@@ -76,7 +76,7 @@ function Jail( ply, params )
 	params[1]:SetNWBool( "NoSuicide", true )
 	params[1]:SetNWBool( "NoSpawn", true )
 	
-	Notify( params[1]:Nick() .. " has been jailed by " .. ply:Nick(), "NOTIFY_CLEANUP" )
+	NA_Notify( params[1]:Nick() .. " has been jailed by " .. ply:Nick(), "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "Jail", "Jail the specified player", "jail", "jail [name]", 1, "Overv", 3, 0, Jail )
 RegisterCheck( "Jail", 1, 3, "Player '%arg%' not found!" )
@@ -99,9 +99,9 @@ function UnJail( ply, params )
 		//Re-arm
 		Arm( ply, params )
 		
-		Notify( params[1]:Nick() .. " has been released by " .. ply:Nick(), "NOTIFY_UNDO" )
+		NA_Notify( params[1]:Nick() .. " has been released by " .. ply:Nick(), "NOTIFY_UNDO" )
 	else
-		Notify( params[1]:Nick() .. " is not in jail!", "NOTIFY_ERROR", ply )
+		NA_Notify( params[1]:Nick() .. " is not in jail!", "NOTIFY_ERROR", ply )
 	end
 end
 RegisterCommand( "UnJail", "Unjail the specified player and respawn him", "unjail", "unjail [name]", 1, "Overv", 3, 0, UnJail )
@@ -111,7 +111,7 @@ RegisterCheck( "UnJail", 1, 3, "Player '%arg%' not found!" )
 function Ignite( ply, params )
 	params[1]:Ignite(999, 1)
 	params[1]:SetNWBool( "Ignited", true )
-	Notify( ply:Nick() .. " has ignited " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has ignited " .. params[1]:Nick() )
 end
 RegisterCommand( "Ignite", "Ignite a player", "ignite", "ignite [name]", 1, "Overv", 3, 0, Ignite )
 RegisterCheck( "Ignite", 1, 3, "Player '%arg%' not found!" )
@@ -120,7 +120,7 @@ AddPlayerMenu( "Ignited", 3, "ignite [PLAYER]", "unignite [PLAYER]", "Ignited" )
 function UnIgnite( ply, params )
 	params[1]:Extinguish()
 	params[1]:SetNWBool( "Ignited", false )
-	Notify( ply:Nick() .. " has extinguished " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has extinguished " .. params[1]:Nick() )
 end
 RegisterCommand( "Extinguish", "Extinguish a player", "unignite", "unignite [name]", 1, "Overv", 3, 0, UnIgnite )
 RegisterCheck( "Extinguish", 1, 3, "Player '%arg%' not found!" )
@@ -128,7 +128,7 @@ RegisterCheck( "Extinguish", 1, 3, "Player '%arg%' not found!" )
 //Blind
 function Blind( ply, params )
 	params[1]:SetNWBool( "Blinded", true )
-	Notify( ply:Nick() .. " has blinded " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has blinded " .. params[1]:Nick() )
 end
 RegisterCommand( "Blind", "Blind a player", "blind", "blind [name]", 1, "Overv", 3, 0, Blind )
 RegisterCheck( "Blind", 1, 3, "Player '%arg%' not found!" )
@@ -136,7 +136,7 @@ AddPlayerMenu( "Blind", 3, "blind [PLAYER]", "unblind [PLAYER]", "Blinded" )
 
 function UnBlind( ply, params )
 	params[1]:SetNWBool( "Blinded", false )
-	Notify( ply:Nick() .. " has unblinded " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has unblinded " .. params[1]:Nick() )
 end
 RegisterCommand( "UnBlind", "Unblind a player", "unblind", "unblind [name]", 1, "Overv", 3, 0, UnBlind )
 RegisterCheck( "UnBlind", 1, 3, "Player '%arg%' not found!" )
@@ -155,7 +155,7 @@ end
 function Freeze( ply, params )
 	params[1]:SetNWBool( "Frozen", true )
 	params[1]:SetSolid( false )
-	Notify( ply:Nick() .. " has frozen " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has frozen " .. params[1]:Nick() )
 end
 RegisterCommand( "Freeze", "Freeze a player", "freeze", "freeze [name]", 1, "Overv", 3, 0, Freeze )
 RegisterCheck( "Freeze", 1, 3, "Player '%arg%' not found!" )
@@ -164,7 +164,7 @@ AddPlayerMenu( "Freeze", 3, "freeze [PLAYER]", "unfreeze [PLAYER]", "Frozen" )
 function UnFreeze( ply, params )
 	params[1]:SetNWBool( "Frozen", false )
 	params[1]:SetSolid( true )
-	Notify( ply:Nick() .. " has unfrozen " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has unfrozen " .. params[1]:Nick() )
 end
 RegisterCommand( "UnFreeze", "Unfreeze a player", "unfreeze", "unfreeze [name]", 1, "Overv", 3, 0, UnFreeze )
 RegisterCheck( "UnFreeze", 1, 3, "Player '%arg%' not found!" )
@@ -172,7 +172,7 @@ RegisterCheck( "UnFreeze", 1, 3, "Player '%arg%' not found!" )
 //Ragdolling
 function Ragdoll( ply, params )
 	if params[1]:GetNWBool("Ragdolled") then
-		Notify( params[1]:Nick() .. " is already ragdolled!", "NOTIFY_ERROR", ply )
+		NA_Notify( params[1]:Nick() .. " is already ragdolled!", "NOTIFY_ERROR", ply )
 		return false
 	end
 
@@ -200,7 +200,7 @@ function Ragdoll( ply, params )
 	params[1]:SetNWBool( "NoSuicide", true )
 	params[1]:SetNWBool( "NoSpawn", true )
 	
-	Notify( ply:Nick() .. " has ragdolled " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has ragdolled " .. params[1]:Nick() )
 end
 RegisterCommand( "Ragdoll", "Turn a player into a ragdoll", "ragdoll", "ragdoll [name]", 1, "Overv", 3, 0, Ragdoll )
 RegisterCheck( "Ragdoll", 1, 3, "Player '%arg%' not found!" )
@@ -208,7 +208,7 @@ AddPlayerMenu( "Ragdoll", 3, "ragdoll [PLAYER]", "unragdoll [PLAYER]", "Ragdolle
 
 function UnRagdoll( ply, params )
 	if params[1]:GetNWBool("Ragdolled") == false then
-		SendNotify( params[1]:Nick() .. " is not ragdolled!", "NOTIFY_ERROR", ply )
+		SendNA_Notify( params[1]:Nick() .. " is not ragdolled!", "NOTIFY_ERROR", ply )
 		return false
 	end
 
@@ -228,7 +228,7 @@ function UnRagdoll( ply, params )
 	params[1]:SetNWBool( "NoSuicide", false )
 	params[1]:SetNWBool( "NoSpawn", false )
 	
-	Notify( ply:Nick() .. " has unragdolled " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has unragdolled " .. params[1]:Nick() )
 end
 RegisterCommand( "UnRagdoll", "Turn a ragdoll into a player again", "unragdoll", "unragdoll [name]", 1, "Overv", 3, 0, UnRagdoll )
 RegisterCheck( "UnRagdoll", 1, 3, "Player '%arg%' not found!" )
@@ -257,7 +257,7 @@ function Explode( ply, params )
 	//Kill the player
 	params[1]:Kill()
 	params[1]:AddFrags( 1 )
-	Notify( ply:Nick() .. " exploded " .. params[1]:Nick(), "NOTIFY_CLEANUP" )
+	NA_Notify( ply:Nick() .. " exploded " .. params[1]:Nick(), "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "Explode", "Explode a player", "explode", "explode [name]", 1, "Overv", 3, 0, Explode )
 RegisterCheck( "Explode", 1, 3, "Player '%arg%' not found!" )

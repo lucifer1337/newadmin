@@ -22,7 +22,7 @@ end
 function ListCommands( ply, params )
 	if SERVER then
 		ply:SendLua("ListCommands(nil, nil)")
-		Notify( "All the commands have been printed out in the console.", "NOTIFY_GENERIC", ply )
+		NA_Notify( "All the commands have been printed out in the console.", "NOTIFY_GENERIC", ply )
 		return 
 	end
 
@@ -56,6 +56,6 @@ RegisterCommand( "List Commands", "List all the commands in the console", "comma
 
 //NewAdmin version
 function Info( ply, params )
-	Notify( "This server is running NewAdmin 1.0 R91", "NOTIFY_GENERIC", ply )
+	NA_Notify( "This server is running NewAdmin 1.0 R91", "NOTIFY_GENERIC", ply )
 end
 RegisterCommand( "Info", "Shows info about NewAdmin, such as the version running", "info", "info", 0, "Overv", 8, 0, Info )

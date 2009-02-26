@@ -1,7 +1,7 @@
 //Grouping
 function SetGroup( ply, args )
 	args[1]:SetUserGroup( args[2] )
-	Notify( args[1]:Nick() .. " is now in the \'" .. args[2] .. "\' group (" .. ply:Nick() .. ")" )
+	NA_Notify( args[1]:Nick() .. " is now in the \'" .. args[2] .. "\' group (" .. ply:Nick() .. ")" )
 end
 RegisterCommand( "Set Group", "Set someone's user group (this does NOT change the rank!)", "group", "group <name> <groupname>", 3, "Overv", 7, 2, SetGroup )
 RegisterCheck( "Set Group", 1, 3, "Player '%arg%' not found!" )
@@ -12,7 +12,7 @@ function SetGroup2( ply, command, args )
 	if GetPlayer( args[1] ) ~= nil then
 		GetPlayer( args[1] ):SetUserGroup( args[2] )
 		
-		Notify( GetPlayer(args[1]):Nick() .. " is now in the \'" .. args[2] .. "\' group (Console)" )
+		NA_Notify( GetPlayer(args[1]):Nick() .. " is now in the \'" .. args[2] .. "\' group (Console)" )
 		Log( GetPlayer(args[1]):Nick() .. " is now in the \'" .. args[2] .. "\' group (Console)" )
 	else
 		Log( "Player '" .. params[1] .. "' not found!" )
@@ -133,7 +133,7 @@ function SetRank2( ply, command, args )
 		if RankExists(table.concat(args, " ", 2)) then
 			GetPlayer( args[1] ):SetNWString( "Rank", table.concat(args, " ", 2) )
 			
-			Notify( GetPlayer(args[1]):Nick() .. " is now " .. GetPlayer(args[1]):GetNWString("Rank") .. " (Console)" )
+			NA_Notify( GetPlayer(args[1]):Nick() .. " is now " .. GetPlayer(args[1]):GetNWString("Rank") .. " (Console)" )
 			Log( GetPlayer(args[1]):Nick() .. " is now " .. GetPlayer(args[1]):GetNWString("Rank") .. " (Console)" )
 			
 			EditRank( GetPlayer(args[1]), GetPlayer(args[1]):GetNWString("Rank") )
@@ -150,9 +150,9 @@ function SetRank( ply, args )
 	if RankExists(table.concat(args, " ", 2)) then
 		args[1]:SetNWString( "Rank", table.concat(args, " ", 2) )
 		EditRank( args[1], table.concat(args, " ", 2) )
-		Notify( args[1]:Nick() .. " is now " .. args[1]:GetNWString("Rank")  .. " (" .. ply:Nick() .. ")" )
+		NA_Notify( args[1]:Nick() .. " is now " .. args[1]:GetNWString("Rank")  .. " (" .. ply:Nick() .. ")" )
 	else
-		Notify( "The rank '" .. table.concat(args, " ", 2) .. "' doesn't exist!", "NOTIFY_ERROR", ply )
+		NA_Notify( "The rank '" .. table.concat(args, " ", 2) .. "' doesn't exist!", "NOTIFY_ERROR", ply )
 	end
 end
 RegisterCommand( "Set Rank", "Set someone's rank", "rank", "rank <name> <rank>", 3, "Overv", 7, 2, SetRank )

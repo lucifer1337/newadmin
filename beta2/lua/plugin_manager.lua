@@ -60,7 +60,7 @@ function CallCommand( ChatCommand, Caller, Args )
 	for _, v in pairs( Commands ) do
 		if v.ChatCommand == ChatCommand then
 			if !HasPrivilege( Caller, v.Title ) then
-				Notify( "You're not allowed to use this command!", "NOTIFY_ERROR", Caller )
+				NA_Notify( "You're not allowed to use this command!", "NOTIFY_ERROR", Caller )
 				return false
 			end
 		
@@ -68,7 +68,7 @@ function CallCommand( ChatCommand, Caller, Args )
 				t = ""
 				if tonumber(v.RequiredArguments) != 1 then t = "s" end
 				
-				Notify( "The command " .. v.Title .. " requires atleast " .. v.RequiredArguments .. " argument" .. t .. "!", "NOTIFY_ERROR", Caller )
+				NA_Notify( "The command " .. v.Title .. " requires atleast " .. v.RequiredArguments .. " argument" .. t .. "!", "NOTIFY_ERROR", Caller )
 			else
 				//Check arguments
 				if table.Count( v.Checks ) > 0 then
@@ -83,12 +83,12 @@ function CallCommand( ChatCommand, Caller, Args )
 							elseif tonumber(Args[c.Argument]) and player.GetByID(Args[c.Argument]) != NULL then
 								Args[ c.Argument ] = player.GetByID(Args[c.Argument])
 							else
-								Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
+								NA_Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
 								return false
 							end
 						elseif c.CheckType == 2 then
 							if tonumber( Args[ c.Argument ] ) == nil then
-								Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
+								NA_Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
 								return false
 							else
 								Args[ c.Argument ] = tonumber( Args[ c.Argument ] )
@@ -103,19 +103,19 @@ function CallCommand( ChatCommand, Caller, Args )
 								elseif tonumber(Args[c.Argument]) and player.GetByID(Args[c.Argument]) != NULL then
 									Args[ c.Argument ] = player.GetByID(Args[c.Argument])
 								else
-									Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
+									NA_Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
 									return false
 								end
 							end
 						elseif c.CheckType == 4 then
 							if tonumber( Args[ c.Argument ] ) == nil then
-								Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
+								NA_Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
 								return false
 							else
 								if tonumber( Args[ c.Argument ] ) == 0 or tonumber( Args[ c.Argument ] ) == 1 then
 									Args[ c.Argument ] = tonumber( Args[ c.Argument ] )
 								else
-									Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
+									NA_Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
 									return false
 								end
 							end

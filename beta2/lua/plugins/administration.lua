@@ -20,7 +20,7 @@ end
 //Kick
 function Kick( ply, params )
 	RunConsoleCommand("kickid", params[1]:UserID(), GetReason(params))
-	Notify( ply:Nick() .. " has kicked " .. params[1]:Nick() .. " (" .. GetReason(params) .. ")", "NOTIFY_CLEANUP" )
+	NA_Notify( ply:Nick() .. " has kicked " .. params[1]:Nick() .. " (" .. GetReason(params) .. ")", "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "Kick", "Kick a player", "kick", "kick <name> [reason]", 1, "Overv", 1, 1, Kick )
 RegisterCheck( "Kick", 1, 1, "Player '%arg%' not found!" )
@@ -93,10 +93,10 @@ function Ban( ply, params )
 	
 	//Do it and notify
 	if time > 0 then
-		Notify( params[1]:Nick() .. " has been banned by " .. ply:Nick() .. " for " .. time .. " minutes (" .. reason .. ")", "NOTIFY_CLEANUP" )				
+		NA_Notify( params[1]:Nick() .. " has been banned by " .. ply:Nick() .. " for " .. time .. " minutes (" .. reason .. ")", "NOTIFY_CLEANUP" )				
 		RunConsoleCommand("kickid", params[1]:UserID(), "Banned for " .. time .. " minutes! (" .. reason .. ")")
 	else
-		Notify( params[1]:Nick() .. " has been permabanned by " .. ply:Nick() .. " (" .. reason .. ")", "NOTIFY_CLEANUP" )
+		NA_Notify( params[1]:Nick() .. " has been permabanned by " .. ply:Nick() .. " (" .. reason .. ")", "NOTIFY_CLEANUP" )
 		RunConsoleCommand("kickid", params[1]:UserID(), "Permabanned! (" .. reason .. ")")
 	end
 	

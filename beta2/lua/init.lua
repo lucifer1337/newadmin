@@ -46,7 +46,7 @@ function CheckCalls( ply, Message )
 			end
 		end
 		
-		Notify( "Unknown command '" .. GetCommand(Message) .. "'", "NOTIFY_ERROR", ply )
+		NA_Notify( "Unknown command '" .. GetCommand(Message) .. "'", "NOTIFY_ERROR", ply )
 		return ""
 	end
 end

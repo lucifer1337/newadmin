@@ -128,7 +128,7 @@ if SERVER then
 	function NextMessage()
 		if #Messages > 0 then
 			if CurMessageID > #Messages then CurMessageID = 1 end
-			Notify( Messages[CurMessageID], "NOTIFY_GENERIC" )
+			NA_Notify( Messages[CurMessageID], "NOTIFY_GENERIC" )
 			for _, v in pairs(player.GetAll()) do v:PrintMessage( HUD_PRINTTALK, Messages[CurMessageID] ) end
 			CurMessageID = CurMessageID + 1
 		end

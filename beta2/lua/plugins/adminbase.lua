@@ -15,7 +15,7 @@ function CheckH( ply )
 			ply:SetMoveType( MOVETYPE_WALK )
 			
 			if ply:GetNetworkedBool( "InZone" ) == false then
-				Notify( "You're not allowed to noclip in the admin base zone!", "NOTIFY_ERROR", ply )
+				NA_Notify( "You're not allowed to noclip in the admin base zone!", "NOTIFY_ERROR", ply )
 			end
 			
 			ply:SetNetworkedBool( "InZone", true )
@@ -29,10 +29,10 @@ if SERVER then hook.Add( "Move", "CheckH", CheckH ) end
 function ProtectBase( ply, params )
 	if params[1] == "1" then
 		enabled = true
-		Notify( "Admin base protection has been enabled by " .. ply:Nick() )
+		NA_Notify( "Admin base protection has been enabled by " .. ply:Nick() )
 	elseif params[1] == "0" then
 		enabled = false
-		Notify( "Admin base protection has been disabled by " .. ply:Nick() )
+		NA_Notify( "Admin base protection has been disabled by " .. ply:Nick() )
 	end
 end
 RegisterCommand( "Base Protect", "Enable or disable the noclip limit", "protectbase", "protectbase <1 or 0>", 2, "Overv", 4, 1, ProtectBase )

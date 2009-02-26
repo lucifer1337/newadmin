@@ -18,8 +18,8 @@ function PM( ply, params )
 	params[1]:PrintMessage( HUD_PRINTTALK, "(From " .. ply:Nick() .. ") " .. collect )
 	ply:PrintMessage( HUD_PRINTTALK, "(To " .. params[1]:Nick() .. ") " .. collect )
 	
-	Notify( "You've received a private message!", nil, params[1] )
-	Notify( "Private message sent", nil, ply )
+	NA_Notify( "You've received a private message!", nil, params[1] )
+	NA_Notify( "Private message sent", nil, ply )
 end
 RegisterCommand( "Private Message", "Use this command to send private messages", "pm", "pm <user> <message>", 0, "Overv", 6, 2, PM )
 RegisterCheck( "Private Message", 1, 1, "Player '%arg%' not found!" )
@@ -43,7 +43,7 @@ function Whisper( ply, params )
 		ply:PrintMessage( HUD_PRINTTALK, "(You whisper) " .. message )
 		
 		if hearit == false then
-			Notify( "Nobody heard you", nil, ply )
+			NA_Notify( "Nobody heard you", nil, ply )
 		end
 	end
 end
@@ -60,14 +60,14 @@ RegisterCommand( "Admin Chat", "Send a message to all admins", "a", "a <message>
 
 //Display the time
 function Time( ply, params )
-	Notify( "The time is now: " .. os.date("%H:%M:%S") )
+	NA_Notify( "The time is now: " .. os.date("%H:%M:%S") )
 end
 RegisterCommand( "Time", "Display the time in the chat", "time", "time", 0, "Overv", 6, 0, Time )
 
 //Imitate a player
 function Imitate( ply, params )
 	if params[1]:SteamID() == "BOT" then
-		Notify( "You can't imitate bots!", "NOTIFY_ERROR", ply )
+		NA_Notify( "You can't imitate bots!", "NOTIFY_ERROR", ply )
 		Log( ply:Nick() .. " tried to imitate a bot" )
 		return false
 	end
@@ -95,7 +95,7 @@ end
 //Muting
 function Mute( ply, params )
 	params[1]:SetNWBool( "Muted", true )
-	Notify( ply:Nick() .. " has muted " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has muted " .. params[1]:Nick() )
 end
 RegisterCommand( "Mute", "Mute a player", "mute", "mute [name]", 1, "Overv", 3, 0, Mute )
 RegisterCheck( "Mute", 1, 3, "Player '%arg%' not found!" )
@@ -103,7 +103,7 @@ AddPlayerMenu( "Mute", 3, "mute [PLAYER]", "unmute [PLAYER]", "Muted" )
 
 function UnMute( ply, params )
 	params[1]:SetNWBool( "Muted", false )
-	Notify( ply:Nick() .. " has unmuted " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has unmuted " .. params[1]:Nick() )
 end
 RegisterCommand( "UnMute", "Unmute a player", "unmute", "unmute [name]", 1, "Overv", 3, 0, UnMute )
 RegisterCheck( "UnMute", 1, 3, "Player '%arg%' not found!" )
