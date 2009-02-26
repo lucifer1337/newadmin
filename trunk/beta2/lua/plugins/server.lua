@@ -97,28 +97,9 @@ RegisterCommand( "Reload map", "Reload the map", "reload", "reload", 2, "Overv",
 if SERVER then concommand.Add( "Reload", ReloadMap ) end
 
 //Cleanup everything
-//When the first player spawns it will save all the entities that are in the map by default, eg the player spawns. Those should not be removed ofcourse!
-local defaultents = {}
-
-function AddEnts()
-	if defaultents[1] == nil and table.Count(ents.GetAll()) > 0 then
-		for _, v in pairs(ents.GetAll()) do
-			table.insert( defaultents, v )
-		end
-		
-		Log("Added " .. table.Count(defaultents) .. " default entities!")
-	end
-end
-hook.Add("Think", "AddEnts", AddEnts)
-
 function FullCleanup( ply, params )
 	//Clean up
-	for _, v in pairs(ents.GetAll()) do
-		if v:IsPlayer() == false and table.HasValue( defaultents, v ) == false and v:IsWeapon() == false and v:GetClass() ~= "predicted_viewmodel" and v:GetClass() ~= "physgun_beam" then
-			constraint.RemoveAll( v )
-		end
-	end
-	
+	cleanup.CC_AdminCleanup( ply, "", {} )	
 	NA_Notify( ply:Nick() .. " has cleaned up the map", "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "Cleanup", "Removes every entity in the map", "cleanup", "cleanup", 2, "Overv", 4, 0, FullCleanup )
