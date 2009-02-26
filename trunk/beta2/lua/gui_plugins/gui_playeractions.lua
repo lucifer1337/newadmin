@@ -1,6 +1,7 @@
 //Tab with all the player functions including actions and punishment
 LCommand = nil
 CommandList = {}
+LastRank = nil
 
 function PlayerTab()
 	//Main panel
@@ -41,14 +42,40 @@ function PlayerTab()
 	CreateCategories()
 	
 	//Building command list
-	table.SortByMember( CommandList, "Text", true )
-	for _, v in pairs(CommandList) do
-		RegisterPlayerMenu( v.Text, v.CategoryID, v.OnCommand, v.OffCommand, v.CheckBoolean )
-	end
+	FillCommandList()
 	
 	Tabs:AddSheet( "Players", TabPlayers, "gui/silkicons/user", false, false, "Apply actions and punishment to players" ) 
 end
 RegisterTab( PlayerTab, 1 )
+
+function FillCommandList()
+	table.SortByMember( CommandList, "Text", true )
+	for _, v in pairs(CommandList) do
+		if HasPrivilege(LocalPlayer(), GetCommandByChat(v.OnCommand)) then
+			RegisterPlayerMenu( v.Text, v.CategoryID, v.OnCommand, v.OffCommand, v.CheckBoolean )
+		end
+	end
+	LastRank = LocalPlayer():GetNWString("Rank") 
+end
+
+function CommandListForRank()
+	//If the user's rank has changed, then update the command list with only the commands the user has access to
+	if LocalPlayer():GetNWString("Rank") != LastRank then
+		pCommandList:Remove()
+		
+		pCommandList = vgui.Create( "DPanelList", TabPlayers )
+		pCommandList:EnableVerticalScrollbar( true )
+		pCommandList:SetPos( TabPlayers:GetWide() - 145, 0 )
+		pCommandList:SetTall( TabPlayers:GetTall() )
+		pCommandList:SetWide( 145 )
+		PlayerMenuItems = {}
+		Categories = {}
+		
+		CreateCategories()
+		FillCommandList()
+	end
+end
+RegisterOnOpen( CommandListForRank )
 
 function RefillPlayers()
 	Players:Clear()
