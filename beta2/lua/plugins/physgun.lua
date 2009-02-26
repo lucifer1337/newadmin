@@ -17,7 +17,7 @@ if SERVER then hook.Add("PhysgunPickup", "PhysgunPickupHook", Pickup) end
 
 function Drop( ply, ent )
 	if ent and ent:IsValid() and ent:IsPlayer() and HasPrivilege(ply, "Player pickup") then
-		ent:GodDisable()
+		if !ply:GetNetworkedBool( "Godded" ) then ent:GodDisable() end
 		ent:SetNWBool( "PickedUp", false )
 		ent:SetMoveType( MOVETYPE_WALK )
 	end
