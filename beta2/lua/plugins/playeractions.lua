@@ -206,8 +206,12 @@ AddPlayerMenu( "Spawn", 2, "spawn [PLAYER]" )
 
 //Force a player to exit a vehicle
 function ExitVehicle( ply, params )
-	params[1]:ExitVehicle()
-	NA_Notify( ply:Nick() .. " has kicked " .. params[1]:Nick() .. " out of his vehicle", "NOTIFY_CLEANUP" )
+	if params[1]:InVehicle() then
+		params[1]:ExitVehicle()
+		NA_Notify( ply:Nick() .. " has kicked " .. params[1]:Nick() .. " out of his vehicle", "NOTIFY_CLEANUP" )
+	else
+		NA_Notify( params[1]:Nick() .. " is not in a vehicle at the moment!", "NOTIFY_ERROR", ply )
+	end
 end
 RegisterCommand( "ExitVehicle", "Force a player to exit a vehicle", "exit", "exit [name]", 1, "Overv", 2, 0, ExitVehicle )
 RegisterCheck( "ExitVehicle", 1, 3, "Player '%arg%' not found!" )
