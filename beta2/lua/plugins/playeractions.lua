@@ -258,9 +258,14 @@ AddPlayerMenu( "Stop Spectating", 2, "unspec [PLAYER]" )
 //AFK Mode
 function AFK( ply, params )
 	ply:SetNWBool( "AFK", true )
+	
+	local Reason = string.Replace(table.concat( params, " " ), "\n", "")
+	if string.len(Reason) > 50 then Reason = string.Left(Reason, 50) end
+	ply:SetNWString( "AFKReason", Reason )
 end
 function UnAFK( ply, params )
 	ply:SetNWBool( "AFK", false )
+	ply:SetNWString( "AFKReason", "" )
 end
-RegisterCommand( "AFK", "Let others know you're away", "afk", "afk", 1, "Overv", 2, 0, AFK )
+RegisterCommand( "AFK", "Let others know you're away. Reason can be max 50 characters.", "afk", "afk [reason]", 1, "Overv", 2, 0, AFK )
 RegisterCommand( "UnAFK", "Let others know you're back", "unafk", "unafk", 1, "Overv", 2, 0, UnAFK )
