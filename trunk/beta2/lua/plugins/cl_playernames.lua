@@ -118,7 +118,15 @@ function DrawPlayers()
 				end
 				
 				//Draw the box with the playername
-				if !v:GetNWBool("AFK") then Nick = v:Nick() else Nick = v:Nick() .. " (AFK)" end
+				if !v:GetNWBool("AFK") then
+					Nick = v:Nick()
+				else
+					if v:GetNWString("AFKReason") == "" then
+						Nick = v:Nick() .. " (AFK)"
+					else
+						Nick = v:Nick() .. " (AFK: " .. v:GetNWString("AFKReason") .. ")"
+					end
+				end
 				
 				surface.SetFont( "ScoreboardText" )
 				local w = surface.GetTextSize( Nick )
