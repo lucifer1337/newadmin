@@ -201,3 +201,12 @@ function TableConcat( Table, Divider, Start )
 	end
 	return string.Left( Str, string.len(Str) - string.len(Divider) )
 end
+
+function GetByUserID( UserID )
+	for _, v in pairs(player.GetAll()) do
+		if v:UserID() == tonumber(UserID) then
+			return v
+		end
+	end
+	return NULL
+end

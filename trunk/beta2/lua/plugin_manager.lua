@@ -80,8 +80,8 @@ function CallCommand( ChatCommand, Caller, Args )
 						if c.CheckType == 1 then
 							if GetPlayer( Args[ c.Argument ] ) then
 								Args[ c.Argument ] = GetPlayer( Args[ c.Argument ] )
-							elseif tonumber(Args[c.Argument]) and player.GetByID(Args[c.Argument]) != NULL then
-								Args[ c.Argument ] = player.GetByID(Args[c.Argument])
+							elseif tonumber(Args[c.Argument]) and GetByUserID(Args[c.Argument]) != NULL then
+								Args[ c.Argument ] = GetByUserID(Args[c.Argument])
 							else
 								NA_Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
 								return false
@@ -100,8 +100,8 @@ function CallCommand( ChatCommand, Caller, Args )
 							else
 								if GetPlayer( Args[ c.Argument ] ) then
 									Args[ c.Argument ] = GetPlayer( Args[ c.Argument ] )
-								elseif tonumber(Args[c.Argument]) and player.GetByID(Args[c.Argument]) != NULL then
-									Args[ c.Argument ] = player.GetByID(Args[c.Argument])
+								elseif tonumber(Args[c.Argument]) and GetByUserID(Args[c.Argument]) != NULL then
+									Args[ c.Argument ] = GetByUserID(Args[c.Argument])
 								else
 									NA_Notify( ErrorMsg, "NOTIFY_ERROR", Caller )
 									return false

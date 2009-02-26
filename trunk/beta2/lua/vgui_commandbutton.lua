@@ -53,9 +53,9 @@ function PANEL:OnMousePressed(  )
 	
 	if GetSelectedPlayer() == nil then return  end
 	if self.CheckBoolean == nil or !self.Checkbox:GetChecked() then
-		RunConsoleCommand( "say", "!" .. string.Replace( self.OnCommand, "[PLAYER]", tostring(GetSelectedPlayer():EntIndex()) ) )
+		RunConsoleCommand( "say", "!" .. string.Replace( self.OnCommand, "[PLAYER]", tostring(GetSelectedPlayer():UserID()) ) )
 	else
-		RunConsoleCommand( "say", "!" .. string.Replace( self.OffCommand, "[PLAYER]", tostring(GetSelectedPlayer():EntIndex()) ) )
+		RunConsoleCommand( "say", "!" .. string.Replace( self.OffCommand, "[PLAYER]", tostring(GetSelectedPlayer():UserID()) ) )
 	end
 	
 end

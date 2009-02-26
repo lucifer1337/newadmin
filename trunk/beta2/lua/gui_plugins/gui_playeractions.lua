@@ -17,7 +17,7 @@ function PlayerTab()
 	Players:SetPos( 0, 0 )
 	Players:SetSize( TabPlayers:GetWide() - 150 , TabPlayers:GetTall() - 42 ) 
 	Players:SetMultiple( false )
-	Players.OnMousePressed = function()
+	Players.DoClick = function()
 		for _, v in pairs(PlayerMenuItems) do if v.InvalidateLayout then v:InvalidateLayout() end end
 	end
 	
@@ -53,22 +53,12 @@ RegisterTab( PlayerTab, 1 )
 function RefillPlayers()
 	Players:Clear()
 	local Filter = PlayerFilter:GetValue()
-	PListItems = {}
 	
 	for i, v in pairs(player.GetAll()) do
 		if string.find(string.lower(v:Nick()), string.lower(Filter)) or v:Nick() == Filter then
-			if string.len(v:GetNWString("Rank")) == 0 then
-				FPlayer = Players:AddItem( v:Nick() .. " (Guest)" )
-			else
-				FPlayer = Players:AddItem( v:Nick() .. " (" .. v:GetNWString("Rank") .. ")" )
-			end
+			FPlayer = Players:AddItem( v:Nick() .. " (" .. v:GetNWString("Rank") .. ")" )
+			FPlayer.Ply = v:EntIndex()
 			
-			local ListItem = {}
-			ListItem.Item = FPlayer
-			ListItem.Ply = v
-			table.insert( PListItems, ListItem )
-			
-			if i == 1 then Players:SelectItem( FPlayer ) end
 			if v == LocalPlayer() then Players:SelectItem( FPlayer ) end
 		end
 	end
@@ -171,15 +161,10 @@ function MenuItemsInCategory( CategoryID )
 	return amount
 end
 
-//Get the real nick from the listbox
+//Get the player from the listbox
 function GetSelectedPlayer()
-	//Get the raw item from the listbox
 	local SelItem = Players:GetSelected()
-	for _, v in pairs(PListItems) do
-		if v.Item == SelItem then
-			return v.Ply
-		end
-	end
+	return player.GetByID(SelItem.Ply)
 end
 
 //Create the base categories
