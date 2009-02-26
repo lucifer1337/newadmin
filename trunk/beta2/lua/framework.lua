@@ -1,7 +1,7 @@
 //The framework file holds handy functions so you don't have to rewrite them yourself :3
 
 //Send notifications
-function Notify( Message, Icon, Filter )
+function NA_Notify( Message, Icon, Filter )
 	for _, v in pairs(player.GetAll()) do
 		//Player passes filter or no filter?
 		if Filter == nil or v:UserID() == Filter:UserID() then

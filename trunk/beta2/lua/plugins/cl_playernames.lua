@@ -14,10 +14,10 @@ pn_enabled = true
 function PlayerNames( ply, params )
 	if tonumber(params[1]) == 1 then
 		pn_enabled = true
-		Notify( "Playernames have been enabled by " .. ply:Nick() )
+		NA_Notify( "Playernames have been enabled by " .. ply:Nick() )
 	elseif tonumber(params[1]) == 0 then
 		pn_enabled = false
-		Notify( "Playernames have been disabled by " .. ply:Nick() )
+		NA_Notify( "Playernames have been disabled by " .. ply:Nick() )
 	end
 	
 	for _, v in pairs(player.GetAll()) do

@@ -1,7 +1,7 @@
 //Welcome message
 function WelcomeMessage( ply )
-	Notify( "Welcome to " .. GetGlobalString("ServerName"), "NOTIFY_GENERIC", ply )
-	Notify( "Type !commands to get an overview of the commands!", "NOTIFY_GENERIC", ply )
+	NA_Notify( "Welcome to " .. GetGlobalString("ServerName"), "NOTIFY_GENERIC", ply )
+	NA_Notify( "Type !commands to get an overview of the commands!", "NOTIFY_GENERIC", ply )
 	ply:PrintMessage( HUD_PRINTTALK, "Type !commands to get an overview of the commands!" )
 	
 	local found = false
@@ -119,7 +119,7 @@ function FullCleanup( ply, params )
 		end
 	end
 	
-	Notify( ply:Nick() .. " has cleaned up the map", "NOTIFY_CLEANUP" )
+	NA_Notify( ply:Nick() .. " has cleaned up the map", "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "Cleanup", "Removes every entity in the map", "cleanup", "cleanup", 2, "Overv", 4, 0, FullCleanup )
 
@@ -130,7 +130,7 @@ function RemoveDecals( ply, params )
 		v:ConCommand("r_cleardecals 1")
 	end
 	
-	Notify( ply:Nick() .. " has cleaned up the decals", "NOTIFY_CLEANUP" )
+	NA_Notify( ply:Nick() .. " has cleaned up the decals", "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "Remove decals", "Removes decals (bullet holes, rpg explosion hits) for every player", "decals", "decals", 2, "Overv", 4, 0, RemoveDecals )
 
@@ -150,7 +150,7 @@ function Message( ply, params )
 	
 	for _, v in pairs(player.GetAll()) do
 		if mtype == 1 then
-			Notify( collect, nil, v )
+			NA_Notify( collect, nil, v )
 		elseif mtype == 2 then
 			v:PrintMessage( HUD_PRINTTALK, collect )
 		elseif mtype == 3 then
@@ -176,7 +176,7 @@ function ListMaps( ply, params )
 	ply:SendLua("ListMaps()")
 	
 	//Inform player
-	Notify( "All the maps on the server have been printed to the console", nil, ply )
+	NA_Notify( "All the maps on the server have been printed to the console", nil, ply )
 end
 RegisterCommand( "Maps", "Prints out all the maps on the server to the console", "maps", "maps", 2, "Overv", 4, 0, ListMaps )
 
@@ -218,7 +218,7 @@ function BlockNoclip( ply )
 		if HasPrivilege( ply, "Noclip always" ) then
 			return true
 		else
-			Notify( "Only admins are allowed to noclip!", "NOTIFY_ERROR", ply )
+			NA_Notify( "Only admins are allowed to noclip!", "NOTIFY_ERROR", ply )
 			return false
 		end
 	end
@@ -228,7 +228,7 @@ hook.Add("PlayerNoClip", "AdminOnly", BlockNoclip)
 function AdminNoclip( ply, params )
 	if tonumber(params[1]) == 1 then
 		activated = true
-		Notify( "Admin only noclip has been enabled by " .. ply:Nick() )
+		NA_Notify( "Admin only noclip has been enabled by " .. ply:Nick() )
 		
 		//Get all players out of noclip
 		for _, v in pairs(player.GetAll()) do
@@ -236,7 +236,7 @@ function AdminNoclip( ply, params )
 		end
 	else
 		activated = false
-		Notify( "Admin only noclip has been disabled by " .. ply:Nick() )
+		NA_Notify( "Admin only noclip has been disabled by " .. ply:Nick() )
 	end
 end
 RegisterCommand( "Admin Noclip", "Enable or disable admin only noclip", "adminnoclip", "adminnoclip <0 or 1>", 2, "Overv", 4, 0, AdminNoclip )
@@ -253,10 +253,10 @@ if SERVER then
 
 	function CreateCountdown( ply, params )
 		if params[1] > 86400 then
-			Notify( "You can't make countdowns longer than 24 hours!", "NOTIFY_ERROR", ply )
+			NA_Notify( "You can't make countdowns longer than 24 hours!", "NOTIFY_ERROR", ply )
 			return 
 		elseif params[1] < 0 then
-			Notify( "The countdown has been ended by " .. ply:Nick(), "NOTIFY_CLEANUP" )
+			NA_Notify( "The countdown has been ended by " .. ply:Nick(), "NOTIFY_CLEANUP" )
 			return 
 		end
 	
@@ -270,7 +270,7 @@ if SERVER then
 		
 		c_text = reason
 		
-		Notify( ply:Nick() .. " has started a new countdown")
+		NA_Notify( ply:Nick() .. " has started a new countdown")
 		c_notedstop = false
 		for _, v in pairs(player.GetAll()) do
 			v:SendLua("CreateCountdown(" .. params[1] .. ", \"" .. c_text .. "\")")
@@ -287,7 +287,7 @@ if SERVER then
 	function CheckCountdown()
 		if os.time() == c_finishtime and c_notedstop == false then
 			c_notedstop = true
-			Notify( "The countdown has ended", "NOTIFY_CLEANUP" )
+			NA_Notify( "The countdown has ended", "NOTIFY_CLEANUP" )
 			
 			if CCommand != nil then
 				Log( "Calling command..." )
@@ -305,7 +305,7 @@ if SERVER then
 	function CountdownCommand( ply, pars )
 		CCommand = pars
 		CommandPlayer = ply
-		Notify( "After countdown calling command '" .. string.sub(CCommand[1], 2) .. "' with the parameters '" .. table.concat( CCommand, " ", 2 ) .. "'", "NOTIFY_GENERIC", ply )
+		NA_Notify( "After countdown calling command '" .. string.sub(CCommand[1], 2) .. "' with the parameters '" .. table.concat( CCommand, " ", 2 ) .. "'", "NOTIFY_GENERIC", ply )
 	end
 end
 RegisterCommand( "Countdown", "Create a countdown", "countdown", "countdown <seconds> <text>", 3, "Overv", 4, 1, CreateCountdown )

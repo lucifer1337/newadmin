@@ -4,7 +4,7 @@
 function God( ply, params )
 	params[1]:GodEnable()
 	params[1]:SetNetworkedBool( "Godded", true )	
-	Notify( ply:Nick() .. " has enabled godmode for " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has enabled godmode for " .. params[1]:Nick() )
 end
 RegisterCommand( "God", "Enable godmode for a player", "god", "god [name]", 1, "Overv", 2, 0, God )
 RegisterCheck( "God", 1, 3, "Player '%arg%' not found!" )
@@ -12,7 +12,7 @@ RegisterCheck( "God", 1, 3, "Player '%arg%' not found!" )
 function UnGod( ply, params )
 	params[1]:GodDisable()
 	params[1]:SetNetworkedBool( "Godded", false )
-	Notify( ply:Nick() .. " has disabled godmode for " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has disabled godmode for " .. params[1]:Nick() )
 end
 RegisterCommand( "UnGod", "Disable godmode for a player", "ungod", "ungod [name]", 1, "Overv", 2, 0, UnGod )
 RegisterCheck( "UnGod", 1, 3, "Player '%arg%' not found!" )
@@ -42,7 +42,7 @@ function SetHealth( ply, params )
 		hp = 100
 	end
 	
-	Notify( ply:Nick() .. " has set " .. params[1]:Nick() .. "'s health to " .. hp )
+	NA_Notify( ply:Nick() .. " has set " .. params[1]:Nick() .. "'s health to " .. hp )
 end
 RegisterCommand( "SetHealth", "Set health for a player", "hp", "hp [name] [amount]", 1, "Overv", 2, 0, SetHealth )
 RegisterCheck( "SetHealth", 1, 3, "Player '%arg%' not found!" )
@@ -64,7 +64,7 @@ function SetArmor( ply, params )
 		armor = 100
 	end
 	
-	Notify( ply:Nick() .. " has set " .. params[1]:Nick() .. "'s armor to " .. armor )
+	NA_Notify( ply:Nick() .. " has set " .. params[1]:Nick() .. "'s armor to " .. armor )
 end
 RegisterCommand( "SetArmor", "Set armor for a player", "armor", "armor [name] [amount]", 1, "Overv", 2, 0, SetArmor )
 RegisterCheck( "SetArmor", 1, 3, "Player '%arg%' not found!" )
@@ -73,14 +73,14 @@ AddPlayerMenu( "Armor", 2, "armor [PLAYER] 100" )
 //Unlimited ammo
 function uAmmo( ply, params )
 	params[1]:SetNetworkedBool( "uAmmo", true)
-	Notify( params[1]:Nick() .. " has been given unlimited ammo by " .. ply:Nick() )
+	NA_Notify( params[1]:Nick() .. " has been given unlimited ammo by " .. ply:Nick() )
 end
 RegisterCommand( "Unlimited Ammo", "Enables unlimited ammo for the player", "uammo", "uammo [name]", 1, "Overv", 2, 0, uAmmo )
 RegisterCheck( "Unlimited Ammo", 1, 3, "Player '%arg%' not found!" )
 
 function UnuAmmo( ply, params )
 	params[1]:SetNetworkedBool( "uAmmo", false)
-	Notify( ply:Nick() .. " has disabled unlimited ammo for " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has disabled unlimited ammo for " .. params[1]:Nick() )
 end
 RegisterCommand( "Limited Ammo", "Disables unlimited ammo for the player", "unuammo", "unuammo [name]", 1, "Overv", 2, 0, UnuAmmo )
 RegisterCheck( "Limited Ammo", 1, 3, "Player '%arg%' not found!" )
@@ -109,7 +109,7 @@ if SERVER then hook.Add("Think", "uAmmoGive", uAmmoGive) end
 
 //Set frags
 function SetFrags( ply, params )
-	Notify( ply:Nick() .. " has set " .. params[1]:Nick() .. "'s frags to " .. params[2] )
+	NA_Notify( ply:Nick() .. " has set " .. params[1]:Nick() .. "'s frags to " .. params[2] )
 	params[1]:SetFrags( params[2])
 end
 RegisterCommand( "SetFrags", "Set the frags of a player", "frags", "frags <name> <frags>", 2, "Overv", 2, 2, SetFrags )
@@ -119,7 +119,7 @@ AddPlayerMenu( "Set Frags", 2, "frags [PLAYER] 0" )
 
 //Set frags
 function SetDeaths( ply, params )
-	Notify( ply:Nick() .. " has set " .. params[1]:Nick() .. "'s deaths to " .. params[2] )
+	NA_Notify( ply:Nick() .. " has set " .. params[1]:Nick() .. "'s deaths to " .. params[2] )
 	params[1]:SetDeaths( params[2])
 end
 RegisterCommand( "SetDeaths", "Set the deaths of a player", "deaths", "deaths <name> <deaths>", 2, "Overv", 2, 2, SetDeaths )
@@ -161,7 +161,7 @@ function Ghost( ply, params )
 		v:SetColor(255, 255, 255, 0)
 	end
 	
-	Notify( ply:Nick() .. " has ghosted " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has ghosted " .. params[1]:Nick() )
 end
 RegisterCommand( "Ghost", "Turn a player into a ghost (invisible)", "ghost", "ghost [name]", 1, "Overv", 2, 0, Ghost )
 RegisterCheck( "Ghost", 1, 3, "Player '%arg%' not found!" )
@@ -178,7 +178,7 @@ function UnGhost( ply, params )
 		v:SetColor(255, 255, 255, 255)
 	end
 	
-	Notify( ply:Nick() .. " has unghosted " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has unghosted " .. params[1]:Nick() )
 end
 RegisterCommand( "UnGhost", "Turn a ghost into a player again", "unghost", "unghost [name]", 1, "Overv", 2, 0, UnGhost )
 RegisterCheck( "UnGhost", 1, 3, "Player '%arg%' not found!" )
@@ -198,7 +198,7 @@ hook.Add( "PlayerSpawn", "RestartGhost", RestartGhost )
 //Force a player to respawn
 function Spawn( ply, params )
 	params[1]:Spawn()
-	Notify( ply:Nick() .. " has respawned " .. params[1]:Nick() )
+	NA_Notify( ply:Nick() .. " has respawned " .. params[1]:Nick() )
 end
 RegisterCommand( "Spawn", "Force a player to respawn", "spawn", "spawn [name]", 1, "Overv", 2, 0, Spawn )
 RegisterCheck( "Spawn", 1, 3, "Player '%arg%' not found!" )
@@ -207,7 +207,7 @@ AddPlayerMenu( "Spawn", 2, "spawn [PLAYER]" )
 //Force a player to exit a vehicle
 function ExitVehicle( ply, params )
 	params[1]:ExitVehicle()
-	Notify( ply:Nick() .. " has kicked " .. params[1]:Nick() .. " out of his vehicle", "NOTIFY_CLEANUP" )
+	NA_Notify( ply:Nick() .. " has kicked " .. params[1]:Nick() .. " out of his vehicle", "NOTIFY_CLEANUP" )
 end
 RegisterCommand( "ExitVehicle", "Force a player to exit a vehicle", "exit", "exit [name]", 1, "Overv", 2, 0, ExitVehicle )
 RegisterCheck( "ExitVehicle", 1, 3, "Player '%arg%' not found!" )
@@ -220,7 +220,7 @@ function EnterVehicle( ply, params )
 	
 	if Ent ~= NULL and Ent:IsValid() and Ent:IsVehicle() then
 		params[1]:EnterVehicle( Ent )
-		Notify( ply:Nick() .. " has put " .. params[1]:Nick() .. " into a vehicle", "NOTIFY_UNDO" )
+		NA_Notify( ply:Nick() .. " has put " .. params[1]:Nick() .. " into a vehicle", "NOTIFY_UNDO" )
 	end
 end
 RegisterCommand( "EnterVehicle", "Force a player to enter a vehicle", "enter", "enter [name]", 1, "Overv", 2, 0, EnterVehicle )
@@ -230,7 +230,7 @@ AddPlayerMenu( "Enter Vehicle", 2, "enter [PLAYER]" )
 //Spectate a player
 function Spectate( ply, params )
 	if params[1] == ply then
-		Notify( "You can't spectate yourself!", "NOTIFY_ERROR", ply )
+		NA_Notify( "You can't spectate yourself!", "NOTIFY_ERROR", ply )
 	else
 		ply:Spectate( OBS_MODE_CHASE )
 		ply:SpectateEntity( params[1] )
