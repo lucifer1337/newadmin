@@ -9,7 +9,6 @@ AddCSLuaFile( "cl_notify.lua" )
 include( "plugin_manager.lua" )
 include( "framework.lua" )
 include( "gui_framework.lua" )
-include( "beta_manager.lua" ) //BETA FUNCTIONS
 
 //Loading message start
 EngineLoading = true
