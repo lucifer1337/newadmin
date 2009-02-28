@@ -2,6 +2,8 @@
 
 //Send notifications
 function NA_Notify( Message, Icon, Filter )
+	Message = string.Replace( Message, "\"", "'" )
+
 	for _, v in pairs(player.GetAll()) do
 		//Player passes filter or no filter?
 		if Filter == nil or v:UserID() == Filter:UserID() then
