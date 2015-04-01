@@ -1,0 +1,3 @@
+The goal of this project is to become a simple and lightweight server administration tool for Garry's Mod servers. The difference between this and most other administration tools is that there is made good use of the GUI classes Garry's Mod provides us. Also, this tool introduces a revolutionary way to  look up the users you want to apply commands to.
+
+There is no estimated release date as of yet as the whole code has been rewritten from scratch. You can pick up the old gui version from the standard svn link and the new beta version from the beta folder in /trunk/. Note that this beta version is currently chatcommand only, apart from that it works the same as the old version.
